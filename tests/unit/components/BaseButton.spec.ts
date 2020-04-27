@@ -1,5 +1,5 @@
 import { render, fireEvent } from '@testing-library/vue'
-import Component from '../BaseButton.vue'
+import Component from '@/components/BaseButton.vue'
 import { Generate } from '@/utils/testsDataGenerator'
 
 const pTagText = Generate.string()

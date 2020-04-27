@@ -1,5 +1,5 @@
 import { render, fireEvent } from '@testing-library/vue'
-import Component from '../BaseCard.vue'
+import Component from '@/components/BaseCard.vue'
 import { Generate } from '@/utils/testsDataGenerator'
 
 const pTAgTExt = Generate.string()

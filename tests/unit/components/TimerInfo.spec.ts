@@ -1,5 +1,5 @@
 import { render, fireEvent } from '@testing-library/vue'
-import Component from '../TimerInfo.vue'
+import Component from '@/components/TimerInfo.vue'
 
 const startDate = new Date(2020, 3, 1, 10, 10)
 const endDate = new Date(2020, 3, 1, 10, 30)

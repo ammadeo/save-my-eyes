@@ -1,5 +1,5 @@
 import { render, fireEvent } from '@testing-library/vue'
-import Component from '../HelpCards.vue'
+import Component from '@/components/HelpCards.vue'
 import { i18nStore } from '../../utils/testsVuexI18n'
 describe('components/HelpCards.vue', () => {
   test('on mouse hover events emit changeAutoFinishLock', async () => {

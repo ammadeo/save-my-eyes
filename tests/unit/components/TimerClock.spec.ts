@@ -1,5 +1,5 @@
 import { render, fireEvent } from '@testing-library/vue'
-import Component from '../TimerClock.vue'
+import Component from '@/components/TimerClock.vue'
 // import { Generate } from '@/utils/testsDataGenerator'
 
 const startDate = new Date(2020, 3, 1, 10, 10)

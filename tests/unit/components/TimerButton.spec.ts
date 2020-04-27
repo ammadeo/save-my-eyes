@@ -1,5 +1,5 @@
 import { render, fireEvent } from '@testing-library/vue'
-import Component from '../TimerButton.vue'
+import Component from '@/components/TimerButton.vue'
 
 const contentOptions = {
   long: {

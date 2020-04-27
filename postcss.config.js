@@ -4,7 +4,8 @@ module.exports = {
   plugins: {
     tailwindcss: {},
     'vue-cli-plugin-tailwind/purgecss': {
-      whitelist
+      whitelist,
+      css: ['src/assets/css/main.css']
     }
   }
 }
