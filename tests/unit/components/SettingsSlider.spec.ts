@@ -11,7 +11,7 @@ const props = {
   step: 1,
   suffix: Generate.string('suffix'),
   name: Generate.string('name'),
-  additionalValidator: jest.fn(),
+  additionalValidator: jest.fn()
 }
 
 const thumbText = (
@@ -22,12 +22,12 @@ const thumbText = (
 
 const thumbStyle = (percentage) => ({
   left: `${percentage}%`,
-  transform: `translate(-${percentage}%)`,
+  transform: `translate(-${percentage}%)`
 })
 describe('components/SettingsSlider.vue', () => {
   test('has scaled value with suffix ', async () => {
     const { getByText } = render(Component, {
-      props,
+      props
     })
 
     const span = getByText(thumbText())
@@ -40,8 +40,8 @@ describe('components/SettingsSlider.vue', () => {
       const { getByText } = render(Component, {
         props: {
           ...props,
-          value: props.min * props.scale,
-        },
+          value: props.min * props.scale
+        }
       })
       const ThumbSpan = getByText(thumbText(props.min * props.scale))
       expect(ThumbSpan).toBeVisible()
@@ -53,8 +53,8 @@ describe('components/SettingsSlider.vue', () => {
       const { getByText } = render(Component, {
         props: {
           ...props,
-          value: props.center * props.scale,
-        },
+          value: props.center * props.scale
+        }
       })
       const ThumbSpan = getByText(thumbText(props.center * props.scale))
       expect(ThumbSpan).toBeVisible()
@@ -67,8 +67,8 @@ describe('components/SettingsSlider.vue', () => {
       const { getByText } = render(Component, {
         props: {
           ...props,
-          value: (props.center + 1) * props.scale,
-        },
+          value: (props.center + 1) * props.scale
+        }
       })
       const ThumbSpan = getByText(thumbText((props.center + 1) * props.scale))
       expect(ThumbSpan).toBeVisible()
@@ -82,8 +82,8 @@ describe('components/SettingsSlider.vue', () => {
       const { getByText } = render(Component, {
         props: {
           ...props,
-          value: props.max * props.scale,
-        },
+          value: props.max * props.scale
+        }
       })
       const ThumbSpan = getByText(thumbText(props.max * props.scale))
       expect(ThumbSpan).toBeVisible()

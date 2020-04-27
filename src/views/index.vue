@@ -46,7 +46,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import TimerInfo from '../components/TimerInfo.vue'
 import TimerButton from '../components/TimerButton.vue'
 import TimerClock from '../components/TimerClock.vue'
@@ -62,7 +62,8 @@ import { addSeconds } from 'date-fns'
 import { getUserSettingsStore } from '../../main/helpers/db'
 import { play } from '../utils/sound'
 
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   components: {
     TimerInfo,
     TimerButton,
@@ -70,14 +71,14 @@ export default {
     HelpInfo,
     HelpCards,
     SettingsCard,
-    HeaderTitle,
+    HeaderTitle
   },
   async fetch() {
     await this.setup()
   },
   asyncData({ req }) {
     return {
-      name: process.static ? 'static' : process.server ? 'server' : 'client',
+      name: process.static ? 'static' : process.server ? 'server' : 'client'
     }
   },
   data() {
@@ -87,7 +88,7 @@ export default {
       long: false,
       finished: false,
       autoFinishLock: false,
-      closing: false,
+      closing: false
     }
   },
   fetchOnServer: false,
@@ -110,7 +111,7 @@ export default {
       target.scroll({
         top: 0,
         left: 0,
-        behavior: 'auto',
+        behavior: 'auto'
       })
     },
     async getBreakIndex() {
@@ -171,7 +172,7 @@ export default {
       this.closing = true
       this.setNextBreak(forceNextBreakIn)
       this.closeWindow()
-    },
-  },
-}
+    }
+  }
+})
 </script>

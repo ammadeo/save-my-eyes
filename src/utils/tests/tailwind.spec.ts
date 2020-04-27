@@ -14,7 +14,7 @@ describe('utils/config/tailwind.js', () => {
       'bg-secondary-light-50',
       'bg-secondary-light-100',
       'bg-secondary-50',
-      'bg-secondary-100',
+      'bg-secondary-100'
     ]
     const generatedClasses = new Classes('bg')
       .setArg('secondary', 'light')

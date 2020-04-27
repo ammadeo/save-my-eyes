@@ -4,28 +4,29 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import SettingsCard from '../components/SettingsCard.vue'
 import { ipcRenderer } from 'electron'
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   components: {
-    SettingsCard,
+    SettingsCard
   },
   asyncData({ req }) {
     return {
-      name: process.static ? 'static' : process.server ? 'server' : 'client',
+      name: process.static ? 'static' : process.server ? 'server' : 'client'
     }
   },
   data() {
     return {
       startDate: new Date(2020, 3, 1, 10, 10),
-      endDate: new Date(2020, 3, 1, 10, 11),
+      endDate: new Date(2020, 3, 1, 10, 11)
     }
   },
   mounted() {
     ipcRenderer.on('console', (data) =>
       console.log('log from background', data)
     )
-  },
-}
+  }
+})
 </script>

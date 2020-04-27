@@ -14,44 +14,44 @@ jest.mock('electron-better-ipc', () => ({
       if (channel === 'break-count') {
         return 1
       }
-    },
-  },
+    }
+  }
 }))
 
 jest.mock('electron', () => ({
   remote: {
     getCurrentWindow: () => ({
-      close: jest.fn(),
-    }),
-  },
+      close: jest.fn()
+    })
+  }
 }))
 
 const mockSettings = {
   breaks: {
     every: 15 * 60,
     short: {
-      last: 30,
+      last: 30
     },
     long: {
       last: 5 * 60,
-      every: 3,
-    },
+      every: 3
+    }
   },
   sounds: {
     ui: true,
-    voice: true,
-  },
+    voice: true
+  }
 }
 
 jest.mock('../../../main/helpers/db')
 getUserSettingsStore.mockImplementation(() => ({
-  get: (id) => mockSettings[id],
+  get: (id) => mockSettings[id]
 }))
 const mocks = {
   $fetchState: {
     pending: false,
-    error: false,
-  },
+    error: false
+  }
 }
 const methods = {
   close() {
@@ -59,7 +59,7 @@ const methods = {
     this.setNextBreak()
     this.hideWindow()
   },
-  finish: jest.fn(),
+  finish: jest.fn()
 }
 
 describe('pages/index.vue', () => {

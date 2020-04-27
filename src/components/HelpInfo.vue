@@ -4,15 +4,16 @@
   </p>
 </template>
 
-<script>
+<script lang="ts">
 import { Lang } from '../utils/mixins/i18n'
 import { mapState } from 'vuex'
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   mixins: [Lang],
   computed: mapState({
     title({ i18n }) {
       return i18n.ideas.title[this.lang]
-    },
-  }),
-}
+    }
+  })
+})
 </script>

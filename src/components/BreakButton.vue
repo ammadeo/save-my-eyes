@@ -7,22 +7,23 @@
   >
 </template>
 
-<script>
+<script lang="ts">
 import BaseButton from './BaseButton.vue'
 
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   components: {
-    BaseButton,
+    BaseButton
   },
   props: {
     long: {
       type: Boolean,
-      default: false,
+      default: false
     },
     finished: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   computed: {
     content() {
@@ -31,7 +32,7 @@ export default {
         else return 'Skip a long break'
       if (this.finished) return 'Finish a short break'
       return 'Skip for 5 minutes'
-    },
-  },
-}
+    }
+  }
+})
 </script>

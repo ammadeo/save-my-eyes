@@ -11,7 +11,7 @@ const baseWindowSettings = {
   frame: !isProd,
   autoHideMenuBar: true,
   devTools: true, //!isProd,
-  webSecurity: false, //isProd,
+  webSecurity: false //isProd,
 }
 
 export const createWindowIndex = async () => {
@@ -20,7 +20,7 @@ export const createWindowIndex = async () => {
       width: 1000,
       height: 600,
       fullscreen: isProd,
-      ...baseWindowSettings,
+      ...baseWindowSettings
     })
     windowIndex.on('close', () => {
       windowIndex = undefined
@@ -41,7 +41,7 @@ export const createWindowTray = async () => {
     windowTray = createWindow({
       width: 600,
       height: 300,
-      ...baseWindowSettings,
+      ...baseWindowSettings
     })
     windowTray.on('close', () => {
       windowTray = undefined
@@ -110,8 +110,8 @@ const createWindow = (options) => {
     ...options,
     // ...state,
     webPreferences: {
-      nodeIntegration: true,
-    },
+      nodeIntegration: true
+    }
   })
 
   return win

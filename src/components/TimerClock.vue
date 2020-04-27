@@ -31,33 +31,34 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import anime from 'animejs'
 import { format, addMilliseconds } from 'date-fns'
 import BaseTile from './BaseTile.vue'
 import {
   AutoBorderClasses,
-  AutoColorClasses,
+  AutoColorClasses
 } from '../utils/mixins/autoClasses'
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   components: {
-    BaseTile,
+    BaseTile
   },
   mixins: [AutoBorderClasses, AutoColorClasses],
   props: {
     startDate: {
       required: true,
-      type: Date,
+      type: Date
     },
     endDate: {
       required: true,
-      type: Date,
-    },
+      type: Date
+    }
   },
   data() {
     return {
       anime: undefined,
-      timePassedObj: { timePassed: 0 },
+      timePassedObj: { timePassed: 0 }
     }
   },
   computed: {
@@ -82,7 +83,7 @@ export default {
     },
     timeLeftPercent() {
       return (this.timeLeft / this.allTime) * 100
-    },
+    }
   },
   mounted() {
     const allTime = this.allTime
@@ -100,12 +101,12 @@ export default {
         duration: allTime,
         easing: 'linear',
         round: 10,
-        complete: completeHandler,
+        complete: completeHandler
       })
-    },
+    }
   },
   unmount() {
     this.anime.stop()
-  },
-}
+  }
+})
 </script>

@@ -6,7 +6,7 @@ const endDate = new Date(2020, 3, 1, 10, 30)
 
 const contentOptions = {
   long: 'Take a long break for 20 minutes',
-  short: 'Take a short break for 20 minutes',
+  short: 'Take a short break for 20 minutes'
 }
 
 describe('components/TimerInfo.vue', () => {
@@ -14,14 +14,14 @@ describe('components/TimerInfo.vue', () => {
     const { getByText, updateProps } = render(Component, {
       props: {
         startDate,
-        endDate,
-      },
+        endDate
+      }
     })
     //? short break
     expect(getByText(contentOptions.short)).toBeVisible()
     //? long break
     await updateProps({
-      long: true,
+      long: true
     })
     expect(getByText(contentOptions.long)).toBeVisible()
   })

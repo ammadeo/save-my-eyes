@@ -6,7 +6,7 @@
       :class="[
         ...autoColorClasses(...autoColorSplit(color)),
         ...autoBorderClasses(6),
-        ...autoFocusWithinCardClasses(focused),
+        ...autoFocusWithinCardClasses(focused)
       ]"
       tabindex="0"
       @mouseleave="focusOut()"
@@ -17,23 +17,24 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import {
   AutoBorderClasses,
   AutoColorClasses,
-  AutoFocusWithinCardClasses,
+  AutoFocusWithinCardClasses
 } from '../utils/mixins/autoClasses'
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   mixins: [AutoBorderClasses, AutoColorClasses, AutoFocusWithinCardClasses],
   props: {
     color: {
       type: String,
-      default: 'secondary-800',
-    },
+      default: 'secondary-800'
+    }
   },
   data() {
     return {
-      focused: false,
+      focused: false
     }
   },
   mounted() {
@@ -58,7 +59,7 @@ export default {
       card.scrollTop = 0
       this.focused = false
       this.$emit('focusout')
-    },
-  },
-}
+    }
+  }
+})
 </script>

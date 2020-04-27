@@ -4,28 +4,29 @@
   </p>
 </template>
 
-<script>
+<script lang="ts">
 import { formatDistanceStrict } from 'date-fns'
 
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   props: {
     startDate: {
       required: true,
-      type: Date,
+      type: Date
     },
     endDate: {
       required: true,
-      type: Date,
+      type: Date
     },
     long: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   computed: {
     breakTime() {
       return formatDistanceStrict(this.startDate, this.endDate, {
-        roundingMethod: 'floor',
+        roundingMethod: 'floor'
       })
     },
     breakType() {
@@ -34,7 +35,7 @@ export default {
     },
     breakInfo() {
       return `Take a ${this.breakType} for ${this.breakTime}`
-    },
-  },
-}
+    }
+  }
+})
 </script>

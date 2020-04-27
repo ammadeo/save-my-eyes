@@ -4,12 +4,12 @@ import Component from '../TimerButton.vue'
 const contentOptions = {
   long: {
     default: 'Skip a long break',
-    finished: 'Finish a long break',
+    finished: 'Finish a long break'
   },
   short: {
     default: 'Skip for 5 minutes',
-    finished: 'Finish a short break',
-  },
+    finished: 'Finish a short break'
+  }
 }
 
 describe('components/TimerButton.vue', () => {
@@ -27,19 +27,19 @@ describe('components/TimerButton.vue', () => {
     //? short finished
     await updateProps({
       long: false,
-      finished: true,
+      finished: true
     })
     expect(getByText(contentOptions.short.finished)).toBeVisible()
     //? long default
     await updateProps({
       long: true,
-      finished: false,
+      finished: false
     })
     expect(getByText(contentOptions.long.default)).toBeVisible()
     //? long finished
     await updateProps({
       long: true,
-      finished: true,
+      finished: true
     })
     expect(getByText(contentOptions.long.finished)).toBeVisible()
   })

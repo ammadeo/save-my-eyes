@@ -23,29 +23,30 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import BaseCard from './BaseCard.vue'
 
 import {
   AutoBorderClasses,
-  AutoColorClasses,
+  AutoColorClasses
 } from '../utils/mixins/autoClasses'
 import { Lang } from '../utils/mixins/i18n'
 import { mapState } from 'vuex'
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   components: {
-    BaseCard,
+    BaseCard
   },
   mixins: [AutoBorderClasses, AutoColorClasses, Lang],
   computed: mapState({
     cards({ i18n }) {
       return i18n.ideas.cards
-    },
+    }
   }),
   methods: {
     emitChangeAutoFinishLock(isAutoLock) {
       this.$emit('changeAutoFinishLock', isAutoLock)
-    },
-  },
-}
+    }
+  }
+})
 </script>

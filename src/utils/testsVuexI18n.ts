@@ -8,7 +8,7 @@ export const i18nStore = new vuex.Store({
   modules: {
     i18n: {
       state,
-      mutations,
-    },
-  },
+      mutations
+    }
+  }
 })

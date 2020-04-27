@@ -46,55 +46,56 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import BaseTile from './BaseTile.vue'
 
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   components: { BaseTile },
   props: {
     value: {
       type: Number,
-      required: true,
+      required: true
     },
     max: {
       type: Number,
-      required: true,
+      required: true
     },
     center: {
       type: Number,
-      required: true,
+      required: true
     },
     min: {
       type: Number,
-      required: true,
+      required: true
     },
     scale: {
       type: Number,
-      default: 1,
+      default: 1
     },
     step: {
       type: Number,
-      default: 1,
+      default: 1
     },
     additionalValidator: {
       type: Function,
-      default: () => true,
+      default: () => true
     },
     suffix: {
       type: String,
-      default: '',
+      default: ''
     },
     name: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
   data() {
     return {
       thumbPosition: { left: '50%', transform: `translate(-50%)` },
       inputFocus: false,
       warning: '',
-      mouseDownTabFocusProtected: false,
+      mouseDownTabFocusProtected: false
     }
   },
   computed: {
@@ -103,7 +104,7 @@ export default {
     },
     inputLength() {
       return this.floorValue.toString().length
-    },
+    }
   },
   watch: {
     value() {
@@ -111,7 +112,7 @@ export default {
     },
     scale() {
       this.setThumbPosition()
-    },
+    }
   },
   beforeMount() {
     this.setThumbPosition()
@@ -165,7 +166,7 @@ export default {
 
       this.thumbPosition = {
         left: `${percentage}%`,
-        transform: `translate(-${percentage}%)`,
+        transform: `translate(-${percentage}%)`
       }
     },
     async focusOnInput(allow) {
@@ -207,7 +208,7 @@ export default {
         return (this.warning = customValidatorResult)
       this.$emit('input', value * scale)
       this.warning = ''
-    },
-  },
-}
+    }
+  }
+})
 </script>

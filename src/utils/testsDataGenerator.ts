@@ -15,5 +15,5 @@ export const Generate = {
       array[u] = Generate[withType]()
     }
     return array
-  },
+  }
 }

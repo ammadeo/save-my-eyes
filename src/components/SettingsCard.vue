@@ -45,9 +45,8 @@
         (value) =>
           value % (every / 60) === 0
             ? true
-            : `You have to set value that can be devided to ${
-                every / 60
-              } min. parts`
+            : `You have to set value that can be devided to ${every /
+                60} min. parts`
       "
       class="mb-2"
       suffix="min."
@@ -83,30 +82,31 @@
   </BaseCard>
 </template>
 
-<script>
+<script lang="ts">
 import BaseCard from './BaseCard.vue'
 import SettingsSlider from './SettingsSlider.vue'
 import settingsImg from '../assets/images/settings.svg'
 import { getUserSettingsStore } from '../../main/helpers/db'
-export default {
+import Vue from 'vue'
+export default Vue.extend({
   components: {
     BaseCard,
-    SettingsSlider,
+    SettingsSlider
   },
   data() {
     return {
       img: {
         src: settingsImg,
-        alt: '',
+        alt: ''
       },
       every: 15 * 60,
       short: {
-        last: 30,
+        last: 30
       },
       long: {
         last: 5 * 60,
-        every: 3,
-      },
+        every: 3
+      }
     }
   },
   beforeMount() {
@@ -132,14 +132,14 @@ export default {
         breaks: {
           every,
           short,
-          long,
+          long
         },
         sounds: {
           ui: true,
-          voice: true,
-        },
+          voice: true
+        }
       })
-    },
-  },
-}
+    }
+  }
+})
 </script>
