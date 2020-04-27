@@ -1,0 +1,42 @@
+.after\:elevation {
+  @apply relative;
+  z-index: 1;
+  
+  &::after{
+    content: "";
+    z-index: -1;
+    @apply absolute w-full h-full rounded-inherit inset-0 transition-transform duration-100 transform translate-x-1 translate-y-1 shadow-inner;
+  }
+  /* &:hover, &:focus {
+    &::after {
+      @apply translate-x-px translate-y-px
+    }
+  } */
+  &:active::after {
+    @apply translate-x-px translate-y-px
+  }
+  
+}
+.after\:elevation-primary {
+      &::after {
+        @apply bg-primary-600
+      }
+  
+      &:hover, &:focus {
+      &::after {
+        @apply bg-primary-700
+      }
+    } 
+    }
+  
+  .after\:elevation-secondary {
+      &::after {
+        @apply bg-secondary-800
+      }
+      &:hover, &:focus {
+      &::after {
+        @apply bg-secondary-900
+      }
+    } 
+    }
+
