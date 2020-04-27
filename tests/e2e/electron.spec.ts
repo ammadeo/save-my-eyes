@@ -1,9 +1,10 @@
-const { testWithSpectron } = require("vue-cli-plugin-electron-builder");
+import { testWithSpectron } from "vue-cli-plugin-electron-builder";
+import spectron from "spectron"
 jest.setTimeout(2 * 60 * 1000);
 
 test("Window Loads Properly", async () => {
   // Wait for dev server to start
-  const { app, stopServe } = await testWithSpectron();
+  const { app, stopServe } = await testWithSpectron(spectron);
   const win = app.browserWindow;
   const client = app.client;
 
