@@ -20,18 +20,10 @@
         ></BaseTile>
       </div>
     </template>
-    <template v-else>
-      <!-- // todo add animation to show it on largew delay about 1 minute -->
-      <p
-        class="font-display flex-grow-0 flex-shrink-0 font-bold text-secondary-100 leading-none px-4 m-2 text-xl"
-      >
-        {{ breakOverdueInfo }}
-      </p>
-    </template>
   </div>
 </template>
 
-<script lang="js">
+<script lang="ts">
 import anime from 'animejs'
 import { format, addMilliseconds } from 'date-fns'
 import BaseTile from './BaseTile.vue'
@@ -59,29 +51,26 @@ export default mixins(AutoBorderClasses, AutoColorClasses).extend({
     return {
       anime: undefined,
       timePassedObj: { timePassed: 0 }
+    } as {
+      anime?: anime.AnimeInstance
+      timePassedObj: { timePassed: number }
     }
   },
   computed: {
-    allTime() {
-      return this.endDate.getTime() - this.startDate.getTime()
+    allTime(): number {
+      const endDate = (this.endDate as unknown) as Date
+      const startDate = (this.startDate as unknown) as Date
+      return endDate.getTime() - startDate.getTime()
     },
-    timeLeft() {
+    timeLeft(): number {
       return this.allTime - this.timePassedObj.timePassed
     },
-    timeLeftInfo() {
+    timeLeftInfo(): string {
       const timeLeft = this.timeLeft
       const helperDate = addMilliseconds(new Date(0), timeLeft)
       return format(helperDate, 'mm : ss')
     },
-    breakOverdueInfo() {
-      const timeLeft = this.timeLeft
-      const helperDate = addMilliseconds(new Date(0), timeLeft)
-      return format(
-        helperDate,
-        "'Youre break have endded 'm ' minutes and ' s' seconds ago'"
-      )
-    },
-    timeLeftPercent() {
+    timeLeftPercent(): number {
       return (this.timeLeft / this.allTime) * 100
     }
   },
@@ -92,7 +81,7 @@ export default mixins(AutoBorderClasses, AutoColorClasses).extend({
     })
   },
   methods: {
-    createTimer(allTime, completeHandler) {
+    createTimer(allTime: number, completeHandler: () => void) {
       const timePassedObj = this.timePassedObj
       return anime({
         targets: timePassedObj,
@@ -105,8 +94,9 @@ export default mixins(AutoBorderClasses, AutoColorClasses).extend({
       })
     }
   },
-  unmount() {
-    this.anime.stop()
+  beforeDestroy() {
+    const anime = this.anime
+    if (anime) anime.pause()
   }
 })
 </script>
