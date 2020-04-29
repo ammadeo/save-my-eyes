@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Index from '../views/Index.vue'
-import Tray from '../views/Tray.vue'
+import Menu from '../views/Menu.vue'
 
 Vue.use(VueRouter)
 
@@ -12,9 +12,9 @@ const routes: Array<RouteConfig> = [
     component: Index
   },
   {
-    path: '/tray',
-    name: 'Tray',
-    component: Tray
+    path: '/menu',
+    name: 'Menu',
+    component: Menu
   }
 ]
 

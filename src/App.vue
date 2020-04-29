@@ -1,7 +1,5 @@
 <template>
-  <div class="font-body bg-secondary-600 h-screen flex flex-col">
-    <router-view />
-  </div>
+  <router-view />
 </template>
 
 <script lang="ts">

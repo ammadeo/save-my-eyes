@@ -1,6 +1,6 @@
 <template>
   <div class="flex w-full">
-    <BaseCard
+    <CardAbsolute
       v-for="({ title, img, content, link }, index) in cards"
       :key="'card' + index"
       color="secondary-500"
@@ -19,12 +19,12 @@
         {{ title[$lang] }}
       </h3>
       <p class="mx-2 mb-4 text-lg text-secondary-100">{{ content[$lang] }}</p>
-    </BaseCard>
+    </CardAbsolute>
   </div>
 </template>
 
 <script lang="ts">
-import BaseCard from './BaseCard.vue'
+import CardAbsolute from './CardAbsolute.vue'
 
 import {
   AutoBorderClasses,
@@ -36,7 +36,7 @@ import mixins from 'vue-typed-mixins'
 
 export default mixins(AutoBorderClasses, AutoColorClasses, Store).extend({
   components: {
-    BaseCard
+    CardAbsolute
   },
   computed: mapState({
     cards({ i18n }) {

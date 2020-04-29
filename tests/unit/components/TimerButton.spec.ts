@@ -1,5 +1,5 @@
 import { render, fireEvent } from '@testing-library/vue'
-import Component from '@/components/TimerButton.vue'
+import Component from '@/components/ButtonTimer.vue'
 
 const contentOptions = {
   long: {
@@ -12,7 +12,7 @@ const contentOptions = {
   }
 }
 
-describe('components/TimerButton.vue', () => {
+describe('components/ButtonTimer.vue', () => {
   test('on click emit click', async () => {
     const { getByText, emitted } = render(Component)
     const button = getByText(contentOptions.short.default)

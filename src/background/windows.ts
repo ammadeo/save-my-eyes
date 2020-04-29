@@ -16,6 +16,8 @@ const baseWindowSettings = {
   webSecurity: isProd,
 }
 
+const getPrimaryDisplay = () => screen.getPrimaryDisplay().workAreaSize
+
 function createWindow(
   window: undefined | BrowserWindow,
   url: string,
@@ -34,7 +36,8 @@ function createWindow(
 
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       // Load the url of the dev server if in development mode
-      window.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
+      const path = process.env.WEBPACK_DEV_SERVER_URL as string + url
+      window.loadURL(path)
       if (!process.env.IS_TEST) window.webContents.openDevTools()
     } else {
       createProtocol('app')
@@ -50,7 +53,8 @@ function createWindow(
 }
 
 export const createWindowIndex = async () => {
-  createWindow(windowIndex, '-', {
+  const url = isProdBuild ? '-' : ''
+  createWindow(windowIndex, url, {
     width: 1000,
     height: 600,
     fullscreen: isProd,
@@ -59,10 +63,20 @@ export const createWindowIndex = async () => {
 }
 
 export const createWindowTray = async () => {
-  createWindow(windowTray, 'tray', {
-    width: 600,
-    height: 300,
-    ...baseWindowSettings
+  const url = isProdBuild ? './menu' : '/#/menu'
+  const width = 600
+  const {height: screenHeight, width: screenWidth} = getPrimaryDisplay();
+  const x = screenWidth - width
+
+
+  createWindow(windowTray, url, {
+    width,
+    height: screenHeight,
+    y: 0,
+    x,
+    transparent: true,
+    frame: false,
+    ...baseWindowSettings,
   })
 }
 

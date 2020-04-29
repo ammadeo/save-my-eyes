@@ -5,7 +5,7 @@ describe('components/HelpCards.vue', () => {
   test('on mouse hover events emit changeAutoFinishLock', async () => {
     const { getAllByTestId, emitted } = render(Component, { store })
     const Tested = getAllByTestId('help-card')[0]
-    //? BaseCard has smart sizing parent
+    //? CardAbsolute has smart sizing parent
     const actualCard = Tested.firstElementChild
 
     if (!actualCard) throw Error('no card found')

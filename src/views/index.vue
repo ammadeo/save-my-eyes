@@ -1,7 +1,7 @@
 <template>
   <div
     v-show="!closing"
-    class="grid grid-cols-base grid-rows-base pt-8 lg:pt-12 xlg:pt-16 mx-8 lg:mx-12 xlg:mx-16 flex-grow overflow-hidden"
+    class="font-body bg-secondary-600 h-screen grid grid-cols-base grid-rows-base pt-8 lg:pt-12 xlg:pt-16  px-8 lg: px-12 xlg: px-16 flex-grow overflow-hidden"
     @scroll="scroolTop($event.target)"
   >
     <HeaderTitle class="col-span-3" />
@@ -25,7 +25,7 @@
         @finished="finish"
       />
 
-      <TimerButton
+      <ButtonTimer
         class="row-start-3"
         :class="[
           ...(finished ? ['col-start-1', 'col-end-4'] : ['col-start-3'])
@@ -40,8 +40,9 @@
       class="col-start-1 row-start-5"
       @changeAutoFinishLock="setAutoFinishLock($event)"
     />
-    <SettingsCard
+    <SettingsContent
       v-if="ready"
+      absolute
       class="col-start-3 row-start-5"
       @changeAutoFinishLock="setAutoFinishLock($event)"
     />
@@ -50,11 +51,11 @@
 
 <script lang="ts">
 import TimerInfo from '../components/TimerInfo.vue'
-import TimerButton from '../components/TimerButton.vue'
+import ButtonTimer from '../components/ButtonTimer.vue'
 import TimerClock from '../components/TimerClock.vue'
 import HelpInfo from '../components/HelpInfo.vue'
 import HelpCards from '../components/HelpCards.vue'
-import SettingsCard from '../components/SettingsCard.vue'
+import SettingsContent from '../components/SettingsContent.vue'
 import HeaderTitle from '../components/HeaderTitle.vue'
 import { remote } from 'electron'
 import {
@@ -70,11 +71,11 @@ import Vue from 'vue'
 export default Vue.extend({
   components: {
     TimerInfo,
-    TimerButton,
+    ButtonTimer,
     TimerClock,
     HelpInfo,
     HelpCards,
-    SettingsCard,
+    SettingsContent,
     HeaderTitle
   },
   data() {
