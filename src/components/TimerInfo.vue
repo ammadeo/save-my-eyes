@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { formatDistanceStrict } from 'date-fns'
+import { formatDistanceStrict, differenceInMinutes } from 'date-fns'
 
 import Vue from 'vue'
 export default Vue.extend({
@@ -21,6 +21,51 @@ export default Vue.extend({
     long: {
       type: Boolean,
       default: false
+    },
+    finished: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      timeAfterInterval: undefined,
+      timeAfterBreakInfo: ''
+    } as {
+      timeAfterInterval?: NodeJS.Timeout
+      timeAfterBreakInfo: string
+    }
+  },
+  watch: {
+    finished: {
+      handler(val) {
+        if (val === true) {
+          this.timeAfterInterval = setInterval(() => {
+            this.timeAfterBreakInfo = this.timeAfterBreak()
+          }, 60 * 1000)
+        }
+      }
+    }
+  },
+  beforeDestroy() {
+    const timeAfterInterval = this.timeAfterInterval
+    if (timeAfterInterval) clearInterval(timeAfterInterval)
+  },
+  methods: {
+    timeAfterBreak(): string {
+      const endDate = this.endDate
+      const nowDate = new Date()
+      if (differenceInMinutes(nowDate, endDate) >= 1) {
+        const formatedDistance = formatDistanceStrict(
+          new Date(),
+          this.endDate,
+          {
+            roundingMethod: 'floor'
+          }
+        )
+        return `${formatedDistance} ago`
+      }
+      return ''
     }
   },
   computed: {
@@ -33,8 +78,13 @@ export default Vue.extend({
       const type = this.long ? 'long' : 'short'
       return `${type} break`
     },
+
     breakInfo(): string {
-      return `Take a ${this.breakType} for ${this.breakTime}`
+      if (this.finished) {
+        return `${this.breakType} has ended ${this.timeAfterBreakInfo}`
+      }
+
+      return `take a ${this.breakType} for ${this.breakTime}`
     }
   }
 })
