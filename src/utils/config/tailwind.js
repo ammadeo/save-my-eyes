@@ -27,7 +27,7 @@ const generateClass = (base, args, prefixes) => {
   return prefix + base + arg
 }
 
-export class Classes {
+class Classes {
   constructor(base) {
     this.base = base
     this.classes = []
@@ -59,12 +59,14 @@ export class Classes {
   }
 }
 
+exports.Classes = Classes
+
 const helpAutoBorderClasses = (elevation) => [
   ['r', elevation],
   ['b', elevation]
 ]
 
-export const whitelist = [
+exports.whitelist = [
   'body',
   'html',
   'overflow-y-auto',
