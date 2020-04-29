@@ -3,7 +3,7 @@
     :primary="finished"
     class="flex-0 self-start min-h-12"
     @click="$emit('click')"
-    ><p class="py-2 px-4 font-display">{{ content }}</p></BaseButton
+    ><p class="py-2 px-4 font-display text-lg">{{ content }}</p></BaseButton
   >
 </template>
 

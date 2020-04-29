@@ -14,8 +14,10 @@
         :long="long"
         :start-date="startDate"
         :end-date="endDate"
+        :finished="finished"
       />
       <TimerClock
+        v-show="!finished"
         class="col-span-1 row-start-3"
         :long="long"
         :start-date="startDate"
@@ -24,7 +26,10 @@
       />
 
       <TimerButton
-        class="col-start-3 row-start-3"
+        class="row-start-3"
+        :class="[
+          ...(finished ? ['col-start-1', 'col-end-4'] : ['col-start-3'])
+        ]"
         :long="long"
         :finished="finished"
         @click="finishForce()"

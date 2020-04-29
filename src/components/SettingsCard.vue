@@ -128,6 +128,7 @@ export default Vue.extend({
       this.$emit('changeAutoFinishLock', false)
     },
     setStore() {
+      // todo implement setStore only if any value has changed
       const { every, short, long } = this
       getUserSettingsStore().set({
         breaks: {
