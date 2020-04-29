@@ -1,7 +1,23 @@
-// import { app, remote } from 'electron'
-// import { join } from 'path'
-// import { writeFileSync, readFileSync } from 'fs'
-import * as Store from 'electron-store'
+import Store from 'electron-store'
+
+interface TypedStore {
+  breaks: {
+    every: number
+    short: {
+      last: number
+    }
+    long: {
+      last: number
+      every: number
+    }
+  }
+
+  sounds: {
+    ui: boolean
+    voice: boolean
+  }
+  lang: string
+}
 
 const userSettingsSchema = {
   breaks: {
@@ -66,14 +82,14 @@ const userSettingsDefaults = {
     ui: true,
     voice: true
   },
-  lang: ''
+  lang: '',
 }
 
 const userSettings = 'user-settings'
 
 export const getUserSettingsStore = () =>
-  new Store({
-    schema: userSettingsSchema,
+  new Store<TypedStore>({
+    schema: userSettingsSchema as Store.Schema,
     defaults: userSettingsDefaults,
     name: userSettings
   })

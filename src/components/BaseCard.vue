@@ -23,9 +23,13 @@ import {
   AutoColorClasses,
   AutoFocusWithinCardClasses
 } from '../utils/mixins/autoClasses'
-import Vue from 'vue'
-export default Vue.extend({
-  mixins: [AutoBorderClasses, AutoColorClasses, AutoFocusWithinCardClasses],
+import mixins from 'vue-typed-mixins'
+
+export default mixins(
+  AutoBorderClasses,
+  AutoColorClasses,
+  AutoFocusWithinCardClasses
+).extend({
   props: {
     color: {
       type: String,
@@ -38,12 +42,12 @@ export default Vue.extend({
     }
   },
   mounted() {
-    const card = this.$refs.card
+    const card = this.$refs.card as HTMLDivElement
     card.addEventListener('focusin', this.focusIn)
     card.addEventListener('focusout', this.focusOut)
   },
   beforeDestroy() {
-    const card = this.$refs.card
+    const card = this.$refs.card as HTMLDivElement
     card.removeEventListener('focusin', this.focusIn)
     card.removeEventListener('focusout', this.focusOut)
   },
@@ -55,7 +59,7 @@ export default Vue.extend({
     },
     focusOut() {
       // console.log('focusOut')
-      const card = this.$refs.card
+      const card = this.$refs.card as HTMLDivElement
       card.scrollTop = 0
       this.focused = false
       this.$emit('focusout')

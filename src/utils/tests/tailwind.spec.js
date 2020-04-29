@@ -1,4 +1,4 @@
-import { whitelist, Classes } from '../config/tailwind'
+import { whitelist, Classes } from '@/utils/config/tailwind.js'
 describe('utils/config/tailwind.js', () => {
   test('Classes can generate correct classes with prefix and arg', () => {
     const expectedClasses = ['hover:bg-secondary-50', 'hover:bg-secondary-100']

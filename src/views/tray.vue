@@ -12,21 +12,11 @@ export default Vue.extend({
   components: {
     SettingsCard
   },
-  asyncData({ req }) {
-    return {
-      name: process.static ? 'static' : process.server ? 'server' : 'client'
-    }
-  },
   data() {
     return {
       startDate: new Date(2020, 3, 1, 10, 10),
       endDate: new Date(2020, 3, 1, 10, 11)
     }
-  },
-  mounted() {
-    ipcRenderer.on('console', (data) =>
-      console.log('log from background', data)
-    )
   }
 })
 </script>

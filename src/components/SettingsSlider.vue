@@ -20,7 +20,7 @@
           @mousedown="mouseDownTabFocusProtected = true"
           @mouseup="mouseDownTabFocusProtected = false"
         >
-          <!-- // ! fix scale issue 
+          <!-- // ! fix scale issue
         // ? maybe change it to be multiplayer not divider  -->
           <input
             v-if="inputFocus"
@@ -49,7 +49,7 @@
 <script lang="ts">
 import BaseTile from './BaseTile.vue'
 
-import Vue from 'vue'
+import Vue, { PropType } from 'vue'
 export default Vue.extend({
   components: { BaseTile },
   props: {
@@ -78,8 +78,8 @@ export default Vue.extend({
       default: 1
     },
     additionalValidator: {
-      type: Function,
-      default: () => true
+      type: Function as PropType<(value: number) => boolean>,
+      default: () => () => true
     },
     suffix: {
       type: String,
@@ -99,10 +99,10 @@ export default Vue.extend({
     }
   },
   computed: {
-    floorValue() {
+    floorValue(): number {
       return Math.floor(this.value / this.scale)
     },
-    inputLength() {
+    inputLength(): number {
       return this.floorValue.toString().length
     }
   },
@@ -119,7 +119,8 @@ export default Vue.extend({
   },
   methods: {
     emitChange() {
-      this.validateInput(this.$refs.input.value)
+      const input = this.$refs.input as HTMLInputElement
+      this.validateInput(Number(input.value))
     },
     setThumbPosition() {
       // console.log(
@@ -169,11 +170,11 @@ export default Vue.extend({
         transform: `translate(-${percentage}%)`
       }
     },
-    async focusOnInput(allow) {
+    async focusOnInput(allow: boolean) {
       if (!allow) return
       this.inputFocus = true
       await this.$nextTick()
-      const input = this.$refs.input
+      const input = this.$refs.input as HTMLInputElement
       if (input) {
         input.focus()
         this.setThumbPosition()
@@ -186,7 +187,7 @@ export default Vue.extend({
       this.setThumbPosition()
       this.warning = ''
     },
-    validateInput(value) {
+    validateInput(value: number) {
       const { min, max, suffix, scale } = this
       if (value < min)
         return (this.warning = `You can't set less than ${min} ${suffix}`)

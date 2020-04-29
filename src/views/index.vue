@@ -5,11 +5,8 @@
     @scroll="scroolTop($event.target)"
   >
     <HeaderTitle class="col-span-3" />
-    <p v-if="!$fetchState || $fetchState.pending" class="font-preset-info mb-8">
+    <p v-if="!ready" class="font-preset-info mb-8">
       Loading...
-    </p>
-    <p v-else-if="$fetchState.error" class="font-preset-info mb-8">
-      Something went wrong...
     </p>
     <template v-else>
       <TimerInfo
@@ -39,7 +36,7 @@
       @changeAutoFinishLock="setAutoFinishLock($event)"
     />
     <SettingsCard
-      v-if="$fetchState && !$fetchState.pending && !$fetchState.error"
+      v-if="ready"
       class="col-start-3 row-start-5"
       @changeAutoFinishLock="setAutoFinishLock($event)"
     />
@@ -55,11 +52,13 @@ import HelpCards from '../components/HelpCards.vue'
 import SettingsCard from '../components/SettingsCard.vue'
 import HeaderTitle from '../components/HeaderTitle.vue'
 import { remote } from 'electron'
-import { ipcRenderer } from 'electron-better-ipc'
-import { channelSetBreak, channelGetBreakCount } from '../../main/helpers/ipc'
-import { isProd } from '../../main/helpers/env'
+import {
+  rendererGetBreakIndex as getBreakIndex,
+  rendererSetNextBreak as setNextBreak
+} from '@/background/ipc'
+import { isProd } from '@/background/env'
 import { addSeconds } from 'date-fns'
-import { getUserSettingsStore } from '../../main/helpers/db'
+import { getUserSettingsStore } from '@/background/db'
 import { play } from '../utils/sound'
 
 import Vue from 'vue'
@@ -73,14 +72,6 @@ export default Vue.extend({
     SettingsCard,
     HeaderTitle
   },
-  async fetch() {
-    await this.setup()
-  },
-  asyncData({ req }) {
-    return {
-      name: process.static ? 'static' : process.server ? 'server' : 'client'
-    }
-  },
   data() {
     return {
       startDate: new Date(),
@@ -88,12 +79,14 @@ export default Vue.extend({
       long: false,
       finished: false,
       autoFinishLock: false,
-      closing: false
+      closing: false,
+      ready: false
     }
   },
-  fetchOnServer: false,
+  async beforeMount() {
+    await this.setup()
+  },
   async mounted() {
-    if (process.env.NODE_ENV === 'test') await this.setup()
     await play.sound.short()
   },
   methods: {
@@ -105,8 +98,9 @@ export default Vue.extend({
       const breakTime = await this.getBreakTime(await this.checkIsLongBreak())
       console.log('breakTime', breakTime)
       this.endDate = addSeconds(startDate, breakTime)
+      this.ready = true
     },
-    scroolTop(target) {
+    scroolTop(target: HTMLElement) {
       // console.log('scroll', target)
       target.scroll({
         top: 0,
@@ -114,11 +108,8 @@ export default Vue.extend({
         behavior: 'auto'
       })
     },
-    async getBreakIndex() {
-      return await ipcRenderer.callMain(channelGetBreakCount)
-    },
     async checkIsLongBreak() {
-      const breakIndex = await this.getBreakIndex()
+      const breakIndex = await getBreakIndex()
       const longBreakEvery = getUserSettingsStore().get('breaks').long.every
       const isLong = breakIndex % longBreakEvery === 0
       console.log(
@@ -132,17 +123,15 @@ export default Vue.extend({
       this.long = isLong
       return isLong
     },
-    async getBreakTime(isLong) {
+    async getBreakTime(isLong: boolean) {
       const breaks = getUserSettingsStore().get('breaks')
       if (isLong) return breaks.long.last
       return breaks.short.last
     },
-    setAutoFinishLock(to) {
+    setAutoFinishLock(to: boolean) {
       this.autoFinishLock = to
     },
-    setNextBreak(forceNextBreakIn = undefined) {
-      ipcRenderer.callMain(channelSetBreak, { forceNextBreakIn })
-    },
+
     closeWindow() {
       const window = remote.getCurrentWindow()
       window.close()
@@ -168,9 +157,9 @@ export default Vue.extend({
       const nextBreakIn = this.long || this.finished ? undefined : 5 * 60
       this.close(nextBreakIn)
     },
-    close(forceNextBreakIn = undefined) {
+    close(forceNextBreakIn?: number) {
       this.closing = true
-      this.setNextBreak(forceNextBreakIn)
+      setNextBreak(forceNextBreakIn)
       this.closeWindow()
     }
   }

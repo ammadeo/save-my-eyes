@@ -1,22 +1,22 @@
-import { scheduleJob } from 'node-schedule'
+import { scheduleJob, Job } from 'node-schedule'
 import { addSeconds } from 'date-fns'
 import { isProd, isProdBuild, isDevProdTest } from './env'
 import { createWindowIndex } from './windows'
 import { breakIndex } from './store'
 import { getUserSettingsStore } from './db'
-import log from 'electron-log'
+// import log from 'electron-log'
 
-let breakSchedule
+let breakSchedule: Job | undefined
 
 const getEveryFromDB = () => {
   return getUserSettingsStore().get('breaks').every
 }
 
-const calculateNextBreak = (nextBreakIn) => {
+const calculateNextBreak = (nextBreakIn: number) => {
   return addSeconds(new Date(), isProdBuild ? nextBreakIn : 3)
 }
 
-export const setNewBreak = (forceBreakIn = undefined) => {
+export const setNewBreak = (forceBreakIn?: number) => {
   const forced = !!forceBreakIn
   const nextBreakIn = forceBreakIn || getEveryFromDB()
 
@@ -25,7 +25,7 @@ export const setNewBreak = (forceBreakIn = undefined) => {
   if (!forced) breakIndex.value++
   const keyBreakIndex = breakIndex.value
   if (breakSchedule) breakSchedule.cancel()
-  log.log(
+  console.log(
     'setNewBreak',
     'keyBreakIndex',
     keyBreakIndex,

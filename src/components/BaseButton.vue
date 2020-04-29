@@ -22,9 +22,8 @@ import {
   AutoColorClasses
 } from '../utils/mixins/autoClasses'
 
-import Vue from 'vue'
-export default Vue.extend({
-  mixins: [AutoBorderClasses, AutoColorClasses],
+import mixins from 'vue-typed-mixins'
+export default mixins(AutoBorderClasses, AutoColorClasses).extend({
   props: {
     primary: {
       default: false,

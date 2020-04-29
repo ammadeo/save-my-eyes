@@ -27,7 +27,7 @@ describe('components/TimerClock.vue', () => {
       }
     })
 
-    const component = getByText('20 minutes left')
+    const component = getByText('20 : 00')
 
     expect(component).toBeVisible()
   })

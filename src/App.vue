@@ -1,32 +1,21 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
+  <div class="font-body bg-secondary-600 h-screen flex flex-col">
     <router-view />
   </div>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script lang="ts">
+import { getUserSettingsStore } from '@/background/db'
+import { Store } from '@/store'
+import mixins from 'vue-typed-mixins'
 
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+export default mixins(Store).extend({
+  beforeMount() {
+    let code = navigator.language
+    console.log('lang code', code)
+    const lang = getUserSettingsStore().get('lang')
+    if (lang) code = lang
+    this.$storeTyped.commit('setLang', code)
+  }
+})
+</script>

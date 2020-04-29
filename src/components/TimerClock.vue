@@ -31,7 +31,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="js">
 import anime from 'animejs'
 import { format, addMilliseconds } from 'date-fns'
 import BaseTile from './BaseTile.vue'
@@ -39,12 +39,12 @@ import {
   AutoBorderClasses,
   AutoColorClasses
 } from '../utils/mixins/autoClasses'
-import Vue from 'vue'
-export default Vue.extend({
+import mixins from 'vue-typed-mixins'
+
+export default mixins(AutoBorderClasses, AutoColorClasses).extend({
   components: {
     BaseTile
   },
-  mixins: [AutoBorderClasses, AutoColorClasses],
   props: {
     startDate: {
       required: true,

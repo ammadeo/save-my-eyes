@@ -5,10 +5,10 @@
 /* purgecss end ignore */
 @import 'tailwindcss/utilities';
 
-@import './fonts';
+@import 'fonts.css';
 
-@import './scroll';
+@import 'scroll.css';
 
-@import './blend';
+@import 'blend.css';
 
-@import './pseudoClasses';
+@import 'pseudoClasses.css';

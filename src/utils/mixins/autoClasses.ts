@@ -1,6 +1,7 @@
-const autoPrefix = (prefix) => (prefix ? `${prefix}:` : '')
+import vue from 'vue'
+const autoPrefix = (prefix: string) => (prefix ? `${prefix}:` : '')
 
-export const AutoBorderClasses = {
+export const AutoBorderClasses = vue.extend({
   methods: {
     autoBorderClasses(elevation = 4, prefix = '') {
       return [
@@ -9,9 +10,9 @@ export const AutoBorderClasses = {
       ]
     }
   }
-}
+})
 
-export const AutoColorClasses = {
+export const AutoColorClasses = vue.extend({
   methods: {
     autoColorClasses(color = 'secondary', intensity = '500', prefix = '') {
       return [
@@ -19,15 +20,15 @@ export const AutoColorClasses = {
         `${autoPrefix(prefix)}border-${color}-${Number(intensity) + 200}`
       ]
     },
-    autoColorSplit(color) {
+    autoColorSplit(color: string) {
       return color.split('-')
     }
   }
-}
+})
 
-export const AutoFocusWithinCardClasses = {
+export const AutoFocusWithinCardClasses = vue.extend({
   methods: {
-    autoFocusWithinCardClasses(isFocused) {
+    autoFocusWithinCardClasses(isFocused: boolean) {
       return isFocused
         ? [
             'overflow-y-auto',
@@ -39,4 +40,4 @@ export const AutoFocusWithinCardClasses = {
         : []
     }
   }
-}
+})

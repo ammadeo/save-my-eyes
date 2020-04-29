@@ -1,3 +1,5 @@
+import { Module } from 'vuex-typescript-interface'
+
 // ? ideas cards images
 import windowImg from '../assets/images/window.svg'
 import plantImg from '../assets/images/plant.svg'
@@ -66,13 +68,26 @@ const generateI18n = () => ({
   }
 })
 
-export const state = () => ({
-  lang: 'en',
-  ...generateI18n()
-})
+// const getterContext = (args: [any, any, any, any]) => moduleGetterContext(args, i18n)
+// const actionContext = (context: any) => moduleActionContext(context, i18n)
 
-export const mutations = {
-  setLang(state, { code }) {
-    state.lang = code === 'pl' ? 'pl' : 'en'
+export type Languages = 'pl' | 'en'
+
+type ReturnedFromGenerator = ReturnType<typeof generateI18n>
+
+export interface I18n extends ReturnedFromGenerator {
+  lang: Languages
+  setLang: (code: Languages) => void
+}
+
+export const i18n: Module<I18n> = {
+  state: {
+    lang: 'en',
+    ...generateI18n()
+  },
+  mutations: {
+    setLang(state,  code: Languages) {
+      state.lang = code === 'pl' ? 'pl' : 'en'
+    }
   }
 }

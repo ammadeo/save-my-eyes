@@ -6,13 +6,16 @@
     "jsx": "preserve",
     "importHelpers": true,
     "moduleResolution": "node",
+    "noImplicitThis": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
       "webpack-env",
-      "jest"
+      "jest",
+      "testing-library__jest-dom",
+      "animejs"
     ],
     "paths": {
       "@/*": [

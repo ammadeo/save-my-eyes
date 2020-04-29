@@ -33,12 +33,17 @@ describe('components/BaseButton.vue', () => {
         default: pTagText
       }
     })
-    expect(getByText(pTagText)).toHaveClass('bg-secondary-700')
-    expect(getByText(pTagText)).toHaveClass('hover:bg-secondary-800')
-    expect(getByText(pTagText)).toHaveClass('focus:bg-secondary-800')
+    const secondaryClasses = getByText(pTagText).classList.toString()
+    expect(secondaryClasses).toMatch('bg-secondary')
+    expect(secondaryClasses).toMatch('hover:bg-secondary')
+    expect(secondaryClasses).toMatch('focus:bg-secondary')
+    expect(secondaryClasses).not.toMatch('bg-primary')
+
     await updateProps({ primary: true })
-    expect(getByText(pTagText)).toHaveClass('bg-primary-700')
-    expect(getByText(pTagText)).toHaveClass('hover:bg-primary-800')
-    expect(getByText(pTagText)).toHaveClass('focus:bg-primary-800')
+    const primaryClasses = getByText(pTagText).classList.toString()
+    expect(primaryClasses).toMatch('bg-primary')
+    expect(primaryClasses).toMatch('hover:bg-primary')
+    expect(primaryClasses).toMatch('focus:bg-primary')
+    expect(primaryClasses).not.toMatch('bg-secondary')
   })
 })

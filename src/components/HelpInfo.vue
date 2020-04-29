@@ -5,14 +5,16 @@
 </template>
 
 <script lang="ts">
-import { Lang } from '../utils/mixins/i18n'
-import { mapState } from 'vuex'
-import Vue from 'vue'
-export default Vue.extend({
-  mixins: [Lang],
+// import { Lang } from '../utils/mixins/i18n'
+import { mapState, Store } from '@/store'
+import { Languages } from '@/store/i18n'
+import mixins from 'vue-typed-mixins'
+
+export default mixins(Store).extend({
   computed: mapState({
-    title({ i18n }) {
-      return i18n.ideas.title[this.lang]
+    title(state) {
+      const lang = this.$lang as Languages
+      return state.i18n.ideas.title[lang]
     }
   })
 })

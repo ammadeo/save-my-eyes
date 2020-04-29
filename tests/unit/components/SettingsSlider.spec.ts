@@ -20,7 +20,7 @@ const thumbText = (
   suffix = props.suffix
 ) => `${value / scale} ${suffix}`
 
-const thumbStyle = (percentage) => ({
+const thumbStyle = (percentage: number) => ({
   left: `${percentage}%`,
   transform: `translate(-${percentage}%)`
 })
@@ -45,7 +45,7 @@ describe('components/SettingsSlider.vue', () => {
       })
       const ThumbSpan = getByText(thumbText(props.min * props.scale))
       expect(ThumbSpan).toBeVisible()
-      const Thumb = ThumbSpan.parentElement.parentElement
+      const Thumb = ThumbSpan?.parentElement?.parentElement
       // console.log(Thumb.style)
       expect(Thumb).toHaveStyle(thumbStyle(0))
     })
@@ -58,7 +58,7 @@ describe('components/SettingsSlider.vue', () => {
       })
       const ThumbSpan = getByText(thumbText(props.center * props.scale))
       expect(ThumbSpan).toBeVisible()
-      const Thumb = ThumbSpan.parentElement.parentElement
+      const Thumb = ThumbSpan?.parentElement?.parentElement
       // console.log(Thumb.style)
 
       expect(Thumb).toHaveStyle(thumbStyle(50))
@@ -72,7 +72,7 @@ describe('components/SettingsSlider.vue', () => {
       })
       const ThumbSpan = getByText(thumbText((props.center + 1) * props.scale))
       expect(ThumbSpan).toBeVisible()
-      const Thumb = ThumbSpan.parentElement.parentElement
+      const Thumb = ThumbSpan?.parentElement?.parentElement
       // console.log(Thumb.style)
 
       expect(Thumb).not.toHaveStyle(thumbStyle(50))
@@ -87,7 +87,7 @@ describe('components/SettingsSlider.vue', () => {
       })
       const ThumbSpan = getByText(thumbText(props.max * props.scale))
       expect(ThumbSpan).toBeVisible()
-      const Thumb = ThumbSpan.parentElement.parentElement
+      const Thumb = ThumbSpan?.parentElement?.parentElement
       // console.log(Thumb.style)
 
       expect(Thumb).toHaveStyle(thumbStyle(100))

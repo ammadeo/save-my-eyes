@@ -12,11 +12,11 @@ export default Vue.extend({
   props: {
     startDate: {
       required: true,
-      type: Date
+      type: Date as new () => Date
     },
     endDate: {
       required: true,
-      type: Date
+      type: Date as new () => Date
     },
     long: {
       type: Boolean,
@@ -24,16 +24,16 @@ export default Vue.extend({
     }
   },
   computed: {
-    breakTime() {
+    breakTime(): string {
       return formatDistanceStrict(this.startDate, this.endDate, {
         roundingMethod: 'floor'
       })
     },
-    breakType() {
+    breakType(): string {
       const type = this.long ? 'long' : 'short'
       return `${type} break`
     },
-    breakInfo() {
+    breakInfo(): string {
       return `Take a ${this.breakType} for ${this.breakTime}`
     }
   }

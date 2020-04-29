@@ -85,8 +85,9 @@
 <script lang="ts">
 import BaseCard from './BaseCard.vue'
 import SettingsSlider from './SettingsSlider.vue'
-import settingsImg from '../assets/images/settings.svg'
-import { getUserSettingsStore } from '../../main/helpers/db'
+import settingsImg from '@/assets/images/settings.svg'
+
+import { getUserSettingsStore } from '@/background/db'
 import Vue from 'vue'
 export default Vue.extend({
   components: {
