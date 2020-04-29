@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { colors } = require('tailwindcss/defaultTheme')
+const plugin = require('tailwindcss/plugin')
 /*
  ** TailwindCSS Configuration File
  **
@@ -85,6 +87,7 @@ module.exports = {
       'focus'
       // 'focus-within'
     ],
+    textTransform: ['first-letter'],
     translate: [
       'responsive',
       'hover',
@@ -102,6 +105,15 @@ module.exports = {
       'group-focus'
     ]
   },
-  plugins: [require('tailwindcss-interaction-variants')],
+  plugins: [
+    require('tailwindcss-interaction-variants'),
+    plugin(function({ addVariant, e }) {
+      addVariant('first-letter', ({ modifySelectors, separator }) => {
+        modifySelectors(({ className }) => {
+          return `.${e(`first-letter${separator}${className}`)}::first-letter`
+        })
+      })
+    })
+  ],
   corePlugins: {}
 }

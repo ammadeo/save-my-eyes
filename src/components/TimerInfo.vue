@@ -1,5 +1,5 @@
 <template>
-  <p class="font-preset-info mb-8">
+  <p class="font-preset-info mb-8 first-letter:capitalize">
     {{ breakInfo }}
   </p>
 </template>
