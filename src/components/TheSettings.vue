@@ -1,11 +1,5 @@
 <template>
-  <component
-    :is="isCardType"
-    color="secondary-300"
-    class="flex-grow"
-    @focusin="$emit('changeAutoFinishLock', true)"
-    @focusout="beforeLeave()"
-  >
+  <div class="flex-grow">
     <img
       class="h-24 md:h-32 lg:h-40 xl:h-48 my-4 mx-2"
       :src="img.src"
@@ -80,13 +74,10 @@
       >
       for awesome drawings
     </p>
-  </component>
+  </div>
 </template>
 
 <script lang="ts">
-import CardCloseable from './CardCloseable.vue'
-import CardAbsolute from './CardAbsolute.vue'
-import BaseCard from './BaseCard.vue'
 import SettingsSlider from './SettingsSlider.vue'
 import settingsImg from '@/assets/images/settings.svg'
 
@@ -94,9 +85,6 @@ import { getUserSettingsStore } from '@/background/db'
 import Vue from 'vue'
 export default Vue.extend({
   components: {
-    CardAbsolute,
-    CardCloseable,
-    BaseCard,
     SettingsSlider
   },
   data() {
@@ -112,48 +100,38 @@ export default Vue.extend({
       long: {
         last: 5 * 60,
         every: 3
-      }
-    }
-  },
-  props: {
-    absolute: {
-      type: Boolean,
-      default: false
-    },
-    closeable: {
-      type: Boolean,
-      default: false
-    }
-  },
-  computed: {
-    isCardType(): 'BaseCard' | 'CardAbsolute' | 'CardCloseable' {
-      return this.absolute
-        ? 'CardAbsolute'
-        : this.closeable
-        ? 'CardCloseable'
-        : 'BaseCard'
+      },
+      changed: false
     }
   },
   beforeMount() {
-    if (process.env.development)
-      if (this.$isServer) throw new Error('no srr support')
-
-    const { every, short, long } = getUserSettingsStore().get('breaks')
+    const breaks = getUserSettingsStore().get('breaks')
+    const { every, short, long } = breaks
     if (every && short && long) {
       this.every = every
       this.short = short
       this.long = long
+
+      this.$watch(
+        () => {
+          const { last: longLast, every: longEvery } = this.long
+          return [this.every, this.short.last, longLast, longEvery]
+        },
+        () => {
+          this.changed = true
+        }
+      )
     }
   },
-
+  beforeDestroy() {
+    this.setStore()
+  },
   methods: {
-    beforeLeave() {
-      this.setStore()
-      this.$emit('changeAutoFinishLock', false)
-    },
     setStore() {
       // todo implement setStore only if any value has changed
       const { every, short, long } = this
+      if (!this.changed) return
+
       getUserSettingsStore().set({
         breaks: {
           every,
