@@ -6,8 +6,8 @@
       :class="[...autoFocusWithinCardClasses(focused)]"
       :color="color"
       tabindex="0"
-      @mouseleave="focusOut()"
-      @mouseover="focusIn()"
+      @mouseleave.native="focusOut()"
+      @mouseover.native="focusIn()"
     >
       <slot />
     </BaseCard>
