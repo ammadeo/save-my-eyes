@@ -1,7 +1,7 @@
 <template>
   <div
     v-show="!closing"
-    class="font-body bg-secondary-600 h-screen grid grid-cols-base grid-rows-base pt-8 lg:pt-12 xlg:pt-16  px-8 lg: px-12 xlg: px-16 flex-grow overflow-hidden"
+    class="font-body pointer-events-auto bg-secondary-600 h-screen grid grid-cols-base grid-rows-base pt-8 lg:pt-12 xlg:pt-16  px-8 lg: px-12 xlg: px-16 flex-grow overflow-hidden"
     @scroll="scroolTop($event.target)"
   >
     <HeaderTitle class="col-span-3" />
@@ -40,22 +40,25 @@
       class="col-start-1 row-start-5"
       @changeAutoFinishLock="setAutoFinishLock($event)"
     />
-    <SettingsContent
+    <CardAbsolute
       v-if="ready"
-      absolute
+      color="secondary-300"
       class="col-start-3 row-start-5"
       @changeAutoFinishLock="setAutoFinishLock($event)"
-    />
+    >
+      <TheSettings />
+    </CardAbsolute>
   </div>
 </template>
 
 <script lang="ts">
 import TimerInfo from '../components/TimerInfo.vue'
+import CardAbsolute from '../components/CardAbsolute.vue'
 import ButtonTimer from '../components/ButtonTimer.vue'
 import TimerClock from '../components/TimerClock.vue'
 import HelpInfo from '../components/HelpInfo.vue'
 import HelpCards from '../components/HelpCards.vue'
-import SettingsContent from '../components/SettingsContent.vue'
+import TheSettings from '../components/TheSettings.vue'
 import HeaderTitle from '../components/HeaderTitle.vue'
 import { remote } from 'electron'
 import {
@@ -71,11 +74,12 @@ import Vue from 'vue'
 export default Vue.extend({
   components: {
     TimerInfo,
+    CardAbsolute,
     ButtonTimer,
     TimerClock,
     HelpInfo,
     HelpCards,
-    SettingsContent,
+    TheSettings,
     HeaderTitle
   },
   data() {
