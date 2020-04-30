@@ -74,6 +74,7 @@ export const createWindowTray = async () => {
     height: screenHeight,
     y: 0,
     x,
+    backgroundColor: '#00000000',
     transparent: true,
     frame: false,
     ...baseWindowSettings,
