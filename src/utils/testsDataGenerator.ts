@@ -14,7 +14,7 @@ export const Generate: Generate = {
       .toString(36)
       .substr(2, 9)}__`,
 
-  number: (scale = 0) => Math.random() * 10 ** scale
+  number: (scale = 0) => Math.random() * 10 ** scale,
 
   // object: (keys: string[] = [], withType: keyof typeof Generate = 'string') =>
   //   keys.reduce((all, key) => ({ ...all, [key]: Generate[withType]() }), {}),

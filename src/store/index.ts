@@ -13,8 +13,8 @@ interface Store {
 
 export default new Vuex.Store<Store>({
   modules: {
-    i18n
-  }
+    i18n,
+  },
 })
 
 export { Store } from '@/utils/mixins/store'

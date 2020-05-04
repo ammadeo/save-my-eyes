@@ -9,17 +9,17 @@ const routes: Array<RouteConfig> = [
   {
     path: '/',
     name: 'Index',
-    component: Index
+    component: Index,
   },
   {
     path: '/menu',
     name: 'Menu',
-    component: Menu
-  }
+    component: Menu,
+  },
 ]
 
 const router = new VueRouter({
-  routes
+  routes,
 })
 
 export default router

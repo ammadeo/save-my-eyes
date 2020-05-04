@@ -5,7 +5,7 @@
     :class="[
       ...(round
         ? ['w-8', 'h-8', 'justify-center']
-        : ['justify-around', 'min-h-8'])
+        : ['justify-around', 'min-h-8']),
     ]"
     @click="$emit('click')"
     ><p v-show="!round" class="py-2 px-4 font-display text-lg">{{ content }}</p>
@@ -19,18 +19,18 @@ import BaseButton from './BaseButton.vue'
 import Vue from 'vue'
 export default Vue.extend({
   components: {
-    BaseButton
+    BaseButton,
   },
   props: {
     content: {
       type: String,
-      required: false
-    }
+      required: false,
+    },
   },
   computed: {
     round() {
       return !this.content
-    }
-  }
+    },
+  },
 })
 </script>

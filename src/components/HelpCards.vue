@@ -28,7 +28,7 @@ import CardAbsolute from './CardAbsolute.vue'
 
 import {
   AutoBorderClasses,
-  AutoColorClasses
+  AutoColorClasses,
 } from '../utils/mixins/autoClasses'
 import { Store, mapState } from '@/store'
 
@@ -36,17 +36,17 @@ import mixins from 'vue-typed-mixins'
 
 export default mixins(AutoBorderClasses, AutoColorClasses, Store).extend({
   components: {
-    CardAbsolute
+    CardAbsolute,
   },
   computed: mapState({
     cards({ i18n }) {
       return i18n.ideas.cards
-    }
+    },
   }),
   methods: {
     emitChangeAutoFinishLock(isAutoLock: boolean) {
       this.$emit('changeAutoFinishLock', isAutoLock)
-    }
-  }
+    },
+  },
 })
 </script>

@@ -26,7 +26,7 @@ const userSettingsSchema = {
       every: {
         type: 'number',
         minimum: 60,
-        maximum: 60 * 60
+        maximum: 60 * 60,
       },
       short: {
         type: 'object',
@@ -34,9 +34,9 @@ const userSettingsSchema = {
           last: {
             type: 'number',
             minimum: 1,
-            maximum: 60
-          }
-        }
+            maximum: 60,
+          },
+        },
       },
       long: {
         type: 'object',
@@ -44,43 +44,43 @@ const userSettingsSchema = {
           last: {
             type: 'number',
             minimum: 60,
-            maximum: 60 * 60
+            maximum: 60 * 60,
           },
           every: {
             type: 'number',
             minimum: 1,
-            maximum: 10
-          }
-        }
-      }
-    }
+            maximum: 10,
+          },
+        },
+      },
+    },
   },
   sounds: {
     type: 'object',
     properties: {
       ui: { type: 'boolean' },
-      voice: { type: 'boolean' }
-    }
+      voice: { type: 'boolean' },
+    },
   },
   lang: {
-    type: 'string'
-  }
+    type: 'string',
+  },
 }
 
 const userSettingsDefaults = {
   breaks: {
     every: 15 * 60,
     short: {
-      last: 30
+      last: 30,
     },
     long: {
       last: 5 * 60,
-      every: 3
-    }
+      every: 3,
+    },
   },
   sounds: {
     ui: true,
-    voice: true
+    voice: true,
   },
   lang: '',
 }
@@ -91,5 +91,5 @@ export const getUserSettingsStore = () =>
   new Store<TypedStore>({
     schema: userSettingsSchema as Store.Schema,
     defaults: userSettingsDefaults,
-    name: userSettings
+    name: userSettings,
   })

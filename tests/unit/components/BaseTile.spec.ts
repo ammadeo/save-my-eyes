@@ -9,8 +9,8 @@ describe('components/BaseTile.vue', () => {
   test('has content slot', () => {
     const { getByText } = render(Component, {
       slots: {
-        default: pTag
-      }
+        default: pTag,
+      },
     })
 
     const progressbar = getByText(pTAgText)
@@ -21,12 +21,12 @@ describe('components/BaseTile.vue', () => {
   test('can be as a button', () => {
     const { getByText } = render(Component, {
       slots: {
-        default: pTAgText
+        default: pTAgText,
       },
       props: {
         color: 'secondary-300',
-        as: 'button'
-      }
+        as: 'button',
+      },
     })
     expect(getByText(pTAgText).tagName).toMatch('BUTTON')
   })

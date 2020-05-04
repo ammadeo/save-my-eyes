@@ -16,21 +16,29 @@ const calculateNextBreak = (nextBreakIn: number) => {
   return addSeconds(new Date(), isProdBuild ? nextBreakIn : 3)
 }
 
-export interface NewBreakOptions
-  {forceNextBreakIn?: number, forceNextBreakType?: 'long' | 'short'
+export interface NewBreakOptions {
+  forceNextBreakIn?: number
+  forceNextBreakType?: 'long' | 'short'
 }
 
-const getNewBreakIndex = (oldIndex: number, options: NewBreakOptions): number => {
-  const forced = typeof options?.forceNextBreakIn === "number" || !!options?.forceNextBreakType
+const getNewBreakIndex = (
+  oldIndex: number,
+  options: NewBreakOptions
+): number => {
+  const forced =
+    typeof options?.forceNextBreakIn === 'number' ||
+    !!options?.forceNextBreakType
   console.log('getNewBreakIndex', 'oldIndex', oldIndex, 'options', options)
-  if (!forced) return ++oldIndex;
+  if (!forced) return ++oldIndex
   else {
     const forceNextBreakType = options?.forceNextBreakType
-    if(forceNextBreakType){
-      const forceLongBreak = forceNextBreakType === "long"
-      if(forceLongBreak)
-      {
-        console.log('long every', getUserSettingsStore().get('breaks').long.every)
+    if (forceNextBreakType) {
+      const forceLongBreak = forceNextBreakType === 'long'
+      if (forceLongBreak) {
+        console.log(
+          'long every',
+          getUserSettingsStore().get('breaks').long.every
+        )
         return getUserSettingsStore().get('breaks').long.every
       } else {
         return 1
@@ -45,7 +53,6 @@ export const setNewBreak = (options: NewBreakOptions) => {
 
   const nextBreakIn = options?.forceNextBreakIn || getEveryFromDB()
 
-
   breakIndex.value = getNewBreakIndex(breakIndex.value, options)
 
   breakId.value++
@@ -53,29 +60,20 @@ export const setNewBreak = (options: NewBreakOptions) => {
 
   if (breakSchedule) breakSchedule.cancel()
 
-  console.log(
-    'setNewBreak',
-    'breakIndex.value',
-    breakIndex.value,
-
-    )
+  console.log('setNewBreak', 'breakIndex.value', breakIndex.value)
 
   lastSchedulerJobDate.value = new Date()
-    if(nextBreakIn > 0)
-    {
+  if (nextBreakIn > 0) {
     const nextBreak = calculateNextBreak(nextBreakIn)
 
-      breakSchedule = scheduleJob(nextBreak, () => {
-        if (keyBreakIndex === breakId.value) {
-          closeAllWindows()
-          createWindowIndex()
-        }
-      })
-
-    }else{
-
+    breakSchedule = scheduleJob(nextBreak, () => {
+      if (keyBreakIndex === breakId.value) {
         closeAllWindows()
         createWindowIndex()
-
-    }
+      }
+    })
+  } else {
+    closeAllWindows()
+    createWindowIndex()
+  }
 }

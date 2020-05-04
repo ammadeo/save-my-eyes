@@ -9,6 +9,6 @@ export const Store = Vue.extend({
     },
     $lang(): Languages {
       return this.$storeTyped.state.i18n.lang
-    }
-  }
+    },
+  },
 })

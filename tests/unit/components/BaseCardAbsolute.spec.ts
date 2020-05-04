@@ -9,8 +9,8 @@ describe('components/CardAbsolute.vue', () => {
   test('has content slot', async () => {
     const { getByText } = render(Component, {
       slots: {
-        default: pTag
-      }
+        default: pTag,
+      },
     })
 
     const Tested = getByText(pTAgTExt)
@@ -20,8 +20,8 @@ describe('components/CardAbsolute.vue', () => {
   test('on hover emit mouseenter and mouseleave', async () => {
     const { getByText, emitted } = render(Component, {
       slots: {
-        default: pTAgTExt
-      }
+        default: pTAgTExt,
+      },
     })
     const Tested = getByText(pTAgTExt)
     await fireEvent.mouseOver(Tested)

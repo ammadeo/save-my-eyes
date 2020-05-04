@@ -19,7 +19,7 @@
 <script lang="ts">
 import {
   AutoBorderClasses,
-  AutoColorClasses
+  AutoColorClasses,
 } from '../utils/mixins/autoClasses'
 
 import mixins from 'vue-typed-mixins'
@@ -27,8 +27,8 @@ export default mixins(AutoBorderClasses, AutoColorClasses).extend({
   props: {
     primary: {
       default: false,
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
   computed: {
     classesTop() {
@@ -42,14 +42,14 @@ export default mixins(AutoBorderClasses, AutoColorClasses).extend({
               'text-black',
               ...autoColorClasses('primary', '400'),
               ...autoColorClasses('primary', '500', 'group-hover'),
-              ...autoColorClasses('primary', '500', 'group-focus')
+              ...autoColorClasses('primary', '500', 'group-focus'),
             ]
           : [
               'text-secondary-100',
               ...autoColorClasses('secondary', '700'),
               ...autoColorClasses('secondary', '800', 'group-hover'),
-              ...autoColorClasses('secondary', '800', 'group-focus')
-            ])
+              ...autoColorClasses('secondary', '800', 'group-focus'),
+            ]),
       ]
     },
     classesBottom() {
@@ -63,16 +63,16 @@ export default mixins(AutoBorderClasses, AutoColorClasses).extend({
               'text-black',
               ...autoColorClasses('primary', '600'),
               ...autoColorClasses('primary', '700', 'group-hover'),
-              ...autoColorClasses('primary', '700', 'group-focus')
+              ...autoColorClasses('primary', '700', 'group-focus'),
             ]
           : [
               'text-secondary-100',
               ...autoColorClasses('secondary', '800'),
               ...autoColorClasses('secondary', '900', 'group-hover'),
-              ...autoColorClasses('secondary', '900', 'group-focus')
-            ])
+              ...autoColorClasses('secondary', '900', 'group-focus'),
+            ]),
       ]
-    }
-  }
+    },
+  },
 })
 </script>

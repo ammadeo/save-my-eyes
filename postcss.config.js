@@ -12,23 +12,23 @@ const purgecss = {
   whitelistPatterns: [
     /-(leave|enter|appear)(|-(to|from|active))$/,
     /^(?!(|.*?:)cursor-move). -move$/,
-    /^router-link(|-exact)-active$/
+    /^router-link(|-exact)-active$/,
   ],
-  whitelist
+  whitelist,
 }
 
 module.exports = {
   plugins: {
     tailwindcss: {},
     'postcss-preset-env': {
-      stage: 0
+      stage: 0,
     },
     ...(process.env.NODE_ENV === 'production'
       ? {
-          '@fullhuman/postcss-purgecss': purgecss
+          '@fullhuman/postcss-purgecss': purgecss,
         }
-      : {})
-  }
+      : {}),
+  },
 }
 
 // module.exports = {

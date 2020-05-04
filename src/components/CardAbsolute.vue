@@ -21,17 +21,17 @@ import mixins from 'vue-typed-mixins'
 
 export default mixins(AutoFocusWithinCardClasses).extend({
   components: {
-    BaseCard
+    BaseCard,
   },
   props: {
     color: {
       type: String,
-      default: 'secondary-800'
-    }
+      default: 'secondary-800',
+    },
   },
   data() {
     return {
-      focused: false
+      focused: false,
     }
   },
   mounted() {
@@ -49,7 +49,7 @@ export default mixins(AutoFocusWithinCardClasses).extend({
     card(): HTMLDivElement {
       const cardInstance = this.$refs.card as Vue
       return cardInstance.$el as HTMLDivElement
-    }
+    },
   },
   methods: {
     focusIn() {
@@ -63,7 +63,7 @@ export default mixins(AutoFocusWithinCardClasses).extend({
       this.card.scrollTop = 0
       this.focused = false
       this.$emit('focusout')
-    }
-  }
+    },
+  },
 })
 </script>

@@ -17,17 +17,17 @@ import mixins from 'vue-typed-mixins'
 export default mixins().extend({
   components: {
     BaseCard,
-    ButtonClose
+    ButtonClose,
   },
   props: {
     color: {
       type: String,
-      default: 'secondary-800'
+      default: 'secondary-800',
     },
     content: {
       type: String,
-      required: false
-    }
-  }
+      required: false,
+    },
+  },
 })
 </script>

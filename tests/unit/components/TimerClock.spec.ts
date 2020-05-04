@@ -10,8 +10,8 @@ describe('components/TimerClock.vue', () => {
     const { getByRole } = render(Component, {
       props: {
         startDate,
-        endDate
-      }
+        endDate,
+      },
     })
 
     const progressbar = getByRole('progressbar')
@@ -23,8 +23,8 @@ describe('components/TimerClock.vue', () => {
     const { getByText } = render(Component, {
       props: {
         startDate,
-        endDate
-      }
+        endDate,
+      },
     })
 
     const component = getByText('20 : 00')
@@ -36,8 +36,8 @@ describe('components/TimerClock.vue', () => {
     const { getByRole } = render(Component, {
       props: {
         startDate,
-        endDate
-      }
+        endDate,
+      },
     })
 
     const progressbar = getByRole('progressbar')

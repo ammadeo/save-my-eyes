@@ -12,25 +12,25 @@ export default Vue.extend({
   props: {
     startDate: {
       required: true,
-      type: Date as new () => Date
+      type: Date as new () => Date,
     },
     endDate: {
       required: true,
-      type: Date as new () => Date
+      type: Date as new () => Date,
     },
     long: {
       type: Boolean,
-      default: false
+      default: false,
     },
     finished: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
       timeAfterInterval: undefined,
-      timeAfterBreakInfo: ''
+      timeAfterBreakInfo: '',
     } as {
       timeAfterInterval?: NodeJS.Timeout
       timeAfterBreakInfo: string
@@ -44,8 +44,8 @@ export default Vue.extend({
             this.timeAfterBreakInfo = this.timeAfterBreak()
           }, 60 * 1000)
         }
-      }
-    }
+      },
+    },
   },
   beforeDestroy() {
     const timeAfterInterval = this.timeAfterInterval
@@ -60,18 +60,18 @@ export default Vue.extend({
           new Date(),
           this.endDate,
           {
-            roundingMethod: 'floor'
+            roundingMethod: 'floor',
           }
         )
         return `${formatedDistance} ago`
       }
       return ''
-    }
+    },
   },
   computed: {
     breakTime(): string {
       return formatDistanceStrict(this.startDate, this.endDate, {
-        roundingMethod: 'floor'
+        roundingMethod: 'floor',
       })
     },
     breakType(): string {
@@ -85,7 +85,7 @@ export default Vue.extend({
       }
 
       return `take a ${this.breakType} for ${this.breakTime}`
-    }
-  }
+    },
+  },
 })
 </script>

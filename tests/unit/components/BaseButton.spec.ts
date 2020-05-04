@@ -9,8 +9,8 @@ describe('components/BaseButton.vue', () => {
   test('has content slot', async () => {
     const { getByText } = render(Component, {
       slots: {
-        default: pTag
-      }
+        default: pTag,
+      },
     })
 
     const progressbar = getByText(pTagText)
@@ -20,8 +20,8 @@ describe('components/BaseButton.vue', () => {
   test('on click emit click', async () => {
     const { getByText, emitted } = render(Component, {
       slots: {
-        default: pTagText
-      }
+        default: pTagText,
+      },
     })
     const button = getByText(pTagText)
     await fireEvent.click(button)
@@ -30,8 +30,8 @@ describe('components/BaseButton.vue', () => {
   test('set secondary color classes on primary prop', async () => {
     const { getByText, updateProps } = render(Component, {
       slots: {
-        default: pTagText
-      }
+        default: pTagText,
+      },
     })
     const secondaryClasses = getByText(pTagText).classList.toString()
     expect(secondaryClasses).toMatch('bg-secondary')

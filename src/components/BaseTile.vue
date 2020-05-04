@@ -4,7 +4,7 @@
     class="rounded-full"
     :class="[
       ...autoColorClasses(...autoColorSplit(color)),
-      ...autoBorderClasses(elevation)
+      ...autoBorderClasses(elevation),
     ]"
   >
     <slot />
@@ -14,7 +14,7 @@
 <script lang="ts">
 import {
   AutoBorderClasses,
-  AutoColorClasses
+  AutoColorClasses,
 } from '../utils/mixins/autoClasses'
 import mixins from 'vue-typed-mixins'
 
@@ -22,16 +22,16 @@ export default mixins(AutoBorderClasses, AutoColorClasses).extend({
   props: {
     color: {
       type: String,
-      default: 'secondary-800'
+      default: 'secondary-800',
     },
     as: {
       type: String,
-      default: 'div'
+      default: 'div',
     },
     elevation: {
       type: Number,
-      default: 4
-    }
-  }
+      default: 4,
+    },
+  },
 })
 </script>

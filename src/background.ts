@@ -1,7 +1,7 @@
 import { app, protocol, BrowserWindow } from 'electron'
 import {
   createProtocol,
-  installVueDevtools
+  installVueDevtools,
 } from 'vue-cli-plugin-electron-builder/lib'
 import { useTray } from '@/background/tray'
 import { isProd, isProdBuild, isDevProdTest } from '@/background/env'
@@ -17,7 +17,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'app', privileges: { secure: true, standard: true } }
+  { scheme: 'app', privileges: { secure: true, standard: true } },
 ])
 
 app.on('window-all-closed', (e: Event) => e.preventDefault())

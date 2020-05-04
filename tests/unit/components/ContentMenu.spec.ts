@@ -14,7 +14,7 @@ describe('components/TheMenu.vue', () => {
   test('has start a long break now button', async () => {
     const { getByText, emitted } = render(Component)
 
-    const Button = getByText('start a long break now', {exact: false})
+    const Button = getByText('start a long break now', { exact: false })
     expect(Button).toBeVisible()
     await fireEvent.click(Button)
     expect(emitted().run[0]).toStrictEqual(['start-long-break'])
@@ -23,7 +23,7 @@ describe('components/TheMenu.vue', () => {
   test('has stop protection button', async () => {
     const { getByText, emitted } = render(Component)
 
-    const Button = getByText('stop protection', {exact: false})
+    const Button = getByText('stop protection', { exact: false })
     expect(Button).toBeVisible()
     await fireEvent.click(Button)
     expect(emitted().run[0]).toStrictEqual(['open-stop-protection'])
@@ -32,7 +32,7 @@ describe('components/TheMenu.vue', () => {
   test('has settings button', async () => {
     const { getByText, emitted } = render(Component)
 
-    const Button = getByText('settings', {exact: false})
+    const Button = getByText('settings', { exact: false })
     expect(Button).toBeVisible()
     await fireEvent.click(Button)
     expect(emitted().run[0]).toStrictEqual(['open-settings'])

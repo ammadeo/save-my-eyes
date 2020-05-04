@@ -55,47 +55,47 @@ export default Vue.extend({
   props: {
     value: {
       type: Number,
-      required: true
+      required: true,
     },
     max: {
       type: Number,
-      required: true
+      required: true,
     },
     center: {
       type: Number,
-      required: true
+      required: true,
     },
     min: {
       type: Number,
-      required: true
+      required: true,
     },
     scale: {
       type: Number,
-      default: 1
+      default: 1,
     },
     step: {
       type: Number,
-      default: 1
+      default: 1,
     },
     additionalValidator: {
       type: Function as PropType<(value: number) => boolean>,
-      default: () => () => true
+      default: () => () => true,
     },
     suffix: {
       type: String,
-      default: ''
+      default: '',
     },
     name: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
       thumbPosition: { left: '50%', transform: `translate(-50%)` },
       inputFocus: false,
       warning: '',
-      mouseDownTabFocusProtected: false
+      mouseDownTabFocusProtected: false,
     }
   },
   computed: {
@@ -104,7 +104,7 @@ export default Vue.extend({
     },
     inputLength(): number {
       return this.floorValue.toString().length
-    }
+    },
   },
   watch: {
     value() {
@@ -112,7 +112,7 @@ export default Vue.extend({
     },
     scale() {
       this.setThumbPosition()
-    }
+    },
   },
   beforeMount() {
     this.setThumbPosition()
@@ -167,7 +167,7 @@ export default Vue.extend({
 
       this.thumbPosition = {
         left: `${percentage}%`,
-        transform: `translate(-${percentage}%)`
+        transform: `translate(-${percentage}%)`,
       }
     },
     async focusOnInput(allow: boolean) {
@@ -209,7 +209,7 @@ export default Vue.extend({
         return (this.warning = customValidatorResult)
       this.$emit('input', value * scale)
       this.warning = ''
-    }
-  }
+    },
+  },
 })
 </script>

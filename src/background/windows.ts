@@ -3,16 +3,16 @@ import { isProd, isProdBuild, isDevProdTest } from './env'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 
 const windows: {
-  windowIndex: undefined | BrowserWindow,
+  windowIndex: undefined | BrowserWindow
   windowTray: undefined | BrowserWindow
 } = {
   windowIndex: undefined,
-  windowTray: undefined
+  windowTray: undefined,
 }
 
 export const closeAllWindows = () => {
-  windows.windowIndex?.close();
-  windows.windowTray?.close();
+  windows.windowIndex?.close()
+  windows.windowTray?.close()
 }
 
 interface WindowOptions extends Electron.BrowserWindowConstructorOptions {
@@ -44,14 +44,14 @@ function createWindow(
       width: 800,
       height: 600,
       webPreferences: {
-        nodeIntegration: true
+        nodeIntegration: true,
       },
-      ...options
+      ...options,
     })
-    windows[windowKey] = newWindow;
+    windows[windowKey] = newWindow
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       // Load the url of the dev server if in development mode
-      const path = process.env.WEBPACK_DEV_SERVER_URL as string + url
+      const path = (process.env.WEBPACK_DEV_SERVER_URL as string) + url
       newWindow.loadURL(path)
       if (!process.env.IS_TEST) newWindow.webContents.openDevTools()
     } else {
@@ -69,23 +69,22 @@ function createWindow(
 
 export const createWindowIndex = async () => {
   const url = isProdBuild ? '-' : ''
-  const {height: screenHeight, width: screenWidth} = getPrimaryDisplay();
+  const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
 
   createWindow('windowIndex', url, {
     width: screenWidth,
     height: screenHeight,
     y: 0,
     x: 0,
-    ...baseWindowSettings
+    ...baseWindowSettings,
   })
 }
 
 export const createWindowTray = async () => {
   const url = isProdBuild ? './menu' : '/#/menu'
   const width = 500
-  const {height: screenHeight, width: screenWidth} = getPrimaryDisplay();
+  const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
   const x = screenWidth - width
-
 
   createWindow('windowTray', url, {
     width,

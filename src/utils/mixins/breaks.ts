@@ -1,7 +1,5 @@
 import vue from 'vue'
-import {
-  rendererGetBreakIndex as getBreakIndex
-} from '@/background/ipc'
+import { rendererGetBreakIndex as getBreakIndex } from '@/background/ipc'
 
 import { getUserSettingsStore } from '@/background/db'
 
@@ -21,7 +19,7 @@ export const CheckIsLongBreak = vue.extend({
       )
       return isLong
     },
-  }
+  },
 })
 
 export const GetBreakTime = vue.extend({
@@ -31,5 +29,5 @@ export const GetBreakTime = vue.extend({
       if (isLong) return breaks.long.last
       return breaks.short.last
     },
-  }
+  },
 })

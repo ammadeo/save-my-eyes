@@ -15,7 +15,7 @@ export default mixins(Store).extend({
     title(state) {
       const lang = this.$lang as Languages
       return state.i18n.ideas.title[lang]
-    }
-  })
+    },
+  }),
 })
 </script>

@@ -2,7 +2,7 @@ import { Howl } from 'howler'
 import shortBreakSound from '../assets/music/tone.mp3'
 
 const howlShortBreak = new Howl({
-  src: [shortBreakSound]
+  src: [shortBreakSound],
 })
 
 const howlPlay = (howlInstance: Howl) => async () => {
@@ -14,7 +14,7 @@ const howlPlay = (howlInstance: Howl) => async () => {
 export const play = Object.freeze({
   sound: {
     short: howlPlay(howlShortBreak),
-    long: howlPlay(howlShortBreak) // temp
+    long: howlPlay(howlShortBreak), // temp
   },
-  comment: {}
+  comment: {},
 })

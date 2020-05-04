@@ -21,17 +21,17 @@ module.exports = {
       secondary: {
         50: '#f5faff',
         ...colors.indigo,
-        1000: '#28276b'
+        1000: '#28276b',
       },
-      primary: colors.orange
+      primary: colors.orange,
     },
     fontFamily: {
       display: ['Oxanium', 'roboto', 'sans-serif'],
-      body: ['Source Sans Pro', 'roboto', 'sans-serif']
+      body: ['Source Sans Pro', 'roboto', 'sans-serif'],
     },
     fontWeight: {
       normal: 400,
-      bold: 600
+      bold: 600,
     },
     borderWidth: {
       default: '1px',
@@ -39,14 +39,14 @@ module.exports = {
       '2': '2px',
       '4': '4px',
       '6': '6px',
-      '8': '8px'
+      '8': '8px',
     },
     gridTemplateColumns: {
       base:
-        'minmax(min-content, 3fr) minmax(2rem, 4rem) minmax(min-content, 1fr)'
+        'minmax(min-content, 3fr) minmax(2rem, 4rem) minmax(min-content, 1fr)',
     },
     gridTemplateRows: {
-      base: 'auto auto 1fr auto auto'
+      base: 'auto auto 1fr auto auto',
     },
     extend: {
       translate: (theme) => ({
@@ -61,30 +61,30 @@ module.exports = {
         )} - 100%)`,
         '-card-64': `calc(${theme('spacing.64')} - ${theme(
           'spacing.2'
-        )} - 100%)`
+        )} - 100%)`,
       }),
       minHeight: (theme) => ({
-        12: theme('spacing.12')
+        12: theme('spacing.12'),
       }),
       maxHeight: (theme) => ({
-        'screen-card': `calc(100vh - ${theme('spacing.2')} * 2)`
+        'screen-card': `calc(100vh - ${theme('spacing.2')} * 2)`,
       }),
       borderRadius: {
-        inherit: 'inherit'
+        inherit: 'inherit',
       },
       boxShadow: (theme) => ({
         'inner-1': `inset 0 -${theme('spacing.px')} ${theme(
           'spacing.1'
-        )} 0 rgba(0, 0, 0, 0.2)`
-      })
-    }
+        )} 0 rgba(0, 0, 0, 0.2)`,
+      }),
+    },
   },
   variants: {
     borderWidth: ['responsive', 'hover', 'focus', 'active'],
     overflow: [
       'responsive',
       'hover',
-      'focus'
+      'focus',
       // 'focus-within'
     ],
     textTransform: ['first-letter'],
@@ -93,7 +93,7 @@ module.exports = {
       'hover',
       'focus',
       'active',
-      'group-active'
+      'group-active',
       // 'focus-within',
       // todo fix focus within or add support by js
     ],
@@ -102,8 +102,8 @@ module.exports = {
       'hover',
       'focus',
       'group-hover',
-      'group-focus'
-    ]
+      'group-focus',
+    ],
   },
   plugins: [
     require('tailwindcss-interaction-variants'),
@@ -113,7 +113,7 @@ module.exports = {
           return `.${e(`first-letter${separator}${className}`)}::first-letter`
         })
       })
-    })
+    }),
   ],
-  corePlugins: {}
+  corePlugins: {},
 }

@@ -29,28 +29,28 @@ import { format, addMilliseconds } from 'date-fns'
 import BaseTile from './BaseTile.vue'
 import {
   AutoBorderClasses,
-  AutoColorClasses
+  AutoColorClasses,
 } from '../utils/mixins/autoClasses'
 import mixins from 'vue-typed-mixins'
 
 export default mixins(AutoBorderClasses, AutoColorClasses).extend({
   components: {
-    BaseTile
+    BaseTile,
   },
   props: {
     startDate: {
       required: true,
-      type: Date
+      type: Date,
     },
     endDate: {
       required: true,
-      type: Date
-    }
+      type: Date,
+    },
   },
   data() {
     return {
       anime: undefined,
-      timePassedObj: { timePassed: 0 }
+      timePassedObj: { timePassed: 0 },
     } as {
       anime?: anime.AnimeInstance
       timePassedObj: { timePassed: number }
@@ -72,7 +72,7 @@ export default mixins(AutoBorderClasses, AutoColorClasses).extend({
     },
     timeLeftPercent(): number {
       return (this.timeLeft / this.allTime) * 100
-    }
+    },
   },
   mounted() {
     const allTime = this.allTime
@@ -90,13 +90,13 @@ export default mixins(AutoBorderClasses, AutoColorClasses).extend({
         duration: allTime,
         easing: 'linear',
         round: 10,
-        complete: completeHandler
+        complete: completeHandler,
       })
-    }
+    },
   },
   beforeDestroy() {
     const anime = this.anime
     if (anime) anime.pause()
-  }
+  },
 })
 </script>

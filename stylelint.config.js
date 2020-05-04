@@ -12,11 +12,11 @@ module.exports = {
           /else/,
           /return/,
           /function/,
-          /debug/
-        ]
-      }
+          /debug/,
+        ],
+      },
     ],
     'declaration-block-trailing-semicolon': null,
-    'no-descending-specificity': null
-  }
+    'no-descending-specificity': null,
+  },
 }

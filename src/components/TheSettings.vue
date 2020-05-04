@@ -85,23 +85,23 @@ import { getUserSettingsStore } from '@/background/db'
 import Vue from 'vue'
 export default Vue.extend({
   components: {
-    SettingsSlider
+    SettingsSlider,
   },
   data() {
     return {
       img: {
         src: settingsImg,
-        alt: ''
+        alt: '',
       },
       every: 15 * 60,
       short: {
-        last: 30
+        last: 30,
       },
       long: {
         last: 5 * 60,
-        every: 3
+        every: 3,
       },
-      changed: false
+      changed: false,
     }
   },
   beforeMount() {
@@ -136,14 +136,14 @@ export default Vue.extend({
         breaks: {
           every,
           short,
-          long
+          long,
         },
         sounds: {
           ui: true,
-          voice: true
-        }
+          voice: true,
+        },
       })
-    }
-  }
+    },
+  },
 })
 </script>

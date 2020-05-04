@@ -21,17 +21,17 @@ import BaseButton from './BaseButton.vue'
 import Vue from 'vue'
 export default Vue.extend({
   components: {
-    BaseButton
+    BaseButton,
   },
   props: {
     content: {
       type: String,
-      required: true
+      required: true,
     },
     primary: {
       type: Boolean,
-      default: false
-    }
-  }
+      default: false,
+    },
+  },
 })
 </script>

@@ -14,6 +14,6 @@ export default mixins(Store).extend({
     const lang = getUserSettingsStore().get('lang')
     if (lang) code = lang
     this.$storeTyped.commit('setLang', code)
-  }
+  },
 })
 </script>

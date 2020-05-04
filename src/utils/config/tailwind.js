@@ -63,7 +63,7 @@ exports.Classes = Classes
 
 const helpAutoBorderClasses = (elevation) => [
   ['r', elevation],
-  ['b', elevation]
+  ['b', elevation],
 ]
 
 exports.whitelist = [
@@ -94,5 +94,5 @@ exports.whitelist = [
     .add('', 40)
     .add('md', 48)
     .add('lg', 56)
-    .add('xl', 64).val
+    .add('xl', 64).val,
 ]
