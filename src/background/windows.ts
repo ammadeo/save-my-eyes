@@ -23,10 +23,7 @@ const baseWindowSettings: Electron.BrowserWindowConstructorOptions = {
   alwaysOnTop: isProd,
   skipTaskbar: isProd,
   frame: !isProd,
-  autoHideMenuBar: true,
-  webPreferences: {
-    devTools: !isProdBuild,
-  },
+  autoHideMenuBar: true
 }
 
 const getPrimaryDisplay = () => screen.getPrimaryDisplay().workAreaSize
@@ -46,6 +43,7 @@ function createWindow(
       height: 600,
       webPreferences: {
         nodeIntegration: true,
+        devTools: !isProdBuild,
       },
       ...options,
     })
