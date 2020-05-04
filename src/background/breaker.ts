@@ -1,8 +1,8 @@
 import { scheduleJob, Job } from 'node-schedule'
 import { addSeconds } from 'date-fns'
 import { isProd, isProdBuild, isDevProdTest } from './env'
-import { createWindowIndex } from './windows'
-import { breakIndex } from './store'
+import { createWindowIndex, closeAllWindows } from './windows'
+import { breakIndex, breakId, lastSchedulerJobDate } from './store'
 import { getUserSettingsStore } from './db'
 // import log from 'electron-log'
 
@@ -16,31 +16,66 @@ const calculateNextBreak = (nextBreakIn: number) => {
   return addSeconds(new Date(), isProdBuild ? nextBreakIn : 3)
 }
 
-export const setNewBreak = (forceBreakIn?: number) => {
-  const forced = !!forceBreakIn
-  const nextBreakIn = forceBreakIn || getEveryFromDB()
+export interface NewBreakOptions
+  {forceNextBreakIn?: number, forceNextBreakType?: 'long' | 'short'
+}
 
-  const nextBreak = calculateNextBreak(nextBreakIn)
+const getNewBreakIndex = (oldIndex: number, options: NewBreakOptions): number => {
+  const forced = typeof options?.forceNextBreakIn === "number" || !!options?.forceNextBreakType
+  console.log('getNewBreakIndex', 'oldIndex', oldIndex, 'options', options)
+  if (!forced) return ++oldIndex;
+  else {
+    const forceNextBreakType = options?.forceNextBreakType
+    if(forceNextBreakType){
+      const forceLongBreak = forceNextBreakType === "long"
+      if(forceLongBreak)
+      {
+        console.log('long every', getUserSettingsStore().get('breaks').long.every)
+        return getUserSettingsStore().get('breaks').long.every
+      } else {
+        return 1
+      }
+    }
+  }
+  return oldIndex
+}
 
-  if (!forced) breakIndex.value++
-  const keyBreakIndex = breakIndex.value
+export const setNewBreak = (options: NewBreakOptions) => {
+  closeAllWindows()
+
+  const nextBreakIn = options?.forceNextBreakIn || getEveryFromDB()
+
+
+  breakIndex.value = getNewBreakIndex(breakIndex.value, options)
+
+  breakId.value++
+  const keyBreakIndex = breakId.value
+
   if (breakSchedule) breakSchedule.cancel()
+
   console.log(
     'setNewBreak',
-    'keyBreakIndex',
-    keyBreakIndex,
     'breakIndex.value',
     breakIndex.value,
-    'forced',
-    forced,
-    'nextBreak',
-    nextBreak,
-    'nextBreakIn',
-    nextBreakIn
-  )
-  breakSchedule = scheduleJob(nextBreak, () => {
-    if (keyBreakIndex === breakIndex.value) {
-      createWindowIndex()
+
+    )
+
+  lastSchedulerJobDate.value = new Date()
+    if(nextBreakIn > 0)
+    {
+    const nextBreak = calculateNextBreak(nextBreakIn)
+
+      breakSchedule = scheduleJob(nextBreak, () => {
+        if (keyBreakIndex === breakId.value) {
+          closeAllWindows()
+          createWindowIndex()
+        }
+      })
+
+    }else{
+
+        closeAllWindows()
+        createWindowIndex()
+
     }
-  })
 }

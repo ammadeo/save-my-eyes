@@ -5,8 +5,8 @@ const startDate = new Date(2020, 3, 1, 10, 10)
 const endDate = new Date(2020, 3, 1, 10, 30)
 
 const contentOptions = {
-  long: 'Take a long break for 20 minutes',
-  short: 'Take a short break for 20 minutes'
+  long: 'take a long break for 20 minutes',
+  short: 'take a short break for 20 minutes'
 }
 
 describe('components/TimerInfo.vue', () => {

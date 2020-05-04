@@ -52,7 +52,7 @@ app.on('ready', async () => {
   //@ts-ignore
   app.tray = useTray()
 
-  setNewBreak()
+  setNewBreak({})
 })
 
 // Exit cleanly on request from parent process in development mode.

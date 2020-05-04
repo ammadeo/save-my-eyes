@@ -1,9 +1,10 @@
 import { breakIndex } from './store'
 import { ipcMain, ipcRenderer } from 'electron-better-ipc'
-import { setNewBreak } from './breaker'
-
+import { setNewBreak, NewBreakOptions } from './breaker'
+import { app } from 'electron'
 export const channelSetBreak = 'set-break'
 export const channelGetBreakCount = 'break-count'
+export const channelCloseApp = 'close-app'
 
 export interface OptionsSetBreak {
   forceNextBreakIn: number
@@ -15,9 +16,13 @@ export const rendererGetBreakIndex = async (): Promise<number> => {
 }
 
 export const rendererSetNextBreak = async (
-  forceNextBreakIn?: number
+  options: NewBreakOptions
 ): Promise<void> => {
-  return await ipcRenderer.callMain(channelSetBreak, { forceNextBreakIn })
+  return await ipcRenderer.callMain(channelSetBreak, options)
+}
+
+export const rendererCloseApp = async (): Promise<true> => {
+  return await ipcRenderer.callMain(channelCloseApp)
 }
 
 //? ipc for main
@@ -26,13 +31,13 @@ export const useIpcMain = () => {
     return breakIndex.value
   })
 
-  ipcMain.answerRenderer(channelSetBreak, (options: OptionsSetBreak) => {
-    let forceNextBreakIn
-    if (options) {
-      forceNextBreakIn = options.forceNextBreakIn
-    }
+  ipcMain.answerRenderer(channelSetBreak, (options: NewBreakOptions) => {
+    setNewBreak(options)
+    return true
+  })
 
-    setNewBreak(forceNextBreakIn)
+  ipcMain.answerRenderer(channelCloseApp, () => {
+    app.quit()
     return true
   })
 }

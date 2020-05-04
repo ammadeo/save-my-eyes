@@ -2,30 +2,45 @@ import { screen, BrowserWindow } from 'electron'
 import { isProd, isProdBuild, isDevProdTest } from './env'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 
-let windowIndex: undefined | BrowserWindow,
+const windows: {
+  windowIndex: undefined | BrowserWindow,
   windowTray: undefined | BrowserWindow
+} = {
+  windowIndex: undefined,
+  windowTray: undefined
+}
 
-const baseWindowSettings = {
+export const closeAllWindows = () => {
+  windows.windowIndex?.close();
+  windows.windowTray?.close();
+}
+
+interface WindowOptions extends Electron.BrowserWindowConstructorOptions {
+  devTools: boolean
+}
+
+const baseWindowSettings: WindowOptions = {
   show: false,
   minimizable: !isProd,
+  movable: !isProd,
+  fullscreenable: !isProd,
   alwaysOnTop: isProd,
   skipTaskbar: isProd,
   frame: !isProd,
   autoHideMenuBar: true,
-  devTools: true, //!isProd,
-  webSecurity: isProd,
+  devTools: !isProdBuild,
 }
 
 const getPrimaryDisplay = () => screen.getPrimaryDisplay().workAreaSize
 
 function createWindow(
-  window: undefined | BrowserWindow,
+  windowKey: keyof typeof windows,
   url: string,
   options: Electron.BrowserWindowConstructorOptions
 ) {
   // Create the browser window.
-  if (!window) {
-    window = new BrowserWindow({
+  if (!windows[windowKey]) {
+    const newWindow = new BrowserWindow({
       width: 800,
       height: 600,
       webPreferences: {
@@ -33,50 +48,52 @@ function createWindow(
       },
       ...options
     })
-
+    windows[windowKey] = newWindow;
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       // Load the url of the dev server if in development mode
       const path = process.env.WEBPACK_DEV_SERVER_URL as string + url
-      window.loadURL(path)
-      if (!process.env.IS_TEST) window.webContents.openDevTools()
+      newWindow.loadURL(path)
+      if (!process.env.IS_TEST) newWindow.webContents.openDevTools()
     } else {
       createProtocol('app')
       // Load the index.html when not in development
-      window.loadURL(`app://${url}`)
+      newWindow.loadURL(`app://${url}`)
     }
 
-    window.on('closed', () => {
-      window = undefined
+    newWindow.on('closed', () => {
+      windows[windowKey] = undefined
     })
   }
-  window.show()
+  windows[windowKey]?.show()
 }
 
 export const createWindowIndex = async () => {
   const url = isProdBuild ? '-' : ''
-  createWindow(windowIndex, url, {
-    width: 1000,
-    height: 600,
-    fullscreen: isProd,
+  const {height: screenHeight, width: screenWidth} = getPrimaryDisplay();
+
+  createWindow('windowIndex', url, {
+    width: screenWidth,
+    height: screenHeight,
+    y: 0,
+    x: 0,
     ...baseWindowSettings
   })
 }
 
 export const createWindowTray = async () => {
   const url = isProdBuild ? './menu' : '/#/menu'
-  const width = 600
+  const width = 500
   const {height: screenHeight, width: screenWidth} = getPrimaryDisplay();
   const x = screenWidth - width
 
 
-  createWindow(windowTray, url, {
+  createWindow('windowTray', url, {
     width,
     height: screenHeight,
     y: 0,
     x,
     backgroundColor: '#00000000',
     transparent: true,
-    frame: false,
     ...baseWindowSettings,
   })
 }

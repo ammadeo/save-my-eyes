@@ -1,9 +1,9 @@
 import { Module } from 'vuex-typescript-interface'
 
 // ? ideas cards images
-import windowImg from '../assets/images/window.svg'
-import plantImg from '../assets/images/plant.svg'
-import eyesImg from '../assets/images/eyes.svg'
+import windowImg from '@/assets/images/window.svg'
+import plantImg from '@/assets/images/plant.svg'
+import eyesImg from '@/assets/images/eyes.svg'
 
 // ? helpers
 const translate = (en = '', pl = '') => ({
