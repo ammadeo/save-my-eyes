@@ -26,7 +26,7 @@ const baseWindowSettings: Electron.BrowserWindowConstructorOptions = {
   autoHideMenuBar: true,
   webPreferences: {
     devTools: !isProdBuild,
-  }
+  },
 }
 
 const getPrimaryDisplay = () => screen.getPrimaryDisplay().workAreaSize
@@ -65,8 +65,7 @@ function createWindow(
       windows[windowKey] = undefined
     })
 
-    if(extendWindow)
-      extendWindow(newWindow)
+    if (extendWindow) extendWindow(newWindow)
   }
   windows[windowKey]?.show()
 }
@@ -90,19 +89,24 @@ export const createWindowTray = async () => {
   const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
   const x = screenWidth - width
 
-  createWindow('windowTray', url, {
-    width,
-    height: screenHeight,
-    y: 0,
-    x,
-    backgroundColor: '#00000000',
-    transparent: true,
-    ...baseWindowSettings,
-  }, (window) => {
-    window.on("blur", ()=>{
-      window.close()
-    })
-  })
+  createWindow(
+    'windowTray',
+    url,
+    {
+      width,
+      height: screenHeight,
+      y: 0,
+      x,
+      backgroundColor: '#00000000',
+      transparent: true,
+      ...baseWindowSettings,
+    },
+    (window) => {
+      window.on('blur', () => {
+        window.close()
+      })
+    }
+  )
 }
 
 // const createWindow = (options) => {
