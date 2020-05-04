@@ -12,3 +12,4 @@ export const breakIndex = new Data(0)
 export const breakId = new Data(0)
 
 export const lastSchedulerJobDate = new Data(new Date())
+export const lastSchedulerJobLength = new Data(0)

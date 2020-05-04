@@ -2,7 +2,7 @@ import { scheduleJob, Job } from 'node-schedule'
 import { addSeconds } from 'date-fns'
 import { isProd, isProdBuild, isDevProdTest } from './env'
 import { createWindowIndex, closeAllWindows } from './windows'
-import { breakIndex, breakId, lastSchedulerJobDate } from './store'
+import { breakIndex, breakId, lastSchedulerJobDate, lastSchedulerJobLength } from './store'
 import { getUserSettingsStore } from './db'
 // import log from 'electron-log'
 
@@ -13,7 +13,7 @@ const getEveryFromDB = () => {
 }
 
 const calculateNextBreak = (nextBreakIn: number) => {
-  return addSeconds(new Date(), isProdBuild ? nextBreakIn : 3)
+  return addSeconds(new Date(), isProdBuild ? nextBreakIn : isDevProdTest ? 15 : 3)
 }
 
 export interface NewBreakOptions {
@@ -63,6 +63,8 @@ export const setNewBreak = (options: NewBreakOptions) => {
   console.log('setNewBreak', 'breakIndex.value', breakIndex.value)
 
   lastSchedulerJobDate.value = new Date()
+  lastSchedulerJobLength.value = nextBreakIn
+  console.log('nextBreakIn', nextBreakIn, 'lastSchedulerJobLength.value', lastSchedulerJobLength.value)
   if (nextBreakIn > 0) {
     const nextBreak = calculateNextBreak(nextBreakIn)
 

@@ -15,11 +15,7 @@ export const closeAllWindows = () => {
   windows.windowTray?.close()
 }
 
-interface WindowOptions extends Electron.BrowserWindowConstructorOptions {
-  devTools: boolean
-}
-
-const baseWindowSettings: WindowOptions = {
+const baseWindowSettings: Electron.BrowserWindowConstructorOptions = {
   show: false,
   minimizable: !isProd,
   movable: !isProd,
@@ -28,15 +24,20 @@ const baseWindowSettings: WindowOptions = {
   skipTaskbar: isProd,
   frame: !isProd,
   autoHideMenuBar: true,
-  devTools: !isProdBuild,
+  webPreferences: {
+    devTools: !isProdBuild,
+  }
 }
 
 const getPrimaryDisplay = () => screen.getPrimaryDisplay().workAreaSize
 
+type WindowFunction = (window: BrowserWindow) => void
+
 function createWindow(
   windowKey: keyof typeof windows,
   url: string,
-  options: Electron.BrowserWindowConstructorOptions
+  options: Electron.BrowserWindowConstructorOptions,
+  extendWindow?: WindowFunction
 ) {
   // Create the browser window.
   if (!windows[windowKey]) {
@@ -63,6 +64,9 @@ function createWindow(
     newWindow.on('closed', () => {
       windows[windowKey] = undefined
     })
+
+    if(extendWindow)
+      extendWindow(newWindow)
   }
   windows[windowKey]?.show()
 }
@@ -94,6 +98,10 @@ export const createWindowTray = async () => {
     backgroundColor: '#00000000',
     transparent: true,
     ...baseWindowSettings,
+  }, (window) => {
+    window.on("blur", ()=>{
+      window.close()
+    })
   })
 }
 
