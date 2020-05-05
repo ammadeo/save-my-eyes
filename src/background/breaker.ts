@@ -20,7 +20,7 @@ const getEveryFromDB = () => {
 const calculateNextBreak = (nextBreakIn: number) => {
   return addSeconds(
     new Date(),
-    isProdBuild ? nextBreakIn : isDevProdTest ? 15 : 3
+    isProdBuild ? nextBreakIn : isDevProdTest ? 30 : 3
   )
 }
 

@@ -41,7 +41,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       nextBreakTime: '',
     }
   },
-  async beforeMount() {
+  async mounted() {
     const isLong = await this.checkIsLongBreak()
     this.nextBreakName = this.breakName(isLong)
     this.runClock()
@@ -51,18 +51,28 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       this.$emit('run', key)
     },
     async runClock() {
-      this.nextBreakTime = await this.nextBreakIn()
-      setTimeout(this.runClock, 1000)
+      console.log('run clock')
+      try {
+        this.nextBreakTime = await this.nextBreakIn()
+        console.log('clock set', 'this.nextBreakTime', this.nextBreakTime)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setTimeout(this.runClock, 1000)
+      }
     },
     async nextBreakDate(): Promise<Date> {
       const {
         lastSchedulerJobDate,
         lastSchedulerJobLength,
       } = await rendererGetBreakerData()
+      console.log('resived ipc ')
       return addSeconds(lastSchedulerJobDate, lastSchedulerJobLength)
     },
     async nextBreakIn(): Promise<string> {
-      return formatDistanceStrict(new Date(), await this.nextBreakDate(), {
+      const nextBreakDate = await this.nextBreakDate()
+      console.log('new Date()', new Date(), 'nextBreakDate', nextBreakDate)
+      return formatDistanceStrict(new Date(), nextBreakDate, {
         roundingMethod: 'floor',
       })
     },

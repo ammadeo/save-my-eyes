@@ -101,7 +101,7 @@ export const createWindowTray = async () => {
     },
     (window) => {
       window.on('blur', () => {
-        window.close()
+        window.focus()
       })
     }
   )
