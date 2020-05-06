@@ -20,9 +20,9 @@ interface TypedStore {
 }
 
 interface UserSettingsSchema {
-  breaks:Store.Schema
-  sounds:Store.Schema
-  lang:Store.Schema
+  breaks: Store.Schema
+  sounds: Store.Schema
+  lang: Store.Schema
 }
 
 const userSettingsSchema: UserSettingsSchema = {
