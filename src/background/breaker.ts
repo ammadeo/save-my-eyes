@@ -70,7 +70,7 @@ export const setNewBreak = (options: NewBreakOptions) => {
 
   console.log('setNewBreak', 'breakIndex.value', breakIndex.value)
 
-  lastSchedulerJobDate.value = new Date()
+  lastSchedulerJobDate.value = new Date().toISOString()
   lastSchedulerJobLength.value = nextBreakIn
   console.log(
     'nextBreakIn',

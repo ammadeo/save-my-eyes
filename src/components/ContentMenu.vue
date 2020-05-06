@@ -26,12 +26,12 @@
 <script lang="ts">
 import ButtonIcon from './ButtonIcon.vue'
 import { RunKey } from '@/types/menu'
-import { formatDistanceStrict, addSeconds } from 'date-fns'
-import { CheckIsLongBreak, GetBreakTime } from '@/utils/mixins/breaks'
-import { rendererGetBreakerData } from '@/background/ipc'
+import { formatDistanceStrict, addSeconds, parseISO } from 'date-fns'
+import { CheckIsLongBreak } from '@/utils/mixins/breaks'
+import { rendererGetBreakData } from '@/background/ipc'
 
 import mixins from 'vue-typed-mixins'
-export default mixins(CheckIsLongBreak, GetBreakTime).extend({
+export default mixins(CheckIsLongBreak).extend({
   components: {
     ButtonIcon,
   },
@@ -65,9 +65,9 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       const {
         lastSchedulerJobDate,
         lastSchedulerJobLength,
-      } = await rendererGetBreakerData()
+      } = await rendererGetBreakData.ask({})
       console.log('resived ipc ')
-      return addSeconds(lastSchedulerJobDate, lastSchedulerJobLength)
+      return addSeconds(parseISO(lastSchedulerJobDate), lastSchedulerJobLength)
     },
     async nextBreakIn(): Promise<string> {
       const nextBreakDate = await this.nextBreakDate()

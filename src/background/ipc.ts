@@ -6,10 +6,10 @@ import {
 import { setNewBreak, NewBreakOptions } from './breaker'
 import { isProdBuild } from './env'
 import { app, ipcMain, ipcRenderer } from 'electron'
-export const channelSetBreak = 'set-break'
-export const channelGetBreakCount = 'break-count'
-export const channelCloseApp = 'close-app'
-export const channelGetBreakerData = 'breaker-data'
+// export const channelSetBreak = 'set-break'
+// export const channelGetBreakCount = 'break-count'
+// export const channelCloseApp = 'close-app'
+// export const channelGetBreakerData = 'breaker-data'
 
 export interface OptionsSetBreak {
   forceNextBreakIn: number
@@ -23,50 +23,27 @@ class IpcChanel<RendererAskPayload extends {}, RendererAskAnswer extends {}> {
     this.rendererChanelId = `${baseChanelId}-renderer`
   }
 
-  renderer(){
-    const ask = async (options: RendererAskPayload): Promise<RendererAskAnswer> => 
+  readonly renderer = {
+    ask: async (options: RendererAskPayload): Promise<RendererAskAnswer> =>
       new Promise((resolve, reject)=>{
-        ipcRenderer.on(this.mainChanelId, (_event:Event, answer: RendererAskAnswer) => {
+        ipcRenderer.on(this.mainChanelId, (_event, answer: RendererAskAnswer) => {
           resolve(answer)
         })
         if(!isProdBuild){
-          setTimeout(()=>{ console.error(`timeout while waiting for ${this.mainChanelId} to response`)
-          reject()}, 500)
+          setTimeout(()=>{
+          reject(`timeout while waiting for ${this.mainChanelId} to response`)}, 3000)
         }
         ipcRenderer.send(this.rendererChanelId, options)
-      })
-    
-
-
-    // todo if needed
-    // const tell = async (): Promise<void> => {
-
-    // }
-
-    // const listen = () =>{
-
-    // }
-
-    return {
-      ask
-    }
+    })
   }
 
-  main(){
-    const tell = () => {
-
-    }
-
-    const listen = () => {
+  readonly main = {
+     listen: (answerHandler: (payload: RendererAskPayload) => RendererAskAnswer) => {
       ipcMain.on(this.rendererChanelId, (event, payload: RendererAskPayload) => {
-        event.reply()
+        event.reply(this.mainChanelId, answerHandler(payload))
       })
     }
-    return {
-      listen
-}
   }
-
 }
 
 class IpcChanelFactory {
@@ -75,56 +52,39 @@ class IpcChanelFactory {
     this.index++
     return `auto-generated-${this.index}`
   }
-  static create() {
+  static create<RendererAskPayload extends {}, RendererAskAnswer extends {}>() {
     const id = this.generateId()
-    return new IpcChanel(id)
+    return new IpcChanel<RendererAskPayload, RendererAskAnswer>(id)
   }
 }
 
 //? ipc for renderer
-export const rendererGetBreakIndex = async (): Promise<number> => {
-  return await ipcRenderer.callMain(channelGetBreakCount)
+interface GetBreakDataAnswer {
+  breakIndex: number;
+  lastSchedulerJobDate: typeof lastSchedulerJobDate.value;
+  lastSchedulerJobLength: typeof lastSchedulerJobLength.value;
 }
+export const {main: mainGetBreakData, renderer: rendererGetBreakData} = IpcChanelFactory.create<{}, GetBreakDataAnswer>()
 
-export const rendererGetBreakerData = async (): Promise<{
-  lastSchedulerJobDate: typeof lastSchedulerJobDate.value
-  lastSchedulerJobLength: typeof lastSchedulerJobLength.value
-}> => {
-  console.log("ipc before call:", channelGetBreakerData)
-  return await ipcRenderer.callMain(channelGetBreakerData)
-}
+export const {main: mainSetNextBreak, renderer: rendererSetNextBreak} = IpcChanelFactory.create<NewBreakOptions,{}>()
 
-export const rendererSetNextBreak = async (
-  options: NewBreakOptions
-): Promise<void> => {
-  return await ipcRenderer.callMain(channelSetBreak, options)
-}
-
-export const rendererCloseApp = async (): Promise<true> => {
-  return await ipcRenderer.callMain(channelCloseApp)
-}
+export const {main: mainCloseApp, renderer: rendererCloseApp} = IpcChanelFactory.create<{},{}>()
 
 //? ipc for main
 export const useIpcMain = () => {
-  ipcMain.answerRenderer(channelGetBreakCount, () => {
-    return breakIndex.value
-  })
+  mainGetBreakData.listen(() => ({
+    breakIndex: breakIndex.value,
+    lastSchedulerJobDate: lastSchedulerJobDate.value,
+    lastSchedulerJobLength: lastSchedulerJobLength.value,
+  }))
 
-  ipcMain.answerRenderer(channelGetBreakerData, () => {
-    console.log("ipc before answer:", channelGetBreakerData, 'lastSchedulerJobDate.value', lastSchedulerJobDate.value, 'lastSchedulerJobLength.value', lastSchedulerJobLength.value)
-    return {
-      lastSchedulerJobDate: lastSchedulerJobDate.value,
-      lastSchedulerJobLength: lastSchedulerJobLength.value,
-    }
-  })
-
-  ipcMain.answerRenderer(channelSetBreak, (options: NewBreakOptions) => {
+  mainSetNextBreak.listen((options)=>{
     setNewBreak(options)
-    return true
+    return {}
   })
 
-  ipcMain.answerRenderer(channelCloseApp, () => {
+  mainCloseApp.listen(()=>{
     app.quit()
-    return true
+    return {}
   })
 }

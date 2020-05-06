@@ -20,6 +20,7 @@ const baseWindowSettings: Electron.BrowserWindowConstructorOptions = {
   minimizable: !isProd,
   movable: !isProd,
   fullscreenable: !isProd,
+  resizable: !isProd,
   alwaysOnTop: isProd,
   skipTaskbar: isProd,
   frame: !isProd,

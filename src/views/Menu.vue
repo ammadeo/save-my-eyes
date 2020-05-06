@@ -70,19 +70,22 @@ export default Vue.extend({
   mounted() {
     type Id<T> = { [K in keyof T]: T[K] }
     const setIgnoreMouseEvents = remote.getCurrentWindow().setIgnoreMouseEvents
-    interface MousePolicyCanClick extends MousePolicy {
-      this: Id<Window & { _canClick: boolean }>
-      event: Event
-    }
+    // interface MousePolicyCanClick extends MousePolicy {
+    //   (event: Event): void
+    //   _canClick: boolean | undefined
+    // }
     if (isProd) {
+      // const addCanClickEventListener = addEventListener as (
+      //   name: 'pointerover',
+      //   handler: MousePolicyCanClick
+      // ) => void
       addEventListener('pointerover', function mousePolicy(event) {
-        mousePolicy as MousePolicyCanClick
         mousePolicy._canClick =
           event.target === document.documentElement
             ? mousePolicy._canClick &&
               setIgnoreMouseEvents(true, { forward: true })
             : mousePolicy._canClick || setIgnoreMouseEvents(false) || 1
-      } as MousePolicyCanClick)
+      })
 
       setIgnoreMouseEvents(true, { forward: true })
     }
@@ -114,7 +117,7 @@ export default Vue.extend({
       console.log(event)
       switch (event) {
         case 'start-long-break':
-          return setNextBreak({
+          return setNextBreak.ask({
             forceNextBreakIn: 0,
             forceNextBreakType: 'long',
           })
