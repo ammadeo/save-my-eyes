@@ -74,8 +74,9 @@ exports.whitelist = [
     .setArg('secondary')
     .add('', 300, 500, 700, 800)
     .add(['focus', 'hover'], 800)
-    .setArg('secondary')
+    .setArg('primary')
     .add('', 400).val,
+  // ? border
   ...new Classes('border')
     .add(
       '',
@@ -87,8 +88,8 @@ exports.whitelist = [
     .setArg('secondary')
     .add('', 500, 700, 900, 1000)
     .add(['focus', 'hover'], 1000)
-    .setArg('secondary')
-    .add('', 600).val,
+    .setArg('primary')
+    .add('', 600, 700, 900).val,
   ...new Classes('-translate')
     .setArg('y', 'card')
     .add('', 40)

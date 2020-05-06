@@ -14,16 +14,7 @@ const plugin = require('tailwindcss/plugin')
 
 module.exports = {
   purge: {
-    content: ['./src/**/*.html', './src/**/*.vue', './src/**/*.jsx'],
-    enabled: true || process.env.NODE_ENV === 'production',
-    options: {
-      whitelist,
-      plugins: {
-        'postcss-preset-env': {
-          stage: 0,
-        },
-      },
-    },
+    enabled: false,
   },
   theme: {
     colors: {
@@ -117,6 +108,7 @@ module.exports = {
       'focus',
       'group-hover',
       'group-focus',
+      'group-hocus',
     ],
   },
   plugins: [

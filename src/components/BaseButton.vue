@@ -17,13 +17,9 @@
 </template>
 
 <script lang="ts">
-import {
-  AutoBorderClasses,
-  AutoColorClasses,
-} from '../utils/mixins/autoClasses'
+import Vue from 'vue'
 
-import mixins from 'vue-typed-mixins'
-export default mixins(AutoBorderClasses, AutoColorClasses).extend({
+export default Vue.extend({
   props: {
     primary: {
       default: false,
@@ -32,45 +28,21 @@ export default mixins(AutoBorderClasses, AutoColorClasses).extend({
   },
   computed: {
     classesTop() {
-      const autoColorClasses = this.autoColorClasses
-      // const autoBorderClasses = this.autoBorderClasses
       return [
-        // ...autoBorderClasses(4),
-        // ...autoBorderClasses(2, 'active'),
         ...(this.primary
-          ? [
-              'text-black',
-              ...autoColorClasses('primary', '400'),
-              ...autoColorClasses('primary', '500', 'group-hover'),
-              ...autoColorClasses('primary', '500', 'group-focus'),
-            ]
+          ? ['text-black', 'bg-primary-400', 'group-hocus:bg-primary-500']
           : [
               'text-secondary-100',
-              ...autoColorClasses('secondary', '700'),
-              ...autoColorClasses('secondary', '800', 'group-hover'),
-              ...autoColorClasses('secondary', '800', 'group-focus'),
+              'bg-secondary-700',
+              'group-hocus:bg-secondary-800',
             ]),
       ]
     },
     classesBottom() {
-      const autoColorClasses = this.autoColorClasses
-      // const autoBorderClasses = this.autoBorderClasses
       return [
-        // ...autoBorderClasses(4),
-        // ...autoBorderClasses(2, 'active'),
         ...(this.primary
-          ? [
-              'text-black',
-              ...autoColorClasses('primary', '600'),
-              ...autoColorClasses('primary', '700', 'group-hover'),
-              ...autoColorClasses('primary', '700', 'group-focus'),
-            ]
-          : [
-              'text-secondary-100',
-              ...autoColorClasses('secondary', '800'),
-              ...autoColorClasses('secondary', '900', 'group-hover'),
-              ...autoColorClasses('secondary', '900', 'group-focus'),
-            ]),
+          ? ['bg-primary-600', 'group-hocus:bg-primary-700']
+          : ['bg-secondary-800', 'group-hocus:bg-secondary-900']),
       ]
     },
   },
