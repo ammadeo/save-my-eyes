@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { colors } = require('tailwindcss/defaultTheme')
+const { whitelist } = require('./src/utils/config/tailwind.js')
+
 const plugin = require('tailwindcss/plugin')
 /*
  ** TailwindCSS Configuration File
@@ -11,6 +13,18 @@ const plugin = require('tailwindcss/plugin')
 // const cardBottomMargin = 'spacing.2'
 
 module.exports = {
+  purge: {
+    content: ['./src/**/*.html', './src/**/*.vue', './src/**/*.jsx'],
+    enabled: true || process.env.NODE_ENV === 'production',
+    options: {
+      whitelist,
+      plugins: {
+        'postcss-preset-env': {
+          stage: 0,
+        },
+      },
+    },
+  },
   theme: {
     colors: {
       black: colors.black,

@@ -44,7 +44,7 @@ function createWindow(
       height: 600,
       webPreferences: {
         nodeIntegration: true,
-        devTools: !isProdBuild,
+        devTools: true || !isProdBuild,
       },
       ...options,
     })
@@ -57,7 +57,7 @@ function createWindow(
     } else {
       createProtocol('app')
       // Load the index.html when not in development
-      newWindow.loadURL(`app://${url}`)
+      newWindow.loadURL(`app://.index.html/${url}`)
     }
 
     newWindow.on('closed', () => {
@@ -70,7 +70,7 @@ function createWindow(
 }
 
 export const createWindowIndex = async () => {
-  const url = isProdBuild ? '-' : ''
+  const url = ''
   const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
 
   createWindow('windowIndex', url, {
@@ -83,7 +83,7 @@ export const createWindowIndex = async () => {
 }
 
 export const createWindowTray = async () => {
-  const url = isProdBuild ? './menu' : '/#/menu'
+  const url = '/#/menu'
   const width = 500
   const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
   const x = screenWidth - width
