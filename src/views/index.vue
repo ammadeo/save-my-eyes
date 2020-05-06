@@ -62,7 +62,8 @@
       v-if="ready"
       color="secondary-300"
       class="col-start-3 row-start-5"
-      @changeAutoFinishLock="setAutoFinishLock($event)"
+      @focusin="setAutoFinishLock(true)"
+      @focusout="setAutoFinishLock(false)"
     >
       <TheSettings />
     </CardAbsolute>

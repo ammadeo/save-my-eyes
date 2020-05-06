@@ -1,24 +1,16 @@
 import Vue from 'vue'
-import Vuex, { createHelpers } from 'vuex-typescript-interface'
+import Vuex, { StoreOptions } from 'vuex'
 
 import { i18n, I18n } from './i18n'
 
 Vue.use(Vuex)
 
-interface Store {
-  modules: {
-    i18n: I18n
-  }
-}
+export type RootStore = {}
 
-export default new Vuex.Store<Store>({
+const store: StoreOptions<RootStore> = {
   modules: {
     i18n,
   },
-})
+}
 
-export { Store } from '@/utils/mixins/store'
-
-export const { mapState, mapGetters, mapMutations, mapActions } = createHelpers<
-  Store
->()
+export default new Vuex.Store<RootStore>(store)

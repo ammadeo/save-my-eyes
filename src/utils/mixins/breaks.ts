@@ -1,12 +1,12 @@
 import vue from 'vue'
-import { rendererGetBreakData} from '@/background/ipc'
+import { rendererGetBreakData } from '@/background/ipc'
 
 import { getUserSettingsStore } from '@/background/db'
 
 export const CheckIsLongBreak = vue.extend({
   methods: {
     async checkIsLongBreak() {
-      const {breakIndex} = await rendererGetBreakData.ask({})
+      const { breakIndex } = await rendererGetBreakData.ask({})
       const longBreakEvery = getUserSettingsStore().get('breaks').long.every
       const isLong = breakIndex % longBreakEvery === 0
       console.log(

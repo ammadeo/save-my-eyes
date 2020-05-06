@@ -19,7 +19,13 @@ interface TypedStore {
   lang: string
 }
 
-const userSettingsSchema = {
+interface UserSettingsSchema {
+  breaks:Store.Schema
+  sounds:Store.Schema
+  lang:Store.Schema
+}
+
+const userSettingsSchema: UserSettingsSchema = {
   breaks: {
     type: 'object',
     properties: {
@@ -89,7 +95,7 @@ const userSettings = 'user-settings'
 
 export const getUserSettingsStore = () =>
   new Store<TypedStore>({
-    schema: userSettingsSchema as Store.Schema,
+    schema: userSettingsSchema,
     defaults: userSettingsDefaults,
     name: userSettings,
   })

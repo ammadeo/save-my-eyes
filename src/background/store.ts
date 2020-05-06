@@ -4,7 +4,7 @@ class Data<T> {
     return this.data
   }
   set value(to) {
-    this.data = typeof to === "object" ? {...to} : to
+    this.data = typeof to === 'object' ? { ...to } : to
   }
 }
 

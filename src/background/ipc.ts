@@ -18,31 +18,40 @@ export interface OptionsSetBreak {
 class IpcChanel<RendererAskPayload extends {}, RendererAskAnswer extends {}> {
   private readonly mainChanelId: string
   private readonly rendererChanelId: string
-  constructor(baseChanelId: string){
+  constructor(baseChanelId: string) {
     this.mainChanelId = `${baseChanelId}-main`
     this.rendererChanelId = `${baseChanelId}-renderer`
   }
 
   readonly renderer = {
     ask: async (options: RendererAskPayload): Promise<RendererAskAnswer> =>
-      new Promise((resolve, reject)=>{
-        ipcRenderer.on(this.mainChanelId, (_event, answer: RendererAskAnswer) => {
-          resolve(answer)
-        })
-        if(!isProdBuild){
-          setTimeout(()=>{
-          reject(`timeout while waiting for ${this.mainChanelId} to response`)}, 3000)
+      new Promise((resolve, reject) => {
+        ipcRenderer.on(
+          this.mainChanelId,
+          (_event, answer: RendererAskAnswer) => {
+            resolve(answer)
+          }
+        )
+        if (!isProdBuild) {
+          setTimeout(() => {
+            reject(`timeout while waiting for ${this.mainChanelId} to response`)
+          }, 3000)
         }
         ipcRenderer.send(this.rendererChanelId, options)
-    })
+      }),
   }
 
   readonly main = {
-     listen: (answerHandler: (payload: RendererAskPayload) => RendererAskAnswer) => {
-      ipcMain.on(this.rendererChanelId, (event, payload: RendererAskPayload) => {
-        event.reply(this.mainChanelId, answerHandler(payload))
-      })
-    }
+    listen: (
+      answerHandler: (payload: RendererAskPayload) => RendererAskAnswer
+    ) => {
+      ipcMain.on(
+        this.rendererChanelId,
+        (event, payload: RendererAskPayload) => {
+          event.reply(this.mainChanelId, answerHandler(payload))
+        }
+      )
+    },
   }
 }
 
@@ -60,15 +69,24 @@ class IpcChanelFactory {
 
 //? ipc for renderer
 interface GetBreakDataAnswer {
-  breakIndex: number;
-  lastSchedulerJobDate: typeof lastSchedulerJobDate.value;
-  lastSchedulerJobLength: typeof lastSchedulerJobLength.value;
+  breakIndex: number
+  lastSchedulerJobDate: typeof lastSchedulerJobDate.value
+  lastSchedulerJobLength: typeof lastSchedulerJobLength.value
 }
-export const {main: mainGetBreakData, renderer: rendererGetBreakData} = IpcChanelFactory.create<{}, GetBreakDataAnswer>()
+export const {
+  main: mainGetBreakData,
+  renderer: rendererGetBreakData,
+} = IpcChanelFactory.create<{}, GetBreakDataAnswer>()
 
-export const {main: mainSetNextBreak, renderer: rendererSetNextBreak} = IpcChanelFactory.create<NewBreakOptions,{}>()
+export const {
+  main: mainSetNextBreak,
+  renderer: rendererSetNextBreak,
+} = IpcChanelFactory.create<NewBreakOptions, {}>()
 
-export const {main: mainCloseApp, renderer: rendererCloseApp} = IpcChanelFactory.create<{},{}>()
+export const {
+  main: mainCloseApp,
+  renderer: rendererCloseApp,
+} = IpcChanelFactory.create<{}, {}>()
 
 //? ipc for main
 export const useIpcMain = () => {
@@ -78,12 +96,12 @@ export const useIpcMain = () => {
     lastSchedulerJobLength: lastSchedulerJobLength.value,
   }))
 
-  mainSetNextBreak.listen((options)=>{
+  mainSetNextBreak.listen((options) => {
     setNewBreak(options)
     return {}
   })
 
-  mainCloseApp.listen(()=>{
+  mainCloseApp.listen(() => {
     app.quit()
     return {}
   })

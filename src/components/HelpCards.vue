@@ -30,19 +30,20 @@ import {
   AutoBorderClasses,
   AutoColorClasses,
 } from '../utils/mixins/autoClasses'
-import { Store, mapState } from '@/store'
-
+import { Lang } from '@/utils/mixins/i18n'
 import mixins from 'vue-typed-mixins'
 
-export default mixins(AutoBorderClasses, AutoColorClasses, Store).extend({
+import { Card } from '@/store/i18n'
+
+export default mixins(AutoBorderClasses, AutoColorClasses, Lang).extend({
   components: {
     CardAbsolute,
   },
-  computed: mapState({
-    cards({ i18n }) {
-      return i18n.ideas.cards
+  computed: {
+    cards(): Card {
+      return this.$store.state.i18n.ideas.cards
     },
-  }),
+  },
   methods: {
     emitChangeAutoFinishLock(isAutoLock: boolean) {
       this.$emit('changeAutoFinishLock', isAutoLock)

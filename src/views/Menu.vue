@@ -53,6 +53,7 @@ interface MousePolicy {
 type Keys = 'menu' | 'settings' | 'stop-protection'
 interface Data {
   openedKeys: Keys[]
+  canClick: boolean | void
 }
 
 export default Vue.extend({
@@ -65,26 +66,19 @@ export default Vue.extend({
   data() {
     return {
       openedKeys: ['menu'],
+      canClick: false,
     } as Data
   },
   mounted() {
     type Id<T> = { [K in keyof T]: T[K] }
     const setIgnoreMouseEvents = remote.getCurrentWindow().setIgnoreMouseEvents
-    // interface MousePolicyCanClick extends MousePolicy {
-    //   (event: Event): void
-    //   _canClick: boolean | undefined
-    // }
+
     if (isProd) {
-      // const addCanClickEventListener = addEventListener as (
-      //   name: 'pointerover',
-      //   handler: MousePolicyCanClick
-      // ) => void
-      addEventListener('pointerover', function mousePolicy(event) {
-        mousePolicy._canClick =
+      addEventListener('pointerover', (event) => {
+        this.canClick =
           event.target === document.documentElement
-            ? mousePolicy._canClick &&
-              setIgnoreMouseEvents(true, { forward: true })
-            : mousePolicy._canClick || setIgnoreMouseEvents(false) || 1
+            ? this.canClick && setIgnoreMouseEvents(true, { forward: true })
+            : this.canClick || setIgnoreMouseEvents(false) || true
       })
 
       setIgnoreMouseEvents(true, { forward: true })

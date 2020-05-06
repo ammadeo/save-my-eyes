@@ -1,4 +1,5 @@
-import { Module } from 'vuex-typescript-interface'
+import { Module } from 'vuex'
+import { RootStore } from './index'
 
 // ? ideas cards images
 import windowImg from '@/assets/images/window.svg'
@@ -11,6 +12,20 @@ const translate = (en = '', pl = '') => ({
   pl,
 })
 const t = translate
+type translateResult = ReturnType<typeof translate>
+
+export interface Card {
+  title: translateResult
+  img: {
+    src: string
+    alt: translateResult
+  }
+  content: translateResult
+  link: {
+    src: translateResult
+    content: translateResult
+  }
+}
 
 // ? translations
 const generateI18n = () => ({
@@ -64,7 +79,7 @@ const generateI18n = () => ({
           content: t(''),
         },
       },
-    ],
+    ] as Card[],
   },
 })
 
@@ -77,10 +92,10 @@ type ReturnedFromGenerator = ReturnType<typeof generateI18n>
 
 export interface I18n extends ReturnedFromGenerator {
   lang: Languages
-  setLang: (code: Languages) => void
 }
 
-export const i18n: Module<I18n> = {
+export const i18n: Module<I18n, RootStore> = {
+  namespaced: true,
   state: {
     lang: 'en',
     ...generateI18n(),

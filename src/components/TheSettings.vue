@@ -1,7 +1,7 @@
 <template>
   <div class="flex-grow">
     <img
-      class="h-24 md:h-32 lg:h-40 xl:h-48 my-4 mx-2"
+      class="h-24 md:h-32 lg:h-40 xl:h-48 my-4 mx-2 self-center"
       :src="img.src"
       :alt="img.alt"
     />

@@ -24,7 +24,7 @@ const baseWindowSettings: Electron.BrowserWindowConstructorOptions = {
   alwaysOnTop: isProd,
   skipTaskbar: isProd,
   frame: !isProd,
-  autoHideMenuBar: true
+  autoHideMenuBar: true,
 }
 
 const getPrimaryDisplay = () => screen.getPrimaryDisplay().workAreaSize
