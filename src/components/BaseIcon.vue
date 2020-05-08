@@ -3,11 +3,8 @@
 </template>
 
 <script lang="ts">
-import { createComponent } from 'vue';
+import Vue from 'vue'
 // import mixins from 'vue-typed-mixins'
 
-
-export default createComponent({
-
-})
+export default Vue.extend({})
 </script>
