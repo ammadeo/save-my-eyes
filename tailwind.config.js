@@ -28,10 +28,10 @@ module.exports = {
         ...colors.indigo,
         1000: '#28276b',
       },
-      primary: colors.orange,
+      primary: colors.blue,
     },
     fontFamily: {
-      display: ['Oxanium', 'roboto', 'sans-serif'],
+      display: ['comfortaa', 'roboto', 'sans-serif'],
       body: ['Source Sans Pro', 'roboto', 'sans-serif'],
     },
     fontWeight: {

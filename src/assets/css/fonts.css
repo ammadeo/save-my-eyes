@@ -8,12 +8,21 @@
 }
 
 /* oxanium-regular - latin-ext_latin */
+/* comfortaa-300 - latin-ext_latin */
 @font-face {
-  font-family: 'Oxanium';
+  font-family: 'Comfortaa';
+  font-style: normal;
+  font-weight: 300;
+  src: local(''),
+       url('../fonts/comfortaa-v28-latin-ext_latin-300.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+}
+/* comfortaa-regular - latin-ext_latin */
+@font-face {
+  font-family: 'Comfortaa';
   font-style: normal;
   font-weight: 400;
-  src: local('Oxanium Regular'), local('Oxanium-Regular'),
-       url('../fonts/oxanium-v1-latin-ext_latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+  src: local(''),
+       url('../fonts/comfortaa-v28-latin-ext_latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
 }
 
 .font-preset-info {
