@@ -31,11 +31,11 @@ module.exports = {
     'postcss-preset-env': {
       stage: 0,
     },
-    // ...(true || process.env.NODE_ENV === 'production'
-    //   ? {
-    '@fullhuman/postcss-purgecss': purgecss,
-    //   }
-    // : {}),
+    ...(process.env.NODE_ENV === 'production'
+      ? {
+          '@fullhuman/postcss-purgecss': purgecss,
+        }
+      : {}),
   },
 }
 
