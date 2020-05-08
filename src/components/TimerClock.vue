@@ -2,7 +2,7 @@
   <div class="flex items-center w-full min-w-full relative self-start">
     <template v-if="timeLeft > 0">
       <p
-        class="font-display flex-grow-0 flex-shrink-0 font-bold text-secondary-100 leading-none pr-6 text-3xl"
+        class="font-body flex-grow-0 flex-shrink-0 font-bold text-secondary-100 leading-none pr-6 text-3xl"
       >
         {{ timeLeftInfo }}
       </p>

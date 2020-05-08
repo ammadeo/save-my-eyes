@@ -9,17 +9,19 @@
     ]"
     @click="$emit('click')"
     ><p v-show="!round" class="py-2 px-4 font-display text-lg">{{ content }}</p>
-    <p class="text-lg">X</p></BaseButton
-  >
+    <BaseIcon icon="close" class="h-2"
+  /></BaseButton>
 </template>
 
 <script lang="ts">
 import BaseButton from './BaseButton.vue'
+import BaseIcon from './BaseIcon.vue'
 
 import Vue from 'vue'
 export default Vue.extend({
   components: {
     BaseButton,
+    BaseIcon,
   },
   props: {
     content: {

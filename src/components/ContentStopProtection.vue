@@ -29,7 +29,8 @@
       class="mb-2 w-full"
       @click="closeApp()"
       content="for this session"
-    ></ButtonIcon>
+      icon="stop"
+    />
     <p class="text-secondary-200 text-center">
       Will start again with your computer
     </p>

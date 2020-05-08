@@ -1,24 +1,27 @@
 <template>
-  <BaseButton
+  <ButtonIcon
     :primary="finished"
+    :icon="icon"
+    :content="content"
     class="flex-0 self-start min-h-12"
     @click="$emit('click')"
-    ><p
+  />
+  <!-- <p
       class="py-2 px-4 font-display"
       :class="[...(finished ? ['text-lg'] : [])]"
     >
-      {{ content }}
-    </p></BaseButton
-  >
+      {{  }}
+    </p></ButtonIcon
+  > -->
 </template>
 
 <script lang="ts">
-import BaseButton from './BaseButton.vue'
+import ButtonIcon from './ButtonIcon.vue'
 
 import Vue from 'vue'
 export default Vue.extend({
   components: {
-    BaseButton,
+    ButtonIcon,
   },
   props: {
     long: {
@@ -37,6 +40,10 @@ export default Vue.extend({
         else return 'Skip a long break'
       if (this.finished) return 'Finish a short break'
       return 'Skip for 5 minutes'
+    },
+    icon() {
+      // todo set proper icon
+      return this.finished ? 'close' : 'skip'
     },
   },
 })
