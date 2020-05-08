@@ -88,7 +88,6 @@ export const setNewBreak = (options: NewBreakOptions) => {
       }
     })
   } else {
-    closeAllWindows()
     createWindowIndex()
   }
 }

@@ -91,8 +91,11 @@ export default Vue.extend({
   },
   methods: {
     closeWindow() {
-      const window = remote.getCurrentWindow()
-      window.close()
+      this.removeFromOpenedKeys('menu')
+      setTimeout(() => {
+        const window = remote.getCurrentWindow()
+        window.close()
+      }, 350)
     },
     addToOpenedKeys(key: Keys) {
       const openedKeys = this.openedKeys
