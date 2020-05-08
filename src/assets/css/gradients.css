@@ -1,0 +1,9 @@
+
+.bg-gradient-card {
+  background-image:
+    radial-gradient(
+      circle farthest-side at top left,
+      theme(colors.secondary.700),
+      theme(colors.secondary.800)
+    );
+}

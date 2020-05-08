@@ -1,7 +1,7 @@
 <template>
   <div
     ref="card"
-    class="rounded-lg scroll-smooth max-h-screen-card scroll-sm rounded-lg min-h-full flex flex-col w-full"
+    class="rounded-lg bg-gradient-card scroll-smooth max-h-screen-card scroll-sm rounded-lg min-h-full flex flex-col w-full"
     :class="[
       ...autoColorClasses(...autoColorSplit(color)),
       ...autoBorderClasses(6),
