@@ -1,5 +1,5 @@
 ---
-to: tests/unit/components/<%= h.changeCase.pascal(name) %>.test.ts
+to: tests/unit/components/<%= h.changeCase.pascal(name) %>.spec.ts
 ---
 import { render } from '@testing-library/vue'
 import Component from "@/components/<%= h.changeCase.pascal(name) %>.vue";
