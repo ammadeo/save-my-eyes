@@ -11,10 +11,9 @@
   &::-webkit-scrollbar-track {
     @apply shadow-inner
   }
-    
+
   &::-webkit-scrollbar-thumb {
     @apply bg-secondary-800 rounded-full;
-    outline: 1px solid theme(secondary.900);
+    outline: 1px solid theme(colors.secondary.900);
   }
 }
-  
