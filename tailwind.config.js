@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { colors } = require('tailwindcss/defaultTheme')
-const { whitelist } = require('./src/utils/config/tailwind.js')
 
 const plugin = require('tailwindcss/plugin')
 /*
