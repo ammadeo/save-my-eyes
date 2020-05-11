@@ -1,11 +1,6 @@
 <template>
   <div class="flex-grow">
-    <img
-      class="h-24 md:h-32 lg:h-40 xl:h-48 my-4 mx-2 self-center"
-      :src="img.src"
-      :alt="img.alt"
-    />
-    <h3 class="font-preset-card-title text-secondary-1000 mb-1 mx-2">
+    <h3 class="font-preset-card-title text-secondary-100 mt-4 mb-1 mx-2">
       Settings
     </h3>
 
@@ -56,13 +51,13 @@
       class="mb-6"
       suffix="min."
     />
-    <h3 class="font-preset-card-title mb-1 mx-2 text-secondary-1000">
+    <h3 class="font-preset-card-title mb-1 mx-2 text-secondary-100">
       Credentials
     </h3>
-    <p class="mx-2 mb-2 text-lg text-secondary-1000 text-center">
+    <p class="mx-2 mb-2 text-lg text-secondary-100 text-center">
       Created by <span>Amadeusza Chomiak</span>
     </p>
-    <p class="mx-2 mb-4 text-lg text-secondary-1000 text-center">
+    <p class="mx-2 mb-4 text-lg text-secondary-100 text-center">
       Thanks to
       <a
         href="https://undraw.co/"
@@ -79,7 +74,6 @@
 
 <script lang="ts">
 import SettingsSlider from './SettingsSlider.vue'
-import settingsImg from '@/assets/images/settings.svg'
 
 import { getUserSettingsStore } from '@/background/db'
 import Vue from 'vue'
@@ -89,10 +83,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      img: {
-        src: settingsImg,
-        alt: '',
-      },
       every: 15 * 60,
       short: {
         last: 30,

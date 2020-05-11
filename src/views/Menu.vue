@@ -19,7 +19,7 @@
         class="pointer-events-auto mb-8"
         @close="removeFromOpenedKeys('settings')"
       >
-        <TheSettings />
+        <ContentSettings />
       </CardCloseable>
       <CardCloseable
         v-if="openedKeys.includes('stop-protection')"
@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import TheSettings from '../components/TheSettings.vue'
+import ContentSettings from '../components/ContentSettings.vue'
 import ContentMenu from '../components/ContentMenu.vue'
 import ContentStopProtection from '../components/ContentStopProtection.vue'
 import CardCloseable from '../components/CardCloseable.vue'
@@ -58,7 +58,7 @@ interface Data {
 
 export default Vue.extend({
   components: {
-    TheSettings,
+    ContentSettings,
     CardCloseable,
     ContentMenu,
     ContentStopProtection,

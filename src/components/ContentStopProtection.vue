@@ -5,21 +5,15 @@
     </p>
     <div class="flex mb-4 w-full">
       <!-- // todo change to v-for -->
-      <ButtonIcon
-        class="mr-4 flex-1"
-        @click="pauseBreak(60 * 60)"
-        content="1 hour"
-      ></ButtonIcon>
-      <ButtonIcon
-        class="mr-4 flex-1"
-        @click="pauseBreak(2 * 60 * 60)"
-        content="2 hours"
-      ></ButtonIcon>
-      <ButtonIcon
-        class="flex-1"
-        @click="pauseBreak(3 * 60 * 60)"
-        content="3 hours"
-      ></ButtonIcon>
+      <BaseButton class="mr-4 flex-1" @click="pauseBreak(60 * 60)"
+        ><p>1 hour</p></BaseButton
+      >
+      <BaseButton class="mr-4 flex-1" @click="pauseBreak(2 * 60 * 60)"
+        ><p>2 hours</p></BaseButton
+      >
+      <BaseButton class="flex-1" @click="pauseBreak(3 * 60 * 60)"
+        ><p>3 hour</p></BaseButton
+      >
     </div>
     <p class="mb-2 text-lg  text-secondary-100">
       Turn off protection
@@ -39,6 +33,7 @@
 
 <script lang="ts">
 import ButtonIcon from './ButtonIcon.vue'
+import BaseButton from './BaseButton.vue'
 import { RunKey } from '@/types/menu'
 import { rendererSetNextBreak, rendererCloseApp } from '@/background/ipc'
 import { getUserSettingsStore } from '@/background/db'
@@ -47,6 +42,7 @@ import Vue from 'vue'
 export default Vue.extend({
   components: {
     ButtonIcon,
+    BaseButton,
   },
   methods: {
     async pauseBreak(nextBreakIn: number) {

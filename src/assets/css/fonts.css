@@ -30,7 +30,7 @@
 }
 
 .font-preset-card-title {
-  @apply font-display text-center font-bold text-sm;
+  @apply font-display font-bold text-sm;
   @screen md {
       @apply text-base;
   }

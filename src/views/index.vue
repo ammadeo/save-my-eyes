@@ -1,23 +1,25 @@
 <template>
   <div
     v-show="!closing"
-    class="font-body pointer-events-auto bg-secondary-600 h-screen grid grid-cols-base grid-rows-base pt-8 lg:pt-12 xlg:pt-16  px-8 lg: px-12 xlg: px-16 flex-grow overflow-hidden"
+    class="font-body pointer-events-auto bg-secondary-1000 h-screen grid grid-cols-base grid-rows-base pt-8 lg:pt-12 xlg:pt-16  px-8 lg: px-12 xlg: px-16 flex-grow overflow-hidden"
     @scroll="scroolTop($event.target)"
   >
     <HeaderTitle class="col-start-1 col-end-3 row-start-1" />
 
-    <div class="col-start-3 row-start-1 flex justify-end items-baseline">
-      <p class="font-display tracking-wide mr-2 text-secondary-300">
+    <div class="col-start-3 row-start-1 flex justify-end items-center">
+      <p
+        class="font-display text-sm tracking-wide mr-2 uppercase text-secondary-400"
+      >
         Stop protection
       </p>
-      <ButtonClose
+      <ButtonRoundable
+        icon="pause"
         @click="showStopProtection = !showStopProtection"
-      ></ButtonClose>
+      ></ButtonRoundable>
     </div>
     <BaseCard
       v-show="showStopProtection"
-      color="secondary-500"
-      class="col-start-1 col-end-4 row-start-1 row-end-4 right-0 top-0 z-10 p-4"
+      class="col-start-1 col-end-4 row-start-1 row-end-4 right-0 top-0 z-10 m-4"
       @mouseleave.native="showStopProtection = false"
     >
       <ContentStopProtection @close="closeWindow()" />
@@ -65,7 +67,7 @@
       @focusin="setAutoFinishLock(true)"
       @focusout="setAutoFinishLock(false)"
     >
-      <TheSettings />
+      <ContentSettings />
     </CardAbsolute>
   </div>
 </template>
@@ -76,11 +78,11 @@ import BaseCard from '../components/BaseCard.vue'
 import ContentStopProtection from '../components/ContentStopProtection.vue'
 import CardAbsolute from '../components/CardAbsolute.vue'
 import ButtonTimer from '../components/ButtonTimer.vue'
-import ButtonClose from '../components/ButtonClose.vue'
+import ButtonRoundable from '../components/ButtonRoundable.vue'
 import TimerClock from '../components/TimerClock.vue'
 import HelpInfo from '../components/HelpInfo.vue'
 import HelpCards from '../components/HelpCards.vue'
-import TheSettings from '../components/TheSettings.vue'
+import ContentSettings from '../components/ContentSettings.vue'
 import HeaderTitle from '../components/HeaderTitle.vue'
 import { remote } from 'electron'
 import { rendererSetNextBreak as setNextBreak } from '@/background/ipc'
@@ -94,12 +96,12 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
     BaseCard,
     CardAbsolute,
     ButtonTimer,
-    ButtonClose,
+    ButtonRoundable,
     TimerClock,
     HelpInfo,
     ContentStopProtection,
     HelpCards,
-    TheSettings,
+    ContentSettings,
     HeaderTitle,
   },
   data() {

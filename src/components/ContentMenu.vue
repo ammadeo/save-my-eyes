@@ -9,16 +9,19 @@
       class="mb-8 w-full"
       @click="emitRun('start-long-break')"
       content="Start a long break now"
+      icon="start"
     ></ButtonIcon>
     <ButtonIcon
       class="mb-4 w-full"
       @click="emitRun('open-stop-protection')"
       content="Stop protection"
+      icon="pause"
     ></ButtonIcon>
     <ButtonIcon
       class="mb-4 w-full"
       @click="emitRun('open-settings')"
       content="Settings"
+      icon="settings"
     ></ButtonIcon>
   </div>
 </template>

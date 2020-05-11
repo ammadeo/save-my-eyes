@@ -10,16 +10,14 @@
         class="pointer-events-auto shadow-2xl mb-8"
         @close="closeWindow()"
       >
-        <ContentMenu @run="run($event)" />
+        <ContentBeforeBreak @run="run($event)" />
       </CardCloseable>
     </transition>
   </div>
 </template>
 
 <script lang="ts">
-import TheSettings from '../components/TheSettings.vue'
-import ContentMenu from '../components/ContentMenu.vue'
-import ContentStopProtection from '../components/ContentStopProtection.vue'
+import ContentBeforeBreak from '../components/ContentBeforeBreak.vue'
 import CardCloseable from '../components/CardCloseable.vue'
 import { RunKey } from '@/types/menu'
 import { remote } from 'electron'
@@ -40,10 +38,8 @@ interface Data {
 
 export default Vue.extend({
   components: {
-    TheSettings,
     CardCloseable,
-    ContentMenu,
-    ContentStopProtection,
+    ContentBeforeBreak,
   },
   data() {
     return {

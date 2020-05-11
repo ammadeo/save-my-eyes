@@ -1,13 +1,13 @@
 <template>
   <BaseButton
     :primary="primary"
-    class="flex-0 self-start min-h-12"
+    class="flex-0 flex  min-h-12"
     @click="$emit('click')"
   >
     <p class="py-2 px-4 font-display text-lg">
       {{ content }}
     </p>
-    <BaseIcon :icon="icon" class="h-4" />
+    <BaseIcon :icon="icon" class="h-4 pr-4" />
   </BaseButton>
 </template>
 

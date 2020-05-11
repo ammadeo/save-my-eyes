@@ -8,7 +8,7 @@
       :class="classesBottom"
     ></div>
     <div
-      class="rounded-full relative flex-1 flex justify-center items-center transform transition-transform delay-100 -translate-y-1 group-active:-translate-y-px"
+      class="rounded-full shadow relative flex-1 flex  items-center transform transition-transform delay-100 -translate-y-1 group-active:-translate-y-px"
       :class="classesTop"
     >
       <slot />
@@ -25,23 +25,28 @@ export default Vue.extend({
       default: false,
       type: Boolean,
     },
+    center: {
+      default: false,
+      type: Boolean,
+    },
   },
   computed: {
     classesTop() {
       return [
         ...(this.primary
-          ? ['text-black', 'bg-primary-400', 'group-hocus:bg-primary-500']
+          ? ['text-primary-50', 'bg-primary-700', 'group-hocus:bg-primary-800']
           : [
-              'text-secondary-100',
+              'text-secondary-50',
               'bg-secondary-700',
               'group-hocus:bg-secondary-800',
             ]),
+        ...(this.center ? ['justify-center'] : ['justify-between']),
       ]
     },
     classesBottom() {
       return [
         ...(this.primary
-          ? ['bg-primary-600', 'group-hocus:bg-primary-700']
+          ? ['bg-primary-800', 'group-hocus:bg-primary-900']
           : ['bg-secondary-800', 'group-hocus:bg-secondary-900']),
       ]
     },

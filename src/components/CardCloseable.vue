@@ -1,23 +1,27 @@
 <template>
-  <BaseCard class="p-4" :color="color">
-    <div class="flex justify-between">
-      <p v-show="!content" class="uppercase text-xl">save my eyes</p>
-      <ButtonClose :content="content" @click="$emit('close')" />
+  <BaseCard :color="color">
+    <div class="flex flex-col p-4">
+      <div class="flex justify-between">
+        <p v-show="!content" class="uppercase text-secondary-100 text-xl">
+          save my eyes
+        </p>
+        <ButtonRoundable primary :content="content" @click="$emit('close')" />
+      </div>
+      <slot />
     </div>
-    <slot />
   </BaseCard>
 </template>
 
 <script lang="ts">
 import BaseCard from './BaseCard.vue'
-import ButtonClose from './ButtonClose.vue'
+import ButtonRoundable from './ButtonRoundable.vue'
 
 import mixins from 'vue-typed-mixins'
 
 export default mixins().extend({
   components: {
     BaseCard,
-    ButtonClose,
+    ButtonRoundable,
   },
   props: {
     color: {

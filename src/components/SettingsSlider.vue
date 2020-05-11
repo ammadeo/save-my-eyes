@@ -1,45 +1,42 @@
 <template>
-  <div class="flex flex-col">
-    <p class="font-display text-center mx-2 mb-1">{{ name }}</p>
-    <div class="flex flex-wrap relative mx-2">
-      <div
-        ref="track"
-        class="w-full self-center cursor-pointer h-2 absolute bg-secondary-100 rounded-full"
-      />
-      <BaseTile
-        ref="thumb"
-        class="flex justify-center z-10 px-2 origin-center relative"
-        :elevation="2"
-        :style="thumbPosition"
-      >
-        <p
-          class="text-secondary-50 cursor-pointer"
-          tabindex="0"
-          @dblclick="focusOnInput(true)"
-          @focus="focusOnInput(!mouseDownTabFocusProtected)"
-          @mousedown="mouseDownTabFocusProtected = true"
-          @mouseup="mouseDownTabFocusProtected = false"
-        >
-          <!-- // ! fix scale issue
-        // ? maybe change it to be multiplayer not divider  -->
-          <input
-            v-if="inputFocus"
-            ref="input"
-            type="number"
-            class="w-6 bg-transparent"
-            :class="{ 'w-8': inputLength === 2, 'w-10': inputLength >= 3 }"
-            :max="max"
-            :min="min"
-            :value="floorValue"
-            :step="step"
-            @input="emitChange()"
-            @blur="blurInput()"
-          />
-          <span v-else>{{ value / scale }} {{ suffix }}</span>
-        </p>
-      </BaseTile>
-    </div>
+  <div class="grid grid-cols-6 grid-rows-3 col-gap-2 mx-2">
+    <p
+      class="font-display col-span-6  mb-1 text-secondary-200"
+      @click="focusOnInput(true)"
+    >
+      {{ name }}
+    </p>
 
+    <div
+      class="col-span-1 row-span-1 flex bg-secondary-800 text-secondary-100 shadow-inner-1 rounded-full px-2"
+    >
+      <input
+        ref="input"
+        type="number"
+        class="w-8 bg-transparent text-right pr-1"
+        :max="max"
+        :min="min"
+        :value="floorValue"
+        :step="step"
+        @input="emitChange()"
+        @blur="blurInput()"
+      />
+      <span @click="focusOnInput(true)">min.</span>
+    </div>
+    <input
+      ref="input"
+      type="range"
+      class="bg-transparent col-span-5"
+      :max="max"
+      :min="min"
+      :value="floorValue"
+      :step="step"
+      @input="emitChange()"
+      @blur="blurInput()"
+    />
+
+    <p class="col-start-2 col-end-3 text-secondary-200">min</p>
+    <p class="col-start-6 col-end-7 text-secondary-200">max</p>
     <p v-if="warning" class="text-sm bg-warn-400 mt-2 px-2 py-1">
       {{ warning }}
     </p>
@@ -47,11 +44,8 @@
 </template>
 
 <script lang="ts">
-import BaseTile from './BaseTile.vue'
-
 import Vue, { PropType } from 'vue'
 export default Vue.extend({
-  components: { BaseTile },
   props: {
     value: {
       type: Number,

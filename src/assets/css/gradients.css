@@ -3,7 +3,7 @@
   background-image:
     radial-gradient(
       circle farthest-side at top left,
-      theme(colors.secondary.700),
-      theme(colors.secondary.800)
+      theme(colors.secondary.900),
+      theme(colors.secondary.1100)
     );
 }

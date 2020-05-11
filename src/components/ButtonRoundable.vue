@@ -1,15 +1,12 @@
 <template>
   <BaseButton
-    primary
-    class="flex-0 self-start align-baseline"
-    :class="[
-      ...(round
-        ? ['w-8', 'h-8', 'justify-center']
-        : ['justify-around', 'min-h-8']),
-    ]"
+    :primary="primary"
+    :center="round"
+    class="flex-0 align-baseline"
+    :class="[...(round ? ['w-8', 'h-8'] : ['min-h-8'])]"
     @click="$emit('click')"
     ><p v-show="!round" class="py-2 px-4 font-display text-lg">{{ content }}</p>
-    <BaseIcon icon="close" class="h-2"
+    <BaseIcon :icon="icon" class="h-3"
   /></BaseButton>
 </template>
 
@@ -27,6 +24,14 @@ export default Vue.extend({
     content: {
       type: String,
       required: false,
+    },
+    icon: {
+      type: String,
+      default: 'close',
+    },
+    primary: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
