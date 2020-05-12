@@ -1,14 +1,14 @@
 <template>
   <div
     v-show="!closing"
-    class="font-body pointer-events-auto bg-secondary-1000 h-screen grid grid-cols-base grid-rows-base pt-8 lg:pt-12 xlg:pt-16  px-8 lg: px-12 xlg: px-16 flex-grow overflow-hidden"
+    class="font-body pointer-events-auto bg-secondary-1000 h-screen grid grid-cols-base grid-rows-base p-8 lg:p-12 xlg:p-16 flex-grow overflow-hidden"
     @scroll="scroolTop($event.target)"
   >
     <HeaderTitle class="col-start-1 col-end-3 row-start-1" />
 
     <div class="col-start-3 row-start-1 flex justify-end items-center">
       <p
-        class="font-display text-sm tracking-wide mr-2 uppercase text-secondary-400"
+        class="font-display selection-darker text-sm tracking-wide mr-2 uppercase text-secondary-400"
       >
         Stop protection
       </p>
@@ -45,7 +45,7 @@
         @finished="finish"
       />
 
-      <ButtonTimer
+      <IndexTimerButton
         class="row-start-3"
         :class="[
           ...(finished ? ['col-start-1', 'col-end-4'] : ['col-start-3']),
@@ -56,19 +56,25 @@
       />
     </template>
     <HelpInfo class="col-start-1 row-start-4 mb-2" />
-    <HelpCards
+    <IndexIdeaCard
       class="col-start-1 row-start-5"
       @changeAutoFinishLock="setAutoFinishLock($event)"
     />
-    <CardAbsolute
-      v-if="ready"
+    <ButtonIcon
+      class="col-start-3 row-start-5 self-end"
+      icon="settings"
+      content="Show settings"
+      @click="showSettings = true"
+    >
+    </ButtonIcon>
+    <BaseCard
+      v-if="ready && showSettings"
       color="secondary-300"
-      class="col-start-3 row-start-5"
-      @focusin="setAutoFinishLock(true)"
-      @focusout="setAutoFinishLock(false)"
+      class="absolute bottom-0 right-0 col-start-3 row-start-5"
+      @focusout="showSettings = false"
     >
       <ContentSettings />
-    </CardAbsolute>
+    </BaseCard>
   </div>
 </template>
 
@@ -77,11 +83,12 @@ import TimerInfo from '../components/TimerInfo.vue'
 import BaseCard from '../components/BaseCard.vue'
 import ContentStopProtection from '../components/ContentStopProtection.vue'
 import CardAbsolute from '../components/CardAbsolute.vue'
-import ButtonTimer from '../components/ButtonTimer.vue'
+import IndexTimerButton from '../components/IndexTimerButton.vue'
 import ButtonRoundable from '../components/ButtonRoundable.vue'
+import ButtonIcon from '../components/ButtonIcon.vue'
 import TimerClock from '../components/TimerClock.vue'
 import HelpInfo from '../components/HelpInfo.vue'
-import HelpCards from '../components/HelpCards.vue'
+import IndexIdeaCard from '../components/IndexIdeaCard.vue'
 import ContentSettings from '../components/ContentSettings.vue'
 import HeaderTitle from '../components/HeaderTitle.vue'
 import { remote } from 'electron'
@@ -94,13 +101,14 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
   components: {
     TimerInfo,
     BaseCard,
+    ButtonIcon,
     CardAbsolute,
-    ButtonTimer,
+    IndexTimerButton,
     ButtonRoundable,
     TimerClock,
     HelpInfo,
     ContentStopProtection,
-    HelpCards,
+    IndexIdeaCard,
     ContentSettings,
     HeaderTitle,
   },
@@ -114,6 +122,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       ready: false,
       // ? state
       showStopProtection: false,
+      showSettings: false,
       // ? closing
       finished: false,
       autoFinishLock: false,
@@ -161,7 +170,10 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
     async finish() {
       this.finished = true
       const preventFinish =
-        this.autoFinishLock || this.long || this.showStopProtection
+        this.autoFinishLock ||
+        this.long ||
+        this.showStopProtection ||
+        this.showSettings
       if (!preventFinish) {
         this.hideWindow()
       }
