@@ -1,5 +1,5 @@
 <template funtional>
-  <p class="font-preset-info text-center">
+  <p class="text-secondary-300 selection-darker font-display text-lg">
     {{ title }}
   </p>
 </template>

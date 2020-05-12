@@ -66,14 +66,14 @@ module.exports = {
       '6': '6px',
       '8': '8px',
     },
-    gridTemplateColumns: {
-      base:
-        'minmax(min-content, 3fr) minmax(2rem, 4rem) minmax(min-content, 1fr)',
-    },
     gridTemplateRows: {
       base: 'auto auto 1fr auto auto',
     },
     extend: {
+      gridTemplateColumns: {
+        base:
+          'minmax(min-content, 3fr) minmax(2rem, 4rem) minmax(min-content, 1fr)',
+      },
       translate: (theme) => ({
         '-card-40': `calc(${theme('spacing.40')} - ${theme(
           'spacing.2'
@@ -126,6 +126,7 @@ module.exports = {
       'responsive',
       'hover',
       'focus',
+      'focus-within',
       'group-hover',
       'group-focus',
       'group-hocus',
