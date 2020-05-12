@@ -41,7 +41,7 @@ const generateI18n = () => ({
     long: t('long break', 'długa przerwa'),
   },
   ideas: {
-    title: t('Try one of those', 'Spróbuj jedną z tych'),
+    title: t('Try this break idea', 'Zainspiruj się'),
     cards: [
       {
         title: t('Look out the window', 'Rozejrzyj się przez okno'),
