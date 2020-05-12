@@ -36,8 +36,7 @@
         @click="finishForce()"
       />
     </template>
-    <HelpInfo class="col-start-1 row-start-4 mb-2" />
-    <IndexIdeaCard
+    <IndexIdea
       class="col-start-1 row-start-5"
       @changeAutoFinishLock="setAutoFinishLock($event)"
     />
@@ -54,8 +53,7 @@ import IndexStopProtection from '../components/IndexStopProtection.vue'
 import ButtonRoundable from '../components/ButtonRoundable.vue'
 import ButtonIcon from '../components/ButtonIcon.vue'
 import TimerClock from '../components/TimerClock.vue'
-import HelpInfo from '../components/HelpInfo.vue'
-import IndexIdeaCard from '../components/IndexIdeaCard.vue'
+import IndexIdea from '../components/IndexIdea.vue'
 import IndexSettings from '../components/IndexSettings.vue'
 import HeaderTitle from '../components/HeaderTitle.vue'
 import { remote } from 'electron'
@@ -75,8 +73,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
     IndexStopProtection,
     ButtonRoundable,
     TimerClock,
-    HelpInfo,
-    IndexIdeaCard,
+    IndexIdea,
     HeaderTitle,
   },
   data() {
