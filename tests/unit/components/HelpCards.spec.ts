@@ -1,7 +1,7 @@
 import { render, fireEvent } from '@testing-library/vue'
-import Component from '@/components/HelpCards.vue'
+import Component from '@/components/IndexIdeaCard.vue'
 import store from '@/store'
-describe('components/HelpCards.vue', () => {
+describe('components/IndexIdeaCard.vue', () => {
   test('on mouse hover events emit changeAutoFinishLock', async () => {
     const { getAllByTestId, emitted } = render(Component, { store })
     const Tested = getAllByTestId('help-card')[0]
