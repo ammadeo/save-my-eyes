@@ -1,5 +1,5 @@
 <template>
-  <div class="grid col-gap-2 mx-2">
+  <div class="grid col-gap-2 relative">
     <p
       class="font-display col-span-6  mb-1 text-secondary-200"
       @click="focusOnInput(true)"
@@ -8,43 +8,57 @@
     </p>
 
     <div
-      class="col-span-1 row-span-1  cursor-text flex bg-primary-700 hover:bg-primary-800 focus-within:bg-primary-800 text-secondary-100 shadow-inner-1 rounded-full px-2"
+      class="lg:col-span-1 row-span-1 w-24 cursor-text flex justify-center bg-primary-700 hover:bg-primary-800 focus-within:bg-primary-800 text-secondary-100 shadow-inner-1 rounded-full px-2"
+      :class="onForceLargeClasses(['col-span-1'], ['col-span-6'])"
       @click="focusOnInput(true)"
     >
       <input
         ref="input"
         type="number"
-        class="w-8 bg-transparent selection-darker outline-none text-right pr-1"
+        class="bg-transparent selection-darker outline-none text-right pr-1"
+        :class="[widthInputLenghtClass]"
         :max="max"
         :min="min"
         :value="floorValue"
         :step="step"
-        @input="emitChange()"
+        @input="emitChange($event)"
         @blur="blurInput()"
       />
       <span class="selection-darker">{{ suffix }}</span>
     </div>
     <input
       type="range"
-      class="bg-transparent col-span-5"
+      class="bg-transparent col-span-5 lg:block"
+      :class="onForceLargeClasses([], ['hidden'])"
       :max="max"
       :min="min"
       :value="floorValue"
       :step="step"
       tabindex="-1"
-      @input="emitChange()"
+      @input="emitChange($event)"
       @blur="blurInput()"
     />
 
-    <p class="col-start-2 col-end-4 text-secondary-200">
+    <p
+      class="col-start-2 col-end-4 text-secondary-200 lg:block"
+      :class="onForceLargeClasses([], ['hidden'])"
+    >
       {{ min }} {{ suffix }}
     </p>
-    <p class="col-start-4 col-end-7 text-right text-secondary-200">
+    <p
+      class="col-start-4 col-end-7 text-right text-secondary-200 lg:block"
+      :class="onForceLargeClasses([], ['hidden'])"
+    >
       {{ max }} {{ suffix }}
     </p>
-    <p v-if="warning" class="text-sm bg-warn-400 mt-2 px-2 py-1">
-      {{ warning }}
-    </p>
+    <transition name="fade">
+      <p
+        v-if="warning"
+        class="text-sm w-full shadow bottom-full absolute rounded-sm bg-warn-400 mt-2 px-2 py-1"
+      >
+        {{ warning }}
+      </p>
+    </transition>
   </div>
 </template>
 
@@ -88,13 +102,14 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+    forceLarge: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
-      thumbPosition: { left: '50%', transform: `translate(-50%)` },
-      inputFocus: false,
       warning: '',
-      mouseDownTabFocusProtected: false,
     }
   },
   computed: {
@@ -104,16 +119,30 @@ export default Vue.extend({
     inputLength(): number {
       return this.floorValue.toString().length
     },
+    widthInputLenghtClass(): string {
+      const lenght = this.inputLength
+      switch (lenght) {
+        case 0:
+          return 'w-4'
+        case 1:
+          return 'w-4'
+        case 2:
+          return 'w-6'
+        default:
+          return 'w-8'
+      }
+    },
   },
   methods: {
-    emitChange() {
-      const input = this.$refs.input as HTMLInputElement
+    emitChange(event: Event) {
+      const input = event.target as HTMLInputElement
       this.validateInput(Number(input.value))
     },
-
+    onForceLargeClasses(onForce: string[], onRevers: string[] = []): string[] {
+      return this.forceLarge ? onForce : onRevers
+    },
     async focusOnInput(allow: boolean) {
       if (!allow) return
-      this.inputFocus = true
       await this.$nextTick()
       const input = this.$refs.input as HTMLInputElement
       if (input) {
@@ -121,9 +150,6 @@ export default Vue.extend({
       }
     },
     async blurInput() {
-      this.inputFocus = false
-      await this.$nextTick()
-
       this.warning = ''
     },
     validateInput(value: number) {

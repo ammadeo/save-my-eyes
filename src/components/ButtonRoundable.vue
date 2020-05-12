@@ -5,8 +5,10 @@
     class="flex-0 align-baseline"
     :class="[...(round ? ['w-8', 'h-8'] : ['min-h-8'])]"
     @click="$emit('click')"
-    ><p v-show="!round" class="py-2 px-4 font-display text-lg">{{ content }}</p>
-    <BaseIcon :icon="icon" class="h-3"
+    ><p v-show="!round" class="my-1 ml-4 mr-2 font-display text-lg">
+      {{ content }}
+    </p>
+    <BaseIcon :icon="icon" class="h-3 m-1" :class="[...(round ? [] : ['pr-4'])]"
   /></BaseButton>
 </template>
 

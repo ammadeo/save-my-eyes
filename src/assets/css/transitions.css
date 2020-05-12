@@ -1,0 +1,36 @@
+.slide-enter-active,
+{
+  @apply: transition-transform duration-300
+}
+.slide-leave-active {
+  @apply: transition-transform duration-600
+}
+
+.slide-enter {
+  transform: translateY(100vw);
+  &.slide-enter-top {
+    transform: translateY(-100vw);
+  }
+  &.slide-enter-right {
+    transform: translateX(100vw);
+  }
+}
+.slide-leave-to {
+  transform: translateX(200%);
+}
+.slide-move {
+  @apply: transition-transform duration-300
+}
+
+
+.fade-enter-active, .fade-leave-active
+{
+  @apply transition-opacity duration-100
+}
+
+.fade-enter {
+  @apply opacity-0
+}
+.fade-leave-to {
+  @apply opacity-100
+}

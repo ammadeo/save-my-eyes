@@ -5,7 +5,7 @@
 
 .scroll-sm {
   &::-webkit-scrollbar {
-    @apply w-1 rounded-full bg-secondary-400
+    @apply w-1 rounded-full bg-transparent
   }
 
   &::-webkit-scrollbar-track {
@@ -13,7 +13,7 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    @apply bg-secondary-800 rounded-full;
-    outline: 1px solid theme(colors.secondary.900);
+    @apply bg-primary-800 rounded-full shadow-xs;
+    outline: 1px solid theme(colors.primary.900);
   }
 }

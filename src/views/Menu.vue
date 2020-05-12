@@ -19,7 +19,7 @@
         class="pointer-events-auto mb-8"
         @close="removeFromOpenedKeys('settings')"
       >
-        <ContentSettings />
+        <ContentSettings force-large />
       </CardCloseable>
       <CardCloseable
         v-if="openedKeys.includes('stop-protection')"
@@ -129,20 +129,6 @@ export default Vue.extend({
 </script>
 
 <style lang="postcss">
-.slide-enter-active,
-.slide-leave-active {
-  transition: transform 300ms;
-}
-
-.slide-enter {
-  transform: translateY(100vw);
-}
-.slide-leave-to {
-  transform: translateX(100%);
-}
-.slide-move {
-  transition: transform 300ms;
-}
 body {
   @apply pointer-events-none;
 }

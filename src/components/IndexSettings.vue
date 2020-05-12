@@ -1,25 +1,31 @@
 <template>
-  <div class="self-end w-full">
+  <div class="self-end w-full relative">
     <ButtonIcon
+      class="w-full"
       icon="settings"
       content="Show settings"
-      @click="showSettings = true"
+      @click="setShowSettings(true)"
     >
     </ButtonIcon>
-    <BaseCard
-      v-if="showSettings"
-      color="secondary-300"
-      class="absolute bottom-0 right-0"
-      @focusout="showSettings = false"
-    >
-      <ContentSettings />
-    </BaseCard>
+    <transition name="slide">
+      <CardCloseable
+        v-if="showSettings"
+        color="secondary-300"
+        :content="closeContent"
+        title="settings"
+        absolute
+        class="bottom-0 right-0 z-40 max-h-screen-16 lg:max-h-screen-24 xl:max-h-screen-32"
+        @close="setShowSettings(false)"
+      >
+        <ContentSettings @changed="changed = true" />
+      </CardCloseable>
+    </transition>
   </div>
 </template>
 
 <script lang="ts">
 import ButtonIcon from './ButtonIcon.vue'
-import BaseCard from './BaseCard.vue'
+import CardCloseable from './CardCloseable.vue'
 import ContentSettings from './ContentSettings.vue'
 
 import Vue from 'vue'
@@ -28,13 +34,26 @@ import Vue from 'vue'
 export default Vue.extend({
   components: {
     ButtonIcon,
-    BaseCard,
+    CardCloseable,
     ContentSettings,
   },
   data() {
     return {
       showSettings: false,
+      changed: false,
     }
+  },
+  methods: {
+    setShowSettings(to: boolean) {
+      this.$emit('changeAutoFinishLock', to)
+      this.showSettings = to
+      if (to === false) this.changed = false
+    },
+  },
+  computed: {
+    closeContent(): string {
+      return this.changed ? 'Save changes' : ''
+    },
   },
 })
 </script>

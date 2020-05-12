@@ -1,22 +1,24 @@
 <template>
-  <div class="flex-grow">
-    <h3 class="font-preset-card-title text-secondary-100 mt-4 mb-1 mx-2">
+  <section class="flex-grow">
+    <h3 class="hidden">
       Settings
     </h3>
 
     <SettingsSlider
       v-model="every"
       name="Take a short break every"
+      :forceLarge="forceLarge"
       :min="1"
       :center="15"
       :max="60"
       :scale="60"
       suffix="min."
-      class="mb-2"
+      class="mb-2 mt-2"
     />
     <SettingsSlider
       v-model="short.last"
       name="Short break will last"
+      :forceLarge="forceLarge"
       :min="1"
       :center="30"
       :max="60"
@@ -26,6 +28,7 @@
     <SettingsSlider
       v-model="long.every"
       name="Take a long break every"
+      :forceLarge="forceLarge"
       :min="every / 60"
       :center="(every * 3) / 60"
       :max="(every * 10) / 60"
@@ -44,6 +47,7 @@
     <SettingsSlider
       v-model="long.last"
       name="Long break will last"
+      :forceLarge="forceLarge"
       :min="1"
       :center="5"
       :max="60"
@@ -51,13 +55,13 @@
       class="mb-6"
       suffix="min."
     />
-    <h3 class="font-preset-card-title mb-1 mx-2 text-secondary-100">
+    <h3 class="font-preset-card-title mb-1  text-secondary-100">
       Credentials
     </h3>
-    <p class="mx-2 mb-2 text-lg text-secondary-100 text-center">
+    <p class=" mb-2 text-lg text-secondary-100">
       Created by <span>Amadeusza Chomiak</span>
     </p>
-    <p class="mx-2 mb-4 text-lg text-secondary-100 text-center">
+    <p class=" mb-2 text-lg text-secondary-100">
       Thanks to
       <a
         href="https://undraw.co/"
@@ -69,7 +73,7 @@
       >
       for awesome drawings
     </p>
-  </div>
+  </section>
 </template>
 
 <script lang="ts">
@@ -80,6 +84,12 @@ import Vue from 'vue'
 export default Vue.extend({
   components: {
     SettingsSlider,
+  },
+  props: {
+    forceLarge: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -93,6 +103,13 @@ export default Vue.extend({
       },
       changed: false,
     }
+  },
+  watch: {
+    changed(to: boolean) {
+      if (to === true) {
+        this.$emit('changed')
+      }
+    },
   },
   beforeMount() {
     const breaks = getUserSettingsStore().get('breaks')

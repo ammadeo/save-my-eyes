@@ -1,6 +1,7 @@
 <template>
   <ButtonIcon
     :primary="finished"
+    centered
     :icon="icon"
     :content="content"
     class="flex-0 self-start min-h-12"

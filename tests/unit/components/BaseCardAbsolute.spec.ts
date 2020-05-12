@@ -1,11 +1,11 @@
 import { render, fireEvent } from '@testing-library/vue'
-import Component from '@/components/CardAbsolute.vue'
+import Component from '@/components/CardFocusable.vue'
 import { Generate } from '@/utils/testsDataGenerator'
 
 const pTAgTExt = Generate.string()
 const pTag = `<p>${pTAgTExt}</p>`
 
-describe('components/CardAbsolute.vue', () => {
+describe('components/CardFocusable.vue', () => {
   test('has content slot', async () => {
     const { getByText } = render(Component, {
       slots: {

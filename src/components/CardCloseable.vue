@@ -1,11 +1,16 @@
 <template>
-  <BaseCard :color="color">
+  <BaseCard :absolute="absolute">
     <div class="flex flex-col p-4">
       <div class="flex justify-between">
         <p v-show="!content" class="uppercase text-secondary-100 text-xl">
-          save my eyes
+          {{ title }}
         </p>
-        <ButtonRoundable primary :content="content" @click="$emit('close')" />
+        <ButtonRoundable
+          primary
+          :class="buttonClasses"
+          :content="content"
+          @click="$emit('close')"
+        />
       </div>
       <slot />
     </div>
@@ -24,13 +29,22 @@ export default mixins().extend({
     ButtonRoundable,
   },
   props: {
-    color: {
+    absolute: {
+      type: Boolean,
+      default: false,
+    },
+    title: {
       type: String,
-      default: 'secondary-800',
+      default: 'save my eyes',
     },
     content: {
       type: String,
       required: false,
+    },
+  },
+  computed: {
+    buttonClasses(): string[] {
+      return this.content ? ['w-full'] : []
     },
   },
 })

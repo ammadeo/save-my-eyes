@@ -1,11 +1,14 @@
 <template>
   <div
     v-show="!closing"
-    class="font-body pointer-events-auto bg-secondary-1000 h-screen grid grid-cols-base grid-rows-base p-8 lg:p-12 xlg:p-16 flex-grow overflow-hidden"
+    class="font-body pointer-events-auto bg-secondary-1000 h-screen grid grid-cols-base grid-rows-base p-8 lg:p-12 xl:p-16 flex-grow overflow-hidden"
     @scroll="scroolTop($event.target)"
   >
     <HeaderTitle class="col-start-1 col-end-3 row-start-1" />
-    <IndexStopProtection class="col-start-3 row-start-1" />
+    <IndexStopProtection
+      class="col-start-3 row-start-1"
+      @changeAutoFinishLock="setAutoFinishLock($event)"
+    />
     <p v-if="!ready" class="font-preset-info mb-8">
       Loading...
     </p>
@@ -37,17 +40,20 @@
       />
     </template>
     <IndexIdea
-      class="col-start-1 row-start-5"
+      class="col-start-1 row-start-4"
       @changeAutoFinishLock="setAutoFinishLock($event)"
     />
-    <IndexSettings class="row-start-5 col-start-3" />
+    <IndexSettings
+      class="row-start-4 col-start-3"
+      @changeAutoFinishLock="setAutoFinishLock($event)"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import TimerInfo from '../components/TimerInfo.vue'
 import BaseCard from '../components/BaseCard.vue'
-import CardAbsolute from '../components/CardAbsolute.vue'
+import CardFocusable from '../components/CardFocusable.vue'
 import IndexTimerButton from '../components/IndexTimerButton.vue'
 import IndexStopProtection from '../components/IndexStopProtection.vue'
 import ButtonRoundable from '../components/ButtonRoundable.vue'
@@ -67,7 +73,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
     TimerInfo,
     BaseCard,
     ButtonIcon,
-    CardAbsolute,
+    CardFocusable,
     IndexTimerButton,
     IndexSettings,
     IndexStopProtection,

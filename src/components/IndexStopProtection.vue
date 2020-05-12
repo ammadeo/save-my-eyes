@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="relative w-full">
     <div class=" flex justify-end items-center">
       <p
         class="font-display selection-darker text-sm tracking-wide mr-2 uppercase text-secondary-400"
@@ -8,23 +8,27 @@
       </p>
       <ButtonRoundable
         icon="pause"
-        @click="showStopProtection = !showStopProtection"
+        @click="setShowStopProtection(true)"
       ></ButtonRoundable>
     </div>
-    <BaseCard
-      v-show="showStopProtection"
-      class="col-start-1 col-end-4 row-start-1 row-end-4 right-0 top-0 z-10 m-4"
-      @mouseleave.native="showStopProtection = false"
-    >
-      <ContentStopProtection @close="closeWindow()" />
-    </BaseCard>
+    <transition name="slide">
+      <CardCloseable
+        v-show="showStopProtection"
+        absolute
+        title="stop protection"
+        class="right-0 top-0 z-30 max-h-screen-16 slide-enter-right lg:max-h-screen-24 xl:max-h-screen-32"
+        @close="setShowStopProtection(false)"
+      >
+        <ContentStopProtection @close="$emit('run', 'closeWindow')" />
+      </CardCloseable>
+    </transition>
   </div>
 </template>
 
 <script lang="ts">
 import ContentStopProtection from '../components/ContentStopProtection.vue'
 import ButtonRoundable from '../components/ButtonRoundable.vue'
-import BaseCard from '../components/BaseCard.vue'
+import CardCloseable from '../components/CardCloseable.vue'
 
 import Vue from 'vue'
 // import mixins from 'vue-typed-mixins'
@@ -32,13 +36,19 @@ import Vue from 'vue'
 export default Vue.extend({
   components: {
     ButtonRoundable,
-    BaseCard,
+    CardCloseable,
     ContentStopProtection,
   },
   data() {
     return {
       showStopProtection: false,
     }
+  },
+  methods: {
+    setShowStopProtection(to: boolean) {
+      this.$emit('changeAutoFinishLock', to)
+      this.showStopProtection = to
+    },
   },
 })
 </script>

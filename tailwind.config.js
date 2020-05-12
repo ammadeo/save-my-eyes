@@ -66,13 +66,16 @@ module.exports = {
       '6': '6px',
       '8': '8px',
     },
-    gridTemplateRows: {
-      base: 'auto auto 1fr auto auto',
-    },
     extend: {
       gridTemplateColumns: {
         base:
-          'minmax(min-content, 3fr) minmax(2rem, 4rem) minmax(min-content, 1fr)',
+          'minmax(min-content, 5fr) minmax(2rem, 4rem) minmax(min-content, 2fr)',
+      },
+      gridTemplateRows: {
+        base: 'auto auto 1fr auto',
+      },
+      inset: {
+        full: '100%',
       },
       translate: (theme) => ({
         '-card-40': `calc(${theme('spacing.40')} - ${theme(
@@ -92,7 +95,9 @@ module.exports = {
         12: theme('spacing.12'),
       }),
       maxHeight: (theme) => ({
-        'screen-card': `calc(100vh - ${theme('spacing.2')} * 2)`,
+        'screen-16': `calc(100vh - ${theme('spacing.16')})`,
+        'screen-24': `calc(100vh - ${theme('spacing.24')})`,
+        'screen-32': `calc(100vh - ${theme('spacing.32')})`,
       }),
       borderRadius: {
         inherit: 'inherit',
@@ -105,6 +110,7 @@ module.exports = {
     },
   },
   variants: {
+    margin: ['responsive', 'last'],
     borderWidth: ['responsive', 'hover', 'focus', 'active'],
     overflow: [
       'responsive',
