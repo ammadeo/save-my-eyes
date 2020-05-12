@@ -5,26 +5,7 @@
     @scroll="scroolTop($event.target)"
   >
     <HeaderTitle class="col-start-1 col-end-3 row-start-1" />
-
-    <div class="col-start-3 row-start-1 flex justify-end items-center">
-      <p
-        class="font-display selection-darker text-sm tracking-wide mr-2 uppercase text-secondary-400"
-      >
-        Stop protection
-      </p>
-      <ButtonRoundable
-        icon="pause"
-        @click="showStopProtection = !showStopProtection"
-      ></ButtonRoundable>
-    </div>
-    <BaseCard
-      v-show="showStopProtection"
-      class="col-start-1 col-end-4 row-start-1 row-end-4 right-0 top-0 z-10 m-4"
-      @mouseleave.native="showStopProtection = false"
-    >
-      <ContentStopProtection @close="closeWindow()" />
-    </BaseCard>
-    <div></div>
+    <IndexStopProtection class="col-start-3 row-start-1" />
     <p v-if="!ready" class="font-preset-info mb-8">
       Loading...
     </p>
@@ -60,36 +41,22 @@
       class="col-start-1 row-start-5"
       @changeAutoFinishLock="setAutoFinishLock($event)"
     />
-    <ButtonIcon
-      class="col-start-3 row-start-5 self-end"
-      icon="settings"
-      content="Show settings"
-      @click="showSettings = true"
-    >
-    </ButtonIcon>
-    <BaseCard
-      v-if="ready && showSettings"
-      color="secondary-300"
-      class="absolute bottom-0 right-0 col-start-3 row-start-5"
-      @focusout="showSettings = false"
-    >
-      <ContentSettings />
-    </BaseCard>
+    <IndexSettings class="row-start-5 col-start-3" />
   </div>
 </template>
 
 <script lang="ts">
 import TimerInfo from '../components/TimerInfo.vue'
 import BaseCard from '../components/BaseCard.vue'
-import ContentStopProtection from '../components/ContentStopProtection.vue'
 import CardAbsolute from '../components/CardAbsolute.vue'
 import IndexTimerButton from '../components/IndexTimerButton.vue'
+import IndexStopProtection from '../components/IndexStopProtection.vue'
 import ButtonRoundable from '../components/ButtonRoundable.vue'
 import ButtonIcon from '../components/ButtonIcon.vue'
 import TimerClock from '../components/TimerClock.vue'
 import HelpInfo from '../components/HelpInfo.vue'
 import IndexIdeaCard from '../components/IndexIdeaCard.vue'
-import ContentSettings from '../components/ContentSettings.vue'
+import IndexSettings from '../components/IndexSettings.vue'
 import HeaderTitle from '../components/HeaderTitle.vue'
 import { remote } from 'electron'
 import { rendererSetNextBreak as setNextBreak } from '@/background/ipc'
@@ -104,12 +71,12 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
     ButtonIcon,
     CardAbsolute,
     IndexTimerButton,
+    IndexSettings,
+    IndexStopProtection,
     ButtonRoundable,
     TimerClock,
     HelpInfo,
-    ContentStopProtection,
     IndexIdeaCard,
-    ContentSettings,
     HeaderTitle,
   },
   data() {
@@ -120,9 +87,6 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       long: false,
       // ? starting
       ready: false,
-      // ? state
-      showStopProtection: false,
-      showSettings: false,
       // ? closing
       finished: false,
       autoFinishLock: false,
@@ -169,11 +133,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
     },
     async finish() {
       this.finished = true
-      const preventFinish =
-        this.autoFinishLock ||
-        this.long ||
-        this.showStopProtection ||
-        this.showSettings
+      const preventFinish = this.autoFinishLock || this.long
       if (!preventFinish) {
         this.hideWindow()
       }
