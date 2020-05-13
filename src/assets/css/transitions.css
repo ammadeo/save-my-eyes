@@ -1,25 +1,27 @@
+
 .slide-enter-active,
+.slide-leave-active
 {
-  @apply: transition-transform duration-300
-}
-.slide-leave-active {
-  @apply: transition-transform duration-600
+  transition: transform 300ms ease-in-out
 }
 
 .slide-enter {
-  transform: translateY(100vw);
+  transform: translateY(150%);
   &.slide-enter-top {
-    transform: translateY(-100vw);
+    transform: translateY(-150%);
   }
   &.slide-enter-right {
-    transform: translateX(100vw);
+    transform: translateX(150%);
   }
 }
 .slide-leave-to {
-  transform: translateX(200%);
+  transform: translateX(150%);
+  &.slide-leave-bottom {
+    transform: translateY(150%);
+  }
 }
 .slide-move {
-  @apply: transition-transform duration-300
+  @apply: transition-transform duration-700
 }
 
 
