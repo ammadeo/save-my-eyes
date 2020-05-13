@@ -92,6 +92,9 @@ module.exports = {
           'spacing.2'
         )} - 100%)`,
       }),
+      spacing: {
+        '120': '30rem',
+      },
       minHeight: (theme) => ({
         12: theme('spacing.12'),
       }),

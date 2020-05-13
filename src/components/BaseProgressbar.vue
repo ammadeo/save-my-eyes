@@ -7,7 +7,7 @@
     :aria-valuemax="max"
   >
     <div
-      class="rounded-full absolute bg-primary-600 shadow-xl inset-0"
+      class="rounded-full absolute bg-primary-600 shadow inset-0"
       :style="{ transform: `translateX(-${progress}%)` }"
     ></div>
     <div

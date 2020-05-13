@@ -30,10 +30,7 @@
       />
 
       <IndexTimerButton
-        class="row-start-3"
-        :class="[
-          ...(finished ? ['col-start-1', 'col-end-4'] : ['col-start-3']),
-        ]"
+        class="row-start-3 col-start-3"
         :long="long"
         :finished="finished"
         @click="finishForce()"
