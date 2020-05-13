@@ -6,6 +6,7 @@
     :aria-valuemin="min"
     :aria-valuemax="max"
   >
+    <slot />
     <div
       class="rounded-full absolute bg-primary-600 shadow inset-0"
       :style="{ transform: `translateX(-${progress}%)` }"
@@ -13,7 +14,6 @@
     <div
       class="h-full w-full shadow-inner-2-top-2 rounded-full bg-secondary-1050"
     ></div>
-    <slot />
   </div>
 </template>
 
