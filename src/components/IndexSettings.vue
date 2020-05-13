@@ -14,7 +14,7 @@
         :content="closeContent"
         title="settings"
         absolute
-        class="bottom-0 right-0 z-40 max-h-screen-16 lg:max-h-screen-24 xl:max-h-screen-32"
+        class="bottom-0 right-0 z-40 slide-leave-bottom max-h-screen-16 lg:max-h-screen-24 xl:max-h-screen-32"
         @close="setShowSettings(false)"
       >
         <ContentSettings @changed="changed = true" />

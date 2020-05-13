@@ -6,18 +6,13 @@
       >
         {{ timeLeftInfo }}
       </p>
-      <div
-        class="bg-secondary-300 flex-1 shadow-inner rounded-full overflow-hidden max-w-6xl h-12"
-      >
-        <BaseTile
-          role="progressbar"
-          :aria-valuenow="100 - timeLeftPercent"
-          aria-valuemin="0"
-          aria-valuemax="100"
+      <div class="max-w-6xl h-12 w-full">
+        <BaseProgressbar
           color="primary-400"
-          class="anime-progress rounded-full shadow-sm w-full h-full"
-          :style="{ transform: `translateX(-${timeLeftPercent}%)` }"
-        ></BaseTile>
+          :min="0"
+          :max="100"
+          :value="timeLeftPercent"
+        />
       </div>
     </template>
   </div>
@@ -26,7 +21,7 @@
 <script lang="ts">
 import anime from 'animejs'
 import { format, addMilliseconds } from 'date-fns'
-import BaseTile from './BaseTile.vue'
+import BaseProgressbar from './BaseProgressbar.vue'
 import {
   AutoBorderClasses,
   AutoColorClasses,
@@ -35,7 +30,7 @@ import mixins from 'vue-typed-mixins'
 
 export default mixins(AutoBorderClasses, AutoColorClasses).extend({
   components: {
-    BaseTile,
+    BaseProgressbar,
   },
   props: {
     startDate: {

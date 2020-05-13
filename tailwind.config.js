@@ -34,6 +34,7 @@ module.exports = {
         800: '#283593',
         900: '#1A237E',
         1000: '#121959',
+        1050: '#10164F',
         1100: '#030943',
         1200: '#020630',
       },
@@ -103,13 +104,20 @@ module.exports = {
         inherit: 'inherit',
       },
       boxShadow: (theme) => ({
+        revers: `0 -1px 3px 0 rgba(0, 0, 0, 0.1), 0 -1px 2px 0 rgba(0, 0, 0, 0.06)`,
+        'lg-revers': `0 -10px 15px -3px rgba(0, 0, 0, 0.1), 0 -4px 6px -2px rgba(0, 0, 0, 0.05)`,
+        'xl-revers': `0 -20px 25px -5px rgba(0, 0, 0, 0.1), 0 -10px 10px -5px rgba(0, 0, 0, 0.04)`,
         'inner-1': `inset 0 -${theme('spacing.px')} ${theme(
           'spacing.1'
         )} 0 rgba(0, 0, 0, 0.2)`,
+        'inner-2-top-2': `inset 0 ${theme('spacing.2')} ${theme(
+          'spacing.2'
+        )} 0 rgba(0, 0, 0, 0.17)`,
       }),
     },
   },
   variants: {
+    boxShadow: ['responsive', 'hover', 'focus', 'group-active', 'active'],
     margin: ['responsive', 'last'],
     borderWidth: ['responsive', 'hover', 'focus', 'active'],
     overflow: [

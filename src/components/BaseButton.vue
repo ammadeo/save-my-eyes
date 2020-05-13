@@ -1,6 +1,6 @@
 <template>
   <button
-    class="group flex flex-col items-stretch focus:outline-none relative"
+    class="group flex flex-col rounded-full items-stretch focus:outline-none relative transition-shadow duration-100 shadow-lg-revers active:shadow-revers"
     @click="$emit('click')"
   >
     <div

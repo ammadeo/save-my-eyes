@@ -4,6 +4,6 @@
     radial-gradient(
       circle farthest-side at top left,
       theme(colors.secondary.900),
-      theme(colors.secondary.1100)
+      theme(colors.secondary.1050)
     );
 }
