@@ -70,7 +70,7 @@ function createWindow(
 }
 
 export const createWindowIndex = async () => {
-  const url = ''
+  const url = '/#/BeforeBreak'
   const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
 
   createWindow('windowIndex', url, {
@@ -78,6 +78,8 @@ export const createWindowIndex = async () => {
     height: screenHeight,
     y: 0,
     x: 0,
+    backgroundColor: '#00000000',
+    transparent: isProd,
     ...baseWindowSettings,
   })
 }
@@ -97,7 +99,7 @@ export const createWindowTray = async () => {
       y: 0,
       x,
       backgroundColor: '#00000000',
-      transparent: true,
+      transparent: isProd,
       ...baseWindowSettings,
     }
   )

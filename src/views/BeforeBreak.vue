@@ -1,24 +1,20 @@
 <template>
   <div
-    class="flex flex-col justify-end overflow-hidden px-16 flex-grow min-h-screen"
+    class="flex flex-col items-end justify-end p-16 overflow-hidden min-h-screen"
   >
-    <transition name="slide" appear>
-      <CardCloseable
-        v-if="openedKeys.includes('menu')"
-        key="menu"
-        color="secondary-600"
-        class="pointer-events-auto shadow-2xl mb-8"
-        @close="closeWindow()"
-      >
-        <ContentBeforeBreak @run="run($event)" />
-      </CardCloseable>
-    </transition>
+    <div>
+      <transition name="slide" appear>
+        <BaseCard class="pointer-events-auto">
+          <ContentBeforeBreak @run="run($event)" />
+        </BaseCard>
+      </transition>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import ContentBeforeBreak from '../components/ContentBeforeBreak.vue'
-import CardCloseable from '../components/CardCloseable.vue'
+import BaseCard from '../components/BaseCard.vue'
 import { RunKey } from '@/types/menu'
 import { remote } from 'electron'
 import Vue from 'vue'
@@ -38,12 +34,11 @@ interface Data {
 
 export default Vue.extend({
   components: {
-    CardCloseable,
+    BaseCard,
     ContentBeforeBreak,
   },
   data() {
     return {
-      openedKeys: ['menu'],
       canClick: false,
     } as Data
   },
@@ -88,11 +83,11 @@ export default Vue.extend({
         this.openedKeys = openedKeys.filter((openedKey) => openedKey !== key)
       }
     },
-    run(event: RunKey) {
+    async run(event: RunKey) {
       console.log(event)
       switch (event) {
         case 'start-long-break':
-          return setNextBreak.ask({
+          return await setNextBreak.ask({
             forceNextBreakIn: 0,
             forceNextBreakType: 'long',
           })
@@ -105,23 +100,3 @@ export default Vue.extend({
   },
 })
 </script>
-
-<style lang="postcss">
-.slide-enter-active,
-.slide-leave-active {
-  transition: transform 300ms;
-}
-
-.slide-enter {
-  transform: translateY(100vw);
-}
-.slide-leave-to {
-  transform: translateX(100%);
-}
-.slide-move {
-  transition: transform 300ms;
-}
-body {
-  @apply pointer-events-none;
-}
-</style>
