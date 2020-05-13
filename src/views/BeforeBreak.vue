@@ -4,8 +4,8 @@
   >
     <div>
       <transition name="slide" appear>
-        <BaseCard class="pointer-events-auto">
-          <ContentBeforeBreak @run="run($event)" />
+        <BaseCard class="pointer-events-auto" v-show="showBreakCard">
+          <ContentBeforeBreak @break="startBreak()" @skip="skipBreak()" />
         </BaseCard>
       </transition>
     </div>
@@ -15,88 +15,41 @@
 <script lang="ts">
 import ContentBeforeBreak from '../components/ContentBeforeBreak.vue'
 import BaseCard from '../components/BaseCard.vue'
-import { RunKey } from '@/types/menu'
+
 import { remote } from 'electron'
-import Vue from 'vue'
-import { isProd } from '@/background/env'
 import { rendererSetNextBreak as setNextBreak } from '@/background/ipc'
 
-interface MousePolicy {
-  _canClic: string
-  (this: Window, event: PointerEvent): void
-}
+import { TransparentClickEngine } from '@/utils/mixins/transparentClickEngine'
+import mixins from 'vue-typed-mixins'
 
-type Keys = 'menu' | 'settings' | 'stop-protection'
-interface Data {
-  openedKeys: Keys[]
-  canClick: boolean | void
-}
-
-export default Vue.extend({
+export default mixins(TransparentClickEngine).extend({
   components: {
     BaseCard,
     ContentBeforeBreak,
   },
   data() {
     return {
-      canClick: false,
-    } as Data
-  },
-  mounted() {
-    type Id<T> = { [K in keyof T]: T[K] }
-    const setIgnoreMouseEvents = remote.getCurrentWindow().setIgnoreMouseEvents
-
-    if (isProd) {
-      addEventListener('pointerover', (event) => {
-        this.canClick =
-          event.target === document.documentElement
-            ? this.canClick && setIgnoreMouseEvents(true, { forward: true })
-            : this.canClick || setIgnoreMouseEvents(false) || true
-      })
-
-      setIgnoreMouseEvents(true, { forward: true })
+      showBreakCard: true,
     }
   },
-  watch: {
-    openedKeys(to: Keys[]) {
-      if (to.length <= 0) this.closeWindow()
-    },
-  },
   methods: {
-    closeWindow() {
-      this.removeFromOpenedKeys('menu')
+    startBreak() {
+      this.showBreakCard = false
       setTimeout(() => {
-        const window = remote.getCurrentWindow()
-        window.close()
-      }, 350)
+        this.$router.push({ name: 'Index' })
+      }, 300)
     },
-    addToOpenedKeys(key: Keys) {
-      const openedKeys = this.openedKeys
-      if (!openedKeys.includes(key)) {
-        openedKeys.push(key)
-        // todo scrool down
-      }
-    },
-    removeFromOpenedKeys(key: Keys) {
-      const openedKeys = this.openedKeys
-      if (openedKeys.includes(key)) {
-        this.openedKeys = openedKeys.filter((openedKey) => openedKey !== key)
-      }
-    },
-    async run(event: RunKey) {
-      console.log(event)
-      switch (event) {
-        case 'start-long-break':
-          return await setNextBreak.ask({
-            forceNextBreakIn: 0,
-            forceNextBreakType: 'long',
-          })
-        case 'open-stop-protection':
-          return this.addToOpenedKeys('stop-protection')
-        case 'open-settings':
-          return this.addToOpenedKeys('settings')
-      }
+    async skipBreak() {
+      await setNextBreak.ask({ forceNextBreakIn: 5 * 60 })
+      const window = remote.getCurrentWindow()
+      window.close()
     },
   },
 })
 </script>
+
+<style lang="postcss">
+body {
+  @apply pointer-events-none;
+}
+</style>
