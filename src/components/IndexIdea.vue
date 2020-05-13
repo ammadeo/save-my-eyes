@@ -40,16 +40,12 @@
 <script lang="ts">
 import BaseCard from './BaseCard.vue'
 
-import {
-  AutoBorderClasses,
-  AutoColorClasses,
-} from '../utils/mixins/autoClasses'
 import { Lang } from '@/utils/mixins/i18n'
 import mixins from 'vue-typed-mixins'
 
 import { Card } from '@/store/i18n'
 
-export default mixins(AutoBorderClasses, AutoColorClasses, Lang).extend({
+export default mixins(Lang).extend({
   components: {
     BaseCard,
   },

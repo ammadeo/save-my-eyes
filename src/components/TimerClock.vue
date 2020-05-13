@@ -22,13 +22,10 @@
 import anime from 'animejs'
 import { format, addMilliseconds } from 'date-fns'
 import BaseProgressbar from './BaseProgressbar.vue'
-import {
-  AutoBorderClasses,
-  AutoColorClasses,
-} from '../utils/mixins/autoClasses'
+
 import mixins from 'vue-typed-mixins'
 
-export default mixins(AutoBorderClasses, AutoColorClasses).extend({
+export default mixins().extend({
   components: {
     BaseProgressbar,
   },
