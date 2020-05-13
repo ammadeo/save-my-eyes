@@ -13,6 +13,7 @@
     <div
       class="h-full w-full shadow-inner-2-top-2 rounded-full bg-secondary-1050"
     ></div>
+    <slot />
   </div>
 </template>
 

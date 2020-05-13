@@ -21,7 +21,6 @@
         :finished="finished"
       />
       <TimerClock
-        v-show="!finished"
         class="col-start-1 row-start-3"
         :long="long"
         :start-date="startDate"
