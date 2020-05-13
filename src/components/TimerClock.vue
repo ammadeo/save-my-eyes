@@ -1,31 +1,31 @@
 <template>
-  <div class="flex items-center w-full min-w-full relative self-start">
-    <template v-if="timeLeft > 0">
-      <p
-        class="font-body flex-grow-0 flex-shrink-0 font-bold text-secondary-100 leading-none pr-6 text-3xl"
-      >
-        {{ timeLeftInfo }}
-      </p>
-      <div class="max-w-6xl h-12 w-full">
-        <BaseProgressbar
-          color="primary-400"
-          :min="0"
-          :max="100"
-          :value="timeLeftPercent"
-        />
-      </div>
-    </template>
+  <div
+    class="flex items-center w-full min-w-full relative self-start transition-opacity duration-1000 ease-in"
+    :class="timeLeft <= 0 ? ['opacity-25'] : []"
+  >
+    <p
+      class="font-body flex-grow-0 flex-shrink-0 font-bold text-secondary-100 leading-none pr-6 text-3xl"
+    >
+      {{ timeLeftInfo }}
+    </p>
+    <div class="max-w-6xl h-12 w-full">
+      <BaseProgressbar
+        color="primary-400"
+        :min="0"
+        :max="100"
+        :value="timeLeftPercent"
+      />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import anime from 'animejs'
 import { format, addMilliseconds } from 'date-fns'
 import BaseProgressbar from './BaseProgressbar.vue'
-
+import { CreateTimer } from '@/utils/mixins/createTimer'
 import mixins from 'vue-typed-mixins'
 
-export default mixins().extend({
+export default mixins(CreateTimer).extend({
   components: {
     BaseProgressbar,
   },
@@ -38,15 +38,6 @@ export default mixins().extend({
       required: true,
       type: Date,
     },
-  },
-  data() {
-    return {
-      anime: undefined,
-      timePassedObj: { timePassed: 0 },
-    } as {
-      anime?: anime.AnimeInstance
-      timePassedObj: { timePassed: number }
-    }
   },
   computed: {
     allTime(): number {
@@ -71,20 +62,6 @@ export default mixins().extend({
     this.anime = this.createTimer(allTime, () => {
       this.$emit('finished')
     })
-  },
-  methods: {
-    createTimer(allTime: number, completeHandler: () => void) {
-      const timePassedObj = this.timePassedObj
-      return anime({
-        targets: timePassedObj,
-        timePassed: allTime,
-        autoplay: true,
-        duration: allTime,
-        easing: 'linear',
-        round: 10,
-        complete: completeHandler,
-      })
-    },
   },
   beforeDestroy() {
     const anime = this.anime
