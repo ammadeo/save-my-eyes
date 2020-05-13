@@ -26,12 +26,20 @@ export default Vue.extend({
   },
   watch: {
     active: {
-      handler(activate): void {
+      async handler(activate): Promise<void> {
         if (activate) {
+          await this.$nextTick()
           const component = this.$el as HTMLElement
-          const trap = createFocusTrap(component)
-          trap.activate()
-          this.focusTrap = trap
+          if (component) {
+            const trap = createFocusTrap(component, {
+              allowOutsideClick: () => true,
+              fallbackFocus: component,
+            })
+            trap.activate()
+            this.focusTrap = trap
+          } else {
+            throw new Error('component not defined')
+          }
         } else {
           this.deactivateTrap()
         }
