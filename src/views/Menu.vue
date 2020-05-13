@@ -41,22 +41,16 @@ import ContentStopProtection from '../components/ContentStopProtection.vue'
 import CardCloseable from '../components/CardCloseable.vue'
 import { RunKey } from '@/types/menu'
 import { remote } from 'electron'
-import Vue from 'vue'
-import { isProd } from '@/background/env'
 import { rendererSetNextBreak as setNextBreak } from '@/background/ipc'
-
-interface MousePolicy {
-  _canClic: string
-  (this: Window, event: PointerEvent): void
-}
+import { TransparentClickEngine } from '@/utils/mixins/transparentClickEngine'
+import mixins from 'vue-typed-mixins'
 
 type Keys = 'menu' | 'settings' | 'stop-protection'
 interface Data {
   openedKeys: Keys[]
-  canClick: boolean | void
 }
 
-export default Vue.extend({
+export default mixins(TransparentClickEngine).extend({
   components: {
     ContentSettings,
     CardCloseable,
@@ -66,23 +60,7 @@ export default Vue.extend({
   data() {
     return {
       openedKeys: ['menu'],
-      canClick: false,
     } as Data
-  },
-  mounted() {
-    type Id<T> = { [K in keyof T]: T[K] }
-    const setIgnoreMouseEvents = remote.getCurrentWindow().setIgnoreMouseEvents
-
-    if (isProd) {
-      addEventListener('pointerover', (event) => {
-        this.canClick =
-          event.target === document.documentElement
-            ? this.canClick && setIgnoreMouseEvents(true, { forward: true })
-            : this.canClick || setIgnoreMouseEvents(false) || true
-      })
-
-      setIgnoreMouseEvents(true, { forward: true })
-    }
   },
   watch: {
     openedKeys(to: Keys[]) {
