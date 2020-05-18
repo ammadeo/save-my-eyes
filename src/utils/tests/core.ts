@@ -1,4 +1,4 @@
-import { render, fireEvent, RenderOptions, ComponentHarness } from '@testing-library/vue'
+import { render, fireEvent, RenderOptions, ComponentHarness, VueFireObject } from '@testing-library/vue'
 import { VueClass } from '@vue/test-utils'
 import Vue from 'vue'
 import { Generate } from '@/utils/tests/dataGenerator'
@@ -14,32 +14,21 @@ interface Temp<V extends Vue> {
 type select = (renderer: ComponentHarness) => HTMLElement | never
 
 
-export class BasicTest<V extends Vue>{
+export class Base<V extends Vue>{
   protected temp: Temp<V> = {}
   constructor(protected readonly Component: VueClass<V>, protected options: RenderOptions<V> = {}){
 
   }
-  protected render(additionalOptions?: RenderOptions<V>) {
+  render(additionalOptions?: RenderOptions<V>) {
     return render(this.Component, {...this.options, ...this.temp.options, ...additionalOptions})
   }
 
-
-  protected isEmptyTemp(){
-    return Object.entries(this.temp).length === 0
-  }
-
-  protected clear(){
+  clear(){
      this.temp = {}
   }
 
-  run(testName: string) {
-    if(!this.isEmptyTemp()) throw new Error(`temporary variables weren't cleared in last test (${this.temp.testName}) call .clear on this test`)
-    this.temp.testName = testName
-    return this
-  }
   setOptions(tempOptions: RenderOptions<V>) {
     this.temp.options = tempOptions
-    return this
   }
 
   // ? tests
@@ -54,16 +43,16 @@ export class BasicTest<V extends Vue>{
       expect(Slot).toBeVisible()
     }
 
-    protected RootSelector(renderer: ComponentHarness) {
-      const firstChild =  renderer.container.firstChild
-      if(firstChild) return firstChild as HTMLElement
+    selectRoot(renderer: ComponentHarness) {
+      const firstElementChild =  renderer.container.firstElementChild
+      if(firstElementChild) return firstElementChild as HTMLElement
       throw new Error('no root container with first child found')
     }
-  async testClickEmit(select: select = this.RootSelector) {
-      const renderer = this.render()
-      const Clicker = select(renderer)
+  async testEmitter(select: select = this.selectRoot, eventName: keyof VueFireObject = "click", emitName: string = eventName) {
+    const renderer = this.render()
+    const EventSource = select(renderer)
 
-      await fireEvent.click(Clicker)
-      expect(renderer.emitted().click).toBeTruthy()
-  }
+    await fireEvent[eventName](EventSource)
+    expect(renderer.emitted()[emitName]).toBeTruthy()
+}
 }
