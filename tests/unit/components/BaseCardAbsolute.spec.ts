@@ -1,6 +1,6 @@
 import { render, fireEvent } from '@testing-library/vue'
 import Component from '@/components/CardFocusable.vue'
-import { Generate } from '@/utils/testsDataGenerator'
+import { Generate } from '@/utils/tests/dataGenerator'
 
 const pTAgTExt = Generate.string()
 const pTag = `<p>${pTAgTExt}</p>`

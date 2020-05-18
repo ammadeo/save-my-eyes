@@ -1,6 +1,6 @@
 import { render, fireEvent } from '@testing-library/vue'
 import Component from '@/components/ContentMenu.vue'
-import { Generate } from '@/utils/testsDataGenerator'
+import { Generate } from '@/utils/tests/dataGenerator'
 
 describe('components/TheMenu.vue', () => {
   test('has next break time info', async () => {

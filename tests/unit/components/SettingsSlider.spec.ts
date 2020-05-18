@@ -1,6 +1,6 @@
 import { render } from '@testing-library/vue'
 import Component from '@/components/SettingsSlider.vue'
-import { Generate } from '@/utils/testsDataGenerator'
+import { Generate } from '@/utils/tests/dataGenerator'
 
 const props = {
   value: 150,
