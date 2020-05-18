@@ -43,10 +43,10 @@ const getNewBreakIndex = (
     if (forceNextBreakType) {
       const forceLongBreak = forceNextBreakType === 'long'
       if (forceLongBreak) {
-        console.log(
-          'long every',
-          getUserSettingsStore().get('breaks').long.every
-        )
+        // console.log(
+        //   'long every',
+        //   getUserSettingsStore().get('breaks').long.every
+        // )
         return getUserSettingsStore().get('breaks').long.every
       } else {
         return 1
@@ -57,14 +57,12 @@ const getNewBreakIndex = (
 }
 
 export const setNewBreak = (options: NewBreakOptions) => {
-  closeAllWindows()
-
   const nextBreakIn = options?.forceNextBreakIn || getEveryFromDB()
 
   breakIndex.value = getNewBreakIndex(breakIndex.value, options)
 
   breakId.value++
-  const keyBreakIndex = breakId.value
+  const keyBreakId = breakId.value
 
   if (breakSchedule) breakSchedule.cancel()
 
@@ -82,12 +80,13 @@ export const setNewBreak = (options: NewBreakOptions) => {
     const nextBreak = calculateNextBreak(nextBreakIn)
 
     breakSchedule = scheduleJob(nextBreak, () => {
-      if (keyBreakIndex === breakId.value) {
+      if (keyBreakId === breakId.value) {
         closeAllWindows()
         createWindowIndex()
       }
     })
   } else {
+    closeAllWindows()
     createWindowIndex()
   }
 }
