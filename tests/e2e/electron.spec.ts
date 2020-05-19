@@ -1,12 +1,12 @@
 process.env.IS_TEST = true
 
-// import {} from 'spectron'
+import spectron from 'spectron'
 import { testWithSpectron } from 'vue-cli-plugin-electron-builder'
 jest.setTimeout(5 * 60 * 1000)
 
 test('Window Loads Properly', async () => {
   // Wait for dev server to start
-  const { app, stopServe } = await testWithSpectron({
+  const { app, stopServe } = await testWithSpectron(spectron, {
     // @ts-ignore
     spectronOptions: {
       connectionRetryCount: 3,
