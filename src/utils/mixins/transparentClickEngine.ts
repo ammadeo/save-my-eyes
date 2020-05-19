@@ -7,7 +7,7 @@ export const TransparentClickEngine = vue.extend({
     return {
       canClick: false,
     } as {
-      canClick: boolean | void,
+      canClick: boolean | void
     }
   },
   mounted() {

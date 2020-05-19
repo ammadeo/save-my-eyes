@@ -4,11 +4,14 @@ import store from '@/store'
 
 describe('components/IndexIdea.vue', () => {
   test('render 1 card with title, content and image', () => {
-    const { getByText, getByAltText } = render(Component, { store, methods: {
-      random(){
-        return 0
-      }
-    } })
+    const { getByText, getByAltText } = render(Component, {
+      store,
+      methods: {
+        random() {
+          return 0
+        },
+      },
+    })
     // @ts-ignore
     const IdeaTitle = getByText(store.state.i18n.ideas.cards[0].title['en'])
     expect(IdeaTitle).toBeVisible()

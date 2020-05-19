@@ -1,9 +1,9 @@
 import { render } from '@testing-library/vue'
-import Component from "@/components/IndexSettings.vue";
+import Component from '@/components/IndexSettings.vue'
 
-describe("components/IndexSettings.vue", () => {
+describe('components/IndexSettings.vue', () => {
   test.todo('implement tests!')
-  test("", () => {
+  test('', () => {
     const { getByText } = render(Component)
-  });
-});
+  })
+})

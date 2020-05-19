@@ -19,10 +19,12 @@ interface Temp<V extends Vue> {
   testName?: string
 }
 
-
 type select = (renderer: ComponentHarness) => HTMLElement | never
 type selectReturn = ReturnType<select>
-type selectWithQuery<T extends string> = (renderer: ComponentHarness, query: T) => selectReturn
+type selectWithQuery<T extends string> = (
+  renderer: ComponentHarness,
+  query: T
+) => selectReturn
 
 export class Base<V extends Vue> {
   protected temp: Temp<V> = {}
@@ -53,7 +55,7 @@ export class Base<V extends Vue> {
   }
 
   // ? tests
-  testHasSlot(slotName: string = 'default') {
+  testHasSlot(slotName = 'default') {
     const { getByText } = this.render({
       slots: {
         [slotName]: testTag,
@@ -76,11 +78,10 @@ export class Base<V extends Vue> {
     expect(renderer.emitted()[emitName]).toBeTruthy()
   }
 
-  testPropInline(
-    select: select,
-    propsOverload?: object
-  ){
-    const renderer = propsOverload ? this.render({ props: propsOverload }) : this.render()
+  testPropInline(select: select, propsOverload?: object) {
+    const renderer = propsOverload
+      ? this.render({ props: propsOverload })
+      : this.render()
     const PropTarget = select(renderer)
     expect(PropTarget).toBeVisible()
   }

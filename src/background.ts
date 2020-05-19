@@ -1,7 +1,5 @@
 import { app, protocol, BrowserWindow } from 'electron'
-import {
-  installVueDevtools,
-} from 'vue-cli-plugin-electron-builder/lib'
+import { installVueDevtools } from 'vue-cli-plugin-electron-builder/lib'
 import { useTray } from '@/background/tray'
 import { isProd, isProdBuild, isDevProdTest } from '@/background/env'
 import { setNewBreak } from '@/background/breaker'

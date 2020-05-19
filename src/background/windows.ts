@@ -2,7 +2,6 @@ import { screen, BrowserWindow } from 'electron'
 import { isProd, isProdBuild, isDevProdTest } from './env'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 
-
 const windows: {
   windowIndex: undefined | BrowserWindow
   windowTray: undefined | BrowserWindow
@@ -91,17 +90,13 @@ export const createWindowTray = async () => {
   const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
   const x = screenWidth - width
 
-  createWindow(
-    'windowTray',
-    url,
-    {
-      width,
-      height: screenHeight,
-      y: 0,
-      x,
-      backgroundColor: '#00000000',
-      transparent: isProd,
-      ...baseWindowSettings,
-    }
-  )
+  createWindow('windowTray', url, {
+    width,
+    height: screenHeight,
+    y: 0,
+    x,
+    backgroundColor: '#00000000',
+    transparent: isProd,
+    ...baseWindowSettings,
+  })
 }

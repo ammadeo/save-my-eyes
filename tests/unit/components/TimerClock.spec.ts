@@ -32,12 +32,12 @@ jest.mock('@/background/db', () => ({
 
 const startDate = new Date(2020, 3, 1, 10, 10)
 const endDate = new Date(2020, 3, 1, 10, 30)
-    const base = new Base(Component, {
-      props: {
-        startDate,
-        endDate,
-      },
-    })
+const base = new Base(Component, {
+  props: {
+    startDate,
+    endDate,
+  },
+})
 
 describe('components/TimerClock.vue', () => {
   test('has working progressbar', async () => {

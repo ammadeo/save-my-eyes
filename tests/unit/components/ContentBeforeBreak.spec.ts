@@ -1,25 +1,25 @@
 import { render, waitFor } from '@testing-library/vue'
-import Component from "@/components/ContentBeforeBreak.vue";
+import Component from '@/components/ContentBeforeBreak.vue'
 import { Base } from '@/utils/tests/core'
 const base = new Base(Component)
 
-jest.useFakeTimers();
+jest.useFakeTimers()
 
-describe("components/ContentBeforeBreak.vue", () => {
-  test("has skip button", () => {
+describe('components/ContentBeforeBreak.vue', () => {
+  test('has skip button', () => {
     const { getByText } = base.render()
     expect(getByText('Skip for 5 minutes')).toBeVisible()
-  });
+  })
 
-  test("has working progressbar", async ()=>{
+  test('has working progressbar', async () => {
     const { getByRole } = base.render()
-    const Progressbar = getByRole("progressbar")
+    const Progressbar = getByRole('progressbar')
     expect(Progressbar).toBeVisible()
     const ProgressDrawer = [...Progressbar.children][1]
-    expect(ProgressDrawer).toHaveStyle("transform: translateX(-100%)")
+    expect(ProgressDrawer).toHaveStyle('transform: translateX(-100%)')
     jest.runAllTimers()
-    waitFor(()=>
-    expect(ProgressDrawer).not.toHaveStyle("transform: translateX(-100%)")
+    waitFor(() =>
+      expect(ProgressDrawer).not.toHaveStyle('transform: translateX(-100%)')
     )
   })
-});
+})
