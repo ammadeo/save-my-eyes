@@ -4,7 +4,7 @@
       Settings
     </h3>
 
-    <SettingsSlider
+    <BaseInputRange
       v-model="every"
       name="Take a short break every"
       :forceLarge="forceLarge"
@@ -15,7 +15,7 @@
       suffix="min."
       class="mb-2 mt-2"
     />
-    <SettingsSlider
+    <BaseInputRange
       v-model="short.last"
       name="Short break will last"
       :forceLarge="forceLarge"
@@ -25,7 +25,7 @@
       class="mb-6"
       suffix="sec."
     />
-    <SettingsSlider
+    <BaseInputRange
       v-model="long.every"
       name="Take a long break every"
       :forceLarge="forceLarge"
@@ -44,7 +44,7 @@
       class="mb-2"
       suffix="min."
     />
-    <SettingsSlider
+    <BaseInputRange
       v-model="long.last"
       name="Long break will last"
       :forceLarge="forceLarge"
@@ -77,13 +77,13 @@
 </template>
 
 <script lang="ts">
-import SettingsSlider from './SettingsSlider.vue'
+import BaseInputRange from './BaseInputRange.vue'
 
 import { getUserSettingsStore } from '@/background/db'
 import Vue from 'vue'
 export default Vue.extend({
   components: {
-    SettingsSlider,
+    BaseInputRange,
   },
   props: {
     forceLarge: {

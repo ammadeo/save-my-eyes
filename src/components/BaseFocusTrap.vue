@@ -34,6 +34,7 @@ export default Vue.extend({
             const trap = createFocusTrap(component, {
               allowOutsideClick: () => true,
               fallbackFocus: component,
+              initialFocus: () => component.firstElementChild as HTMLElement,
             })
             trap.activate()
             this.focusTrap = trap

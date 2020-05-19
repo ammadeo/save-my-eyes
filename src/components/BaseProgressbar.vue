@@ -38,7 +38,7 @@ export default Vue.extend({
   },
   computed: {
     progress(): number {
-      return ((this.value - this.min) / this.max) * 100
+      return ((this.max - this.value - this.min) / this.max) * 100
     },
   },
 })

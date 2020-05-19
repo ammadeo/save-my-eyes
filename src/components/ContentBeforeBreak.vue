@@ -36,11 +36,8 @@ export default mixins(CreateTimer).extend({
     }
   },
   computed: {
-    timeLeft(): number {
-      return this.allTime - this.timePassedObj.timePassed
-    },
     timeLeftPercent(): number {
-      return (this.timeLeft / this.allTime) * 100
+      return (this.timePassedObj.timePassed / this.allTime) * 100
     },
   },
   mounted() {

@@ -1,31 +1,59 @@
-import { render, fireEvent } from '@testing-library/vue'
+import { render, fireEvent, waitFor } from '@testing-library/vue'
 import Component from '@/components/TimerClock.vue'
-// import { Generate } from '@/utils/testsDataGenerator'
+import { Base } from '@/utils/tests/core'
+import { formatISO, addMinutes } from 'date-fns'
+const mockDateIso = formatISO(addMinutes(new Date(), 15))
+
+jest.mock('@/background/ipc', () => ({
+  rendererGetBreakData: {
+    ask: async () =>
+      new Promise((resolve) =>
+        resolve({
+          lastSchedulerJobDate: mockDateIso,
+          lastSchedulerJobLength: 5 * 60,
+        })
+      ),
+  },
+}))
+jest.mock('@/background/db', () => ({
+  getUserSettingsStore: () => ({
+    get: () => ({
+      every: 15 * 60,
+      short: {
+        last: 30,
+      },
+      long: {
+        every: 3,
+        last: 5 * 60,
+      },
+    }),
+  }),
+}))
 
 const startDate = new Date(2020, 3, 1, 10, 10)
 const endDate = new Date(2020, 3, 1, 10, 30)
-
-describe('components/TimerClock.vue', () => {
-  test('set progress bar transform: translateX to -100% at start', async () => {
-    const { getByRole } = render(Component, {
+    const base = new Base(Component, {
       props: {
         startDate,
         endDate,
       },
     })
 
-    const progressbar = getByRole('progressbar')
-
-    expect(progressbar).toHaveStyle('transform: translateX(-100%)')
+describe('components/TimerClock.vue', () => {
+  test('has working progressbar', async () => {
+    const { getByRole, debug } = base.render()
+    const Progressbar = getByRole('progressbar')
+    expect(Progressbar).toBeVisible()
+    const ProgressDrawer = [...Progressbar.children][0]
+    expect(ProgressDrawer).toHaveStyle('transform: translateX(-100%)')
+    jest.runAllTimers()
+    waitFor(() =>
+      expect(ProgressDrawer).not.toHaveStyle('transform: translateX(-100%)')
+    )
   })
 
   test('set progress bar label to 20 minutes at start', async () => {
-    const { getByText } = render(Component, {
-      props: {
-        startDate,
-        endDate,
-      },
-    })
+    const { getByText } = base.render()
 
     const component = getByText('20 : 00')
 
@@ -33,12 +61,7 @@ describe('components/TimerClock.vue', () => {
   })
 
   test('set progress bar aria attributes', async () => {
-    const { getByRole } = render(Component, {
-      props: {
-        startDate,
-        endDate,
-      },
-    })
+    const { getByRole } = base.render()
 
     const progressbar = getByRole('progressbar')
     expect(progressbar).toHaveAttribute('aria-valuenow', '0')

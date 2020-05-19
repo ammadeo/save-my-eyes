@@ -2,6 +2,7 @@ import { screen, BrowserWindow } from 'electron'
 import { isProd, isProdBuild, isDevProdTest } from './env'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 
+
 const windows: {
   windowIndex: undefined | BrowserWindow
   windowTray: undefined | BrowserWindow

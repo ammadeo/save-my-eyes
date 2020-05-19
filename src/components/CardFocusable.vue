@@ -42,14 +42,10 @@ export default Vue.extend({
     },
   },
   methods: {
-    focusIn(event: Event) {
-      console.log('focus in', event)
+    focusIn() {
       this.$emit('focusin')
     },
-    focusOut(event: Event) {
-      console.log('focus out', event)
-
-      // this.card.scrollTop = 0
+    focusOut() {
       this.$emit('focusout')
     },
   },

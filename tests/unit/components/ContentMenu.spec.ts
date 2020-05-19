@@ -1,14 +1,47 @@
-import { render, fireEvent } from '@testing-library/vue'
+import { render, fireEvent, waitFor } from '@testing-library/vue'
 import Component from '@/components/ContentMenu.vue'
 import { Generate } from '@/utils/tests/dataGenerator'
+import { formatISO, addMinutes } from 'date-fns'
+const mockDateIso = formatISO(addMinutes(new Date(), 15))
 
-describe('components/TheMenu.vue', () => {
+jest.mock('vue-cli-plugin-electron-builder/lib', () => ({
+  createProtocol: () => {},
+}))
+jest.mock('@/background/ipc', () => ({
+  rendererGetBreakData: {
+    ask: async () =>
+      new Promise((resolve) =>
+        resolve({
+          lastSchedulerJobDate: mockDateIso,
+          lastSchedulerJobLength: 5 * 60,
+        })
+      ),
+  },
+}))
+jest.mock('@/background/db', () => ({
+  getUserSettingsStore: () => ({
+    get: () => ({
+      every: 15 * 60,
+      short: {
+        last: 30,
+      },
+      long: {
+        every: 3,
+        last: 5 * 60,
+      },
+    }),
+  }),
+}))
+
+describe('components/ContentMenu.vue', () => {
   test('has next break time info', async () => {
     const { getByText } = render(Component)
-
-    const ContentBox = getByText('next long break in 13 minutes')
-
-    expect(ContentBox).toBeVisible()
+    waitFor(() => {
+      const ContentBox = getByText('next short break in')
+      expect(ContentBox).toBeVisible()
+      const SpanBox = getByText('15 minutes')
+      expect(SpanBox).toBeVisible()
+    })
   })
 
   test('has start a long break now button', async () => {

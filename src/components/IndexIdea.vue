@@ -12,10 +12,7 @@
       <BaseCard
         color="secondary-500"
         class="flex-grow delay-100 duration-500"
-        data-testid="help-card"
         v-if="card"
-        @focusin="emitChangeAutoFinishLock(true)"
-        @focusout="emitChangeAutoFinishLock(false)"
       >
         <div class="flex m-4">
           <img
@@ -68,9 +65,6 @@ export default mixins(Lang).extend({
     },
   },
   methods: {
-    emitChangeAutoFinishLock(isAutoLock: boolean) {
-      this.$emit('changeAutoFinishLock', isAutoLock)
-    },
     random(max: number) {
       return Math.floor(Math.random() * max)
     },

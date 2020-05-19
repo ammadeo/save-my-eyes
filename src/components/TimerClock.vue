@@ -13,7 +13,7 @@
         color="primary-400"
         :min="0"
         :max="100"
-        :value="timeLeftPercent"
+        :value="timePercentage"
       />
     </div>
   </div>
@@ -53,8 +53,8 @@ export default mixins(CreateTimer).extend({
       const helperDate = addMilliseconds(new Date(0), timeLeft)
       return format(helperDate, 'mm : ss')
     },
-    timeLeftPercent(): number {
-      return (this.timeLeft / this.allTime) * 100
+    timePercentage(): number {
+      return (this.timePassedObj.timePassed / this.allTime) * 100
     },
   },
   mounted() {
