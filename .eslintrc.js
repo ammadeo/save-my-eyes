@@ -5,6 +5,7 @@ module.exports = {
   },
   extends: [
     'plugin:vue/essential',
+    'plugin:jest',
     'plugin:jest/recommended',
     'plugin:jest/style',
     'eslint:recommended',
