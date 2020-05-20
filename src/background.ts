@@ -19,25 +19,19 @@ protocol.registerSchemesAsPrivileged([
 
 app.on('window-all-closed', (e: Event) => e.preventDefault())
 
-app.on('activate', () => {
+// app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   // if (win === null) {
   //   createWindow()
   // }
-})
+// })
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-  if (isDevelopment && !process.env.IS_TEST) {
-    // Install Vue Devtools
-    // Devtools extensions are broken in Electron 6.0.0 and greater
-    // See https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/378 for more info
-    // Electron will not launch with Devtools extensions installed on Windows 10 with dark mode
-    // If you are not using Windows 10 dark mode, you may uncomment these lines
-    // In addition, if the linked issue is closed, you can upgrade electron and uncomment these lines
+  if (isDevelopment) {
     try {
       await installVueDevtools()
     } catch (e) {

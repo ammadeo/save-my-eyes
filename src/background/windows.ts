@@ -53,7 +53,7 @@ function createWindow(
       // Load the url of the dev server if in development mode
       const path = (process.env.WEBPACK_DEV_SERVER_URL as string) + url
       newWindow.loadURL(path)
-      if (!process.env.IS_TEST) newWindow.webContents.openDevTools()
+      newWindow.webContents.openDevTools()
     } else {
       createProtocol('app')
       // Load the index.html when not in development

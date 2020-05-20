@@ -1,3 +1,5 @@
+import {expectCall} from '@/utils/tests/electron'
+
 import {
   breakIndex,
   lastSchedulerJobDate,
@@ -26,9 +28,11 @@ class IpcChanel<RendererAskPayload extends {}, RendererAskAnswer extends {}> {
   readonly renderer = {
     ask: async (options: RendererAskPayload): Promise<RendererAskAnswer> =>
       new Promise((resolve, reject) => {
+          const called = expectCall(`IPC chanel expect answer from [mainId: ${this.mainChanelId}] to [rendererId: ${this.rendererChanelId}]`)
         ipcRenderer.on(
           this.mainChanelId,
           (_event, answer: RendererAskAnswer) => {
+            if(called) called()
             resolve(answer)
           }
         )

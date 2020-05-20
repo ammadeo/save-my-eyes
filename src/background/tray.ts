@@ -11,5 +11,6 @@ export const useTray = () => {
   )
   tray.setToolTip('Save your eyes')
   tray.on('click', createWindowTray)
+  tray.on('right-click', createWindowTray)
   return tray
 }
