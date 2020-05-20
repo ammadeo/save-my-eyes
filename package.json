@@ -11,9 +11,7 @@
     "electron:serve": "vue-cli-service electron:serve",
     "electron:build": "vue-cli-service electron:build",
     "test:unit": "vue-cli-service test:unit tests/unit",
-    "test:unit:watch": "vue-cli-service test:unit --watch tests/unit",
-    "test:e2e": "vue-cli-service test:unit tests/e2e",
-    "test:e2e:watch": "vue-cli-service test:unit --watch tests/e2e"
+    "test:unit:watch": "vue-cli-service test:unit --watch tests/unit"
   },
   "main": "src/background.ts",
   "dependencies": {
@@ -54,13 +52,10 @@
     "eslint-plugin-jest": "^23.8.2",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-vue": "^6.2.2",
-    "execa": "^4.0.1",
     "flush-promises": "^1.0.2",
-    "portfinder": "^1.0.26",
     "postcss-loader": "^3.0.0",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^1.19.1",
-    "spectron": "^8.0.0",
     "stylelint": "^13.3.3",
     "stylelint-config-recommended": "^3.0.0",
     "tailwindcss-interaction-variants": "^3.1.1",
