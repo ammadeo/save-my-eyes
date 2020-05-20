@@ -119,7 +119,6 @@ export default Vue.extend({
       const lenght = this.inputLength
       switch (lenght) {
         case 0:
-          return 'w-4'
         case 1:
           return 'w-4'
         case 2:

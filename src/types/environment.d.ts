@@ -1,8 +1,8 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      IS_TEST: boolean | undefined
-      [key: string]: boolean | string | undefined
+      IS_TEST: string | undefined
+      [key: string]: string | undefined
     }
   }
 }
