@@ -3,6 +3,7 @@ import Component from '@/components/TimerClock.vue'
 import { Base } from '@/utils/tests/core'
 import { formatISO, addMinutes } from 'date-fns'
 const mockDateIso = formatISO(addMinutes(new Date(), 15))
+jest.useFakeTimers()
 
 jest.mock('@/background/ipc', () => ({
   rendererGetBreakData: {
@@ -47,7 +48,7 @@ describe('components/TimerClock.vue', () => {
     const ProgressDrawer = [...Progressbar.children][0]
     expect(ProgressDrawer).toHaveStyle('transform: translateX(-100%)')
     jest.runAllTimers()
-    waitFor(() =>
+    await waitFor(() =>
       expect(ProgressDrawer).not.toHaveStyle('transform: translateX(-100%)')
     )
   })

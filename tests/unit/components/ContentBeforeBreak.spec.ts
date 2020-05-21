@@ -18,7 +18,7 @@ describe('components/ContentBeforeBreak.vue', () => {
     const ProgressDrawer = [...Progressbar.children][1]
     expect(ProgressDrawer).toHaveStyle('transform: translateX(-100%)')
     jest.runAllTimers()
-    waitFor(() =>
+    await waitFor(() =>
       expect(ProgressDrawer).not.toHaveStyle('transform: translateX(-100%)')
     )
   })

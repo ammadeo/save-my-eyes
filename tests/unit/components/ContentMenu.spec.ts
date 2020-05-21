@@ -36,10 +36,10 @@ jest.mock('@/background/db', () => ({
 describe('components/ContentMenu.vue', () => {
   test('has next break time info', async () => {
     const { getByText } = render(Component)
-    waitFor(() => {
+    await waitFor(() => {
       const ContentBox = getByText('next short break in')
       expect(ContentBox).toBeVisible()
-      const SpanBox = getByText('15 minutes')
+      const SpanBox = getByText('19 minutes')
       expect(SpanBox).toBeVisible()
     })
   })
