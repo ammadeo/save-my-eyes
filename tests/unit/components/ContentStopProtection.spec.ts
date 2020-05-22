@@ -1,7 +1,7 @@
 import { fireEvent, waitFor } from '@testing-library/vue'
 import Component from '@/components/ContentStopProtection.vue'
 import { Base } from '@/utils/tests/core'
-import {rendererCloseApp, rendererSetNextBreak} from '@/background/ipc'
+import { rendererCloseApp, rendererSetNextBreak } from '@/background/ipc'
 const base = new Base(Component)
 const askToClose = (rendererCloseApp.ask as unknown) as jest.Mock<
   typeof rendererCloseApp.ask

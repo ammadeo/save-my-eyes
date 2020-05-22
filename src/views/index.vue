@@ -8,6 +8,7 @@
     <IndexStopProtection
       class="col-start-3 row-start-1"
       @changeAutoFinishLock="setAutoFinishLock($event)"
+      @close="closeWindow()"
     />
     <p v-if="!ready" class="font-preset-info mb-8">
       Loading...

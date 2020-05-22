@@ -1,6 +1,6 @@
 <template>
   <div class="relative w-full">
-    <div class=" flex justify-end items-center">
+    <div class="flex justify-end items-center">
       <p
         class="font-display selection-darker text-sm tracking-wide mr-2 uppercase text-secondary-400"
       >
@@ -19,7 +19,7 @@
         class="right-0 top-0 z-30 max-h-screen-16 slide-enter-right lg:max-h-screen-24 xl:max-h-screen-32"
         @close="setShowStopProtection(false)"
       >
-        <ContentStopProtection @close="$emit('run', 'closeWindow')" />
+        <ContentStopProtection @close="$emit('close')" />
       </CardCloseable>
     </transition>
   </div>

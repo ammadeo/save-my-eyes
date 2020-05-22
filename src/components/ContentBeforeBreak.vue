@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col text-secondary-100 py-6 px-4">
     <h1 class="text-xl font-display uppercase mb-2">save my eyes</h1>
-    <p class="mb-2">Short break starting in 5 seconds</p>
+    <p class="mb-2">{{ breakName }} break will start in 5 seconds</p>
     <div class="h-8 w-full mb-6">
       <ProgressbarIcon
         :min="0"
@@ -23,9 +23,10 @@
 import ProgressbarIcon from './ProgressbarIcon.vue'
 import ButtonIcon from './ButtonIcon.vue'
 import { CreateTimer } from '@/utils/mixins/createTimer'
+import { CheckIsLongBreak } from '@/utils/mixins/breaks'
 import mixins from 'vue-typed-mixins'
 
-export default mixins(CreateTimer).extend({
+export default mixins(CreateTimer, CheckIsLongBreak).extend({
   components: {
     ProgressbarIcon,
     ButtonIcon,
@@ -33,14 +34,19 @@ export default mixins(CreateTimer).extend({
   data() {
     return {
       allTime: 5000,
+      isLong: false,
     }
   },
   computed: {
     timeLeftPercent(): number {
       return (this.timePassedObj.timePassed / this.allTime) * 100
     },
+    breakName(): string {
+      return this.isLong ? 'Long' : 'Short'
+    },
   },
-  mounted() {
+  async mounted() {
+    this.isLong = await this.checkIsLongBreak()
     setTimeout(() => {
       const allTime = this.allTime
       this.anime = this.createTimer(allTime, () => {

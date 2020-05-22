@@ -21,7 +21,7 @@
   }
 }
 .slide-move {
-  @apply: transition-transform duration-700
+  transition: transform 700ms
 }
 
 
