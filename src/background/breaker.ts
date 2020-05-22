@@ -1,7 +1,7 @@
 import { scheduleJob, Job } from 'node-schedule'
 import { addSeconds } from 'date-fns'
 import { isProd, isProdBuild, isDevProdTest } from './env'
-import { createWindowIndex, closeAllWindows } from './windows'
+import { createWindowIndex, createWindowIndexChildren, closeAllWindows } from './windows'
 import {
   breakIndex,
   breakId,
@@ -56,7 +56,7 @@ const getNewBreakIndex = (
   return oldIndex
 }
 
-export const setNewBreak = (options: NewBreakOptions) => {
+export const setNewBreak = async (options: NewBreakOptions) => {
   const nextBreakIn = options?.forceNextBreakIn || getEveryFromDB()
 
   breakIndex.value = getNewBreakIndex(breakIndex.value, options)
@@ -79,14 +79,16 @@ export const setNewBreak = (options: NewBreakOptions) => {
   if (nextBreakIn > 0) {
     const nextBreak = calculateNextBreak(nextBreakIn)
 
-    breakSchedule = scheduleJob(nextBreak, () => {
+    breakSchedule = scheduleJob(nextBreak,async () => {
       if (keyBreakId === breakId.value) {
         closeAllWindows()
-        createWindowIndex()
+        await createWindowIndex()
+        await createWindowIndexChildren()
       }
     })
   } else {
     closeAllWindows()
-    createWindowIndex()
+    await createWindowIndex()
+    await createWindowIndexChildren()
   }
 }
