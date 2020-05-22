@@ -9,14 +9,14 @@ export const CheckIsLongBreak = vue.extend({
       const { breakIndex } = await rendererGetBreakData.ask({})
       const longBreakEvery = getUserSettingsStore().get('breaks').long.every
       const isLong = breakIndex % longBreakEvery === 0
-      console.log(
-        'breakIndex',
-        breakIndex,
-        'longBreakEvery',
-        longBreakEvery,
-        'breakIndex % longBreakEvery',
-        breakIndex % longBreakEvery
-      )
+      // console.log(
+      //   'breakIndex',
+      //   breakIndex,
+      //   'longBreakEvery',
+      //   longBreakEvery,
+      //   'breakIndex % longBreakEvery',
+      //   breakIndex % longBreakEvery
+      // )
       return isLong
     },
   },

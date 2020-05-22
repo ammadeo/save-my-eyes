@@ -4,13 +4,13 @@
       Stop protection for
     </p>
     <div class="flex mb-4 w-full">
-      <!-- // todo change to v-for -->
       <BaseButton
         v-for="({ content, lenght }, index) in pauseLenghts"
         :key="'pause' + index"
         center
         class="flex-1 mr-2 last:mr-0"
         @click="pauseBreak(lenght)"
+        data-testid="button-pause-break"
         ><p class="py-2 px-1">{{ content }}</p></BaseButton
       >
     </div>
@@ -23,6 +23,7 @@
       @click="closeApp()"
       content="for this session"
       icon="stop"
+      data-testid="button-close-app"
     />
     <p class="text-secondary-200 text-center">
       App will start again with your computer
@@ -33,10 +34,7 @@
 <script lang="ts">
 import ButtonIcon from './ButtonIcon.vue'
 import BaseButton from './BaseButton.vue'
-import { RunKey } from '@/types/menu'
 import { rendererSetNextBreak, rendererCloseApp } from '@/background/ipc'
-import { getUserSettingsStore } from '@/background/db'
-import { formatDistanceStrict, addMinutes } from 'date-fns'
 import Vue from 'vue'
 
 interface PauseLenght {

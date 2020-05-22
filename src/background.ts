@@ -20,11 +20,11 @@ protocol.registerSchemesAsPrivileged([
 app.on('window-all-closed', (e: Event) => e.preventDefault())
 
 // app.on('activate', () => {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  // if (win === null) {
-  //   createWindow()
-  // }
+// On macOS it's common to re-create a window in the app when the
+// dock icon is clicked and there are no other windows open.
+// if (win === null) {
+//   createWindow()
+// }
 // })
 
 // This method will be called when Electron has finished

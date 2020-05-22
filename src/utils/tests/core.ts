@@ -14,6 +14,8 @@ import { RecordPropsDefinition } from 'vue/types/options'
 const testText = Generate.string()
 const testTag = `<p>${testText}</p>`
 
+type LiteralUnion<T extends U, U = string> = T | (U & never)
+
 interface Temp<V extends Vue> {
   options?: RenderOptions<V>
   testName?: string
@@ -84,5 +86,19 @@ export class Base<V extends Vue> {
       : this.render()
     const PropTarget = select(renderer)
     expect(PropTarget).toBeVisible()
+  }
+
+  testHtmlVisibility(select: select, optionsOverload: RenderOptions<V> = {}) {
+    const renderer = this.render(optionsOverload)
+    expect(select(renderer)).toBeVisible()
+  }
+
+  testHtmlTag(
+    select: select,
+    tag: LiteralUnion<'button' | 'p' | 'span' | 'div'>,
+    optionsOverload: RenderOptions<V> = {}
+  ) {
+    const renderer = this.render(optionsOverload)
+    expect(select(renderer).tagName.toLowerCase()).toBe(tag.toLowerCase())
   }
 }
