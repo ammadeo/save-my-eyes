@@ -1,4 +1,4 @@
-import {expectCall} from '@/utils/tests/electron'
+import { expectCall } from '@/utils/tests/electron'
 
 import {
   breakIndex,
@@ -28,11 +28,13 @@ class IpcChanel<RendererAskPayload extends {}, RendererAskAnswer extends {}> {
   readonly renderer = {
     ask: async (options: RendererAskPayload): Promise<RendererAskAnswer> =>
       new Promise((resolve, reject) => {
-          const called = expectCall(`IPC chanel expect answer from [mainId: ${this.mainChanelId}] to [rendererId: ${this.rendererChanelId}]`)
+        const called = expectCall(
+          `IPC chanel expect answer from [mainId: ${this.mainChanelId}] to [rendererId: ${this.rendererChanelId}]`
+        )
         ipcRenderer.on(
           this.mainChanelId,
           (_event, answer: RendererAskAnswer) => {
-            if(called) called()
+            if (called) called()
             resolve(answer)
           }
         )
@@ -72,7 +74,7 @@ class IpcChanelFactory {
 }
 
 //? ipc for renderer
-interface GetBreakDataAnswer {
+export interface GetBreakDataAnswer {
   breakIndex: number
   lastSchedulerJobDate: typeof lastSchedulerJobDate.value
   lastSchedulerJobLength: typeof lastSchedulerJobLength.value
