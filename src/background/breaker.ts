@@ -1,7 +1,11 @@
 import { scheduleJob, Job } from 'node-schedule'
 import { addSeconds } from 'date-fns'
 import { isProd, isProdBuild, isDevProdTest } from './env'
-import { createWindowIndex, createWindowIndexChildren, closeAllWindows } from './windows'
+import {
+  createWindowIndex,
+  createWindowIndexChildren,
+  closeAllWindows,
+} from './windows'
 import {
   breakIndex,
   breakId,
@@ -55,9 +59,10 @@ const getNewBreakIndex = (
   }
   return oldIndex
 }
-
+let showChildTimeout: NodeJS.Timeout | undefined = undefined
 export const setNewBreak = async (options: NewBreakOptions) => {
-  const nextBreakIn = options?.forceNextBreakIn || getEveryFromDB()
+  const nextBreakIn = options?.forceNextBreakIn ?? getEveryFromDB()
+  if (showChildTimeout) clearTimeout(showChildTimeout)
 
   breakIndex.value = getNewBreakIndex(breakIndex.value, options)
 
@@ -79,16 +84,24 @@ export const setNewBreak = async (options: NewBreakOptions) => {
   if (nextBreakIn > 0) {
     const nextBreak = calculateNextBreak(nextBreakIn)
 
-    breakSchedule = scheduleJob(nextBreak,async () => {
+    breakSchedule = scheduleJob(nextBreak, async () => {
       if (keyBreakId === breakId.value) {
+        if (showChildTimeout) clearTimeout(showChildTimeout)
         closeAllWindows()
         await createWindowIndex()
-        await createWindowIndexChildren()
+        showChildTimeout = setTimeout(
+          async () => await createWindowIndexChildren(),
+          5000
+        )
       }
     })
   } else {
+    if (showChildTimeout) clearTimeout(showChildTimeout)
     closeAllWindows()
     await createWindowIndex()
-    await createWindowIndexChildren()
+     showChildTimeout = setTimeout(
+       async () => await createWindowIndexChildren(),
+       5000
+     )
   }
 }

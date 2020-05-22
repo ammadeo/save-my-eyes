@@ -30,72 +30,13 @@ const baseWindowSettings: Electron.BrowserWindowConstructorOptions = {
 
 const getPrimaryDisplay = () => screen.getPrimaryDisplay().workAreaSize
 const getExternalDisplays = (): Electron.Display[] => {
-  let displays = screen.getAllDisplays()
+  const displays = screen.getAllDisplays()
   return displays.filter((display) => {
     return display.bounds.x !== 0 || display.bounds.y !== 0
   })
 }
 
 type WindowFunction = (window: BrowserWindow) => void
-
-
-
-export const createWindowIndex = async () => {
-  const url = '/#/BeforeBreak'
-  const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
-
-  createWindow('windowIndex', url, {
-    width: screenWidth,
-    height: screenHeight,
-    y: 0,
-    x: 0,
-    backgroundColor: '#00000000',
-    transparent: isProd,
-    ...baseWindowSettings,
-  }, undefined, false)
-}
-
-export const createWindowTray = async () => {
-  const url = '/#/menu'
-  const width = 500
-  const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
-  const x = screenWidth - width
-
-  createWindow('windowTray', url, {
-    width,
-    height: screenHeight,
-    y: 0,
-    x,
-    backgroundColor: '#00000000',
-    transparent: isProd,
-    ...baseWindowSettings,
-  })
-}
-
-const createWindowIndexChild = async (
-  index: number,
-  bounds: Electron.Rectangle
-) => {
-  const url = '/#/blank'
-  const { height, width, x, y } = bounds
-
-  createWindow(`windowChild-${index}`, url, {
-    width,
-    height,
-    y,
-    x,
-    backgroundColor: '#121959',
-    parent: windows.windowIndex,
-    ...baseWindowSettings,
-  })
-}
-
-export const createWindowIndexChildren = async () => {
-  const externalDisplays = getExternalDisplays()
-  externalDisplays.forEach((display, index) => {
-    createWindowIndexChild(index, display.bounds)
-  })
-}
 
 const createWindow = async (
   windowKey: keyof typeof windows,
@@ -120,7 +61,7 @@ const createWindow = async (
       // Load the url of the dev server if in development mode
       const path = (process.env.WEBPACK_DEV_SERVER_URL as string) + url
       await newWindow.loadURL(path)
-      newWindow.webContents.openDevTools()
+      if (!isProd) newWindow.webContents.openDevTools()
     } else {
       createProtocol('app')
       // Load the index.html when not in development
@@ -140,3 +81,68 @@ const createWindow = async (
   }
 }
 
+export const createWindowIndex = async () => {
+  const url = '/#/BeforeBreak'
+  const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
+
+  return createWindow(
+    'windowIndex',
+    url,
+    {
+      width: screenWidth,
+      height: screenHeight,
+      y: 0,
+      x: 0,
+      backgroundColor: '#00000000',
+      transparent: isProd,
+      ...baseWindowSettings,
+    },
+    undefined,
+    false
+  )
+}
+
+export const createWindowTray = async () => {
+  const url = '/#/menu'
+  const width = 500
+  const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
+  const x = screenWidth - width
+
+  return createWindow('windowTray', url, {
+    width,
+    height: screenHeight,
+    y: 0,
+    x,
+    backgroundColor: '#00000000',
+    transparent: isProd,
+    ...baseWindowSettings,
+  })
+}
+
+const createWindowIndexChild = async (
+  index: number,
+  bounds: Electron.Rectangle
+) => {
+  const url = '/#/blank'
+  const { height, width, x, y } = bounds
+
+  if (windows.windowIndex)
+  {
+   return createWindow(`windowChild-${index}`, url, {
+     width,
+     height,
+     y,
+     x,
+     backgroundColor: '#121959',
+     parent: windows.windowIndex,
+     ...baseWindowSettings,
+   })
+  }
+}
+
+export const createWindowIndexChildren = async () => {
+  const externalDisplays = getExternalDisplays()
+  return Promise.all(externalDisplays.map((display, index) => {
+    return createWindowIndexChild(index, display.bounds)
+  }))
+}

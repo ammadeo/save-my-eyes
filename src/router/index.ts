@@ -22,7 +22,8 @@ const routes: Array<RouteConfig> = [
     path: '/menu',
     name: 'Menu',
     component: Menu,
-  },{
+  },
+  {
     path: '/blank',
     name: 'Blank',
     component: Blank,

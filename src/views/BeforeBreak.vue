@@ -34,6 +34,7 @@ export default mixins(TransparentClickEngine).extend({
   },
   methods: {
     startBreak() {
+      // todo use this real handler for blank window creation
       this.showBreakCard = false
       setTimeout(() => {
         this.$router.push({ name: 'Index' })
