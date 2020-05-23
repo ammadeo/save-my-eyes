@@ -19,6 +19,7 @@ const purgecss = {
   // From: https://github.com/ky-is/vue-cli-plugin-tailwind
   whitelistPatterns: [
     /-(leave|enter|appear)(|-(to|from|active))$/,
+    /-(move)$/,
     /^(?!(|.*?:)cursor-move). -move$/,
     /^router-link(|-exact)-active$/,
   ],
