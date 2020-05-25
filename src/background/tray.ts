@@ -9,7 +9,9 @@ export const useTray = () => {
       ? join('resources', 'app.asar', 'icon.png')
       : join('public', 'icon.png')
   )
-  tray.setToolTip('Save your eyes')
+  tray.setToolTip(
+    isProdBuild ? 'Save your eyes' : 'Save your eyes (Development)'
+  )
   tray.on('click', createWindowTray)
   tray.on('right-click', createWindowTray)
   return tray
