@@ -17,7 +17,10 @@ import ContentBeforeBreak from '../components/ContentBeforeBreak.vue'
 import BaseCard from '../components/BaseCard.vue'
 
 import { remote } from 'electron'
-import { rendererSetNextBreak as setNextBreak } from '@/background/ipc'
+import {
+  rendererSetNextBreak as setNextBreak,
+  rendererStartBreak as StartBreak,
+} from '@/background/ipc'
 
 import { TransparentClickEngine } from '@/utils/mixins/transparentClickEngine'
 import mixins from 'vue-typed-mixins'
@@ -34,8 +37,8 @@ export default mixins(TransparentClickEngine).extend({
   },
   methods: {
     startBreak() {
-      // todo use this real handler for blank window creation
       this.showBreakCard = false
+      StartBreak.ask({})
       setTimeout(() => {
         this.$router.push({ name: 'Index' })
       }, 300)

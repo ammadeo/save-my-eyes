@@ -93,11 +93,10 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       closing: false,
     }
   },
-  async beforeMount() {
-    await this.setup()
-  },
+  // async beforeMount() {
+  //   },
   async mounted() {
-    this.focusWindow()
+    await this.setup()
     await play.sound.short()
   },
   methods: {
@@ -131,10 +130,6 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
     hideWindow() {
       const window = remote.getCurrentWindow()
       window.hide()
-    },
-    focusWindow() {
-      const window = remote.getCurrentWindow()
-      window.focus()
     },
     async finish() {
       this.finished = true

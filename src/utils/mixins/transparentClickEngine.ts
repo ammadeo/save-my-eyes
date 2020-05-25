@@ -24,4 +24,8 @@ export const TransparentClickEngine = vue.extend({
       setIgnoreMouseEvents(true, { forward: true })
     }
   },
+  beforeDestroy() {
+    const setIgnoreMouseEvents = remote.getCurrentWindow().setIgnoreMouseEvents
+    setIgnoreMouseEvents(false)
+  }
 })

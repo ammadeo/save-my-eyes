@@ -2,8 +2,25 @@ import { render, waitFor } from '@testing-library/vue'
 import Component from '@/components/ContentBeforeBreak.vue'
 import { Base } from '@/utils/tests/core'
 const base = new Base(Component)
+import { formatISO, addMinutes } from 'date-fns'
+const mockDateIso = formatISO(addMinutes(new Date(), 15))
 
 jest.useFakeTimers()
+jest.mock('vue-cli-plugin-electron-builder/lib', () => ({
+  createProtocol: () => {},
+}))
+
+jest.mock('@/background/ipc', () => ({
+  rendererGetBreakData: {
+    ask: async () =>
+      new Promise((resolve) =>
+        resolve({
+          lastSchedulerJobDate: mockDateIso,
+          lastSchedulerJobLength: 5 * 60,
+        })
+      ),
+  },
+}))
 
 describe('components/ContentBeforeBreak.vue', () => {
   test('has skip button', () => {

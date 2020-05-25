@@ -5,6 +5,7 @@ import {
   lastSchedulerJobDate,
   lastSchedulerJobLength,
 } from './store'
+import {createWindowIndexChildren, focusOn, setBackgroundOf} from './windows'
 import { setNewBreak, NewBreakOptions } from './breaker'
 import { isProdBuild } from './env'
 import { app, ipcMain, ipcRenderer } from 'electron'
@@ -94,6 +95,11 @@ export const {
   renderer: rendererCloseApp,
 } = IpcChanelFactory.create<{}, {}>()
 
+export const {
+  main: mainStartBreak,
+  renderer: rendererStartBreak,
+} = IpcChanelFactory.create<{}, {}>()
+
 //? ipc for main
 export const useIpcMain = () => {
   mainGetBreakData.listen(() => ({
@@ -109,6 +115,14 @@ export const useIpcMain = () => {
 
   mainCloseApp.listen(() => {
     app.quit()
+    return {}
+  })
+
+  mainStartBreak.listen(async () => {
+    const indexKey = 'windowIndex'
+    setBackgroundOf(indexKey)
+    focusOn(indexKey)
+    await createWindowIndexChildren()
     return {}
   })
 }
