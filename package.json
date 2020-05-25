@@ -5,12 +5,10 @@
   "author": "Amadeusz Chomiak",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "lint:fix": "vue-cli-service lint --fix",
     "electron:serve": "vue-cli-service electron:serve",
     "electron:build": "vue-cli-service electron:build",
+    "lint": "vue-cli-service lint",
+    "lint:fix": "vue-cli-service lint --fix",
     "test:unit": "vue-cli-service test:unit tests/unit",
     "test:unit:watch": "vue-cli-service test:unit --watch tests/unit"
   },
