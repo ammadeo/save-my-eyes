@@ -10,10 +10,10 @@ export const TransparentClickEngine = vue.extend({
       canClick: boolean | void
     }
   },
-  mounted() {
-    const setIgnoreMouseEvents = remote.getCurrentWindow().setIgnoreMouseEvents
-
+  beforeMount() {
     if (isProd) {
+      const setIgnoreMouseEvents = remote.getCurrentWindow()
+        .setIgnoreMouseEvents
       addEventListener('pointerover', (event) => {
         this.canClick =
           event.target === document.documentElement
@@ -21,11 +21,14 @@ export const TransparentClickEngine = vue.extend({
             : this.canClick || setIgnoreMouseEvents(false) || true
       })
 
-      setIgnoreMouseEvents(true, { forward: true })
+      setIgnoreMouseEvents(false)
+      setTimeout(() => {
+        setIgnoreMouseEvents(true, { forward: true })
+      }, 1)
     }
   },
   beforeDestroy() {
     const setIgnoreMouseEvents = remote.getCurrentWindow().setIgnoreMouseEvents
     setIgnoreMouseEvents(false)
-  }
+  },
 })

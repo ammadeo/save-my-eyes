@@ -145,8 +145,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       }
     },
     async finishForce() {
-      const nextBreakIn = this.long || this.finished ? undefined : 5 * 60
-      this.close(nextBreakIn)
+      this.close()
     },
     close(forceNextBreakIn?: number) {
       this.closing = true

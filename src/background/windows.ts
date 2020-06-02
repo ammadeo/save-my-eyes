@@ -68,6 +68,9 @@ const createWindow = (
       },
       ...options,
     })
+    if(options.transparent) {
+      newWindow.setIgnoreMouseEvents(true)
+    }
     windows[windowKey] = newWindow
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       // Load the url of the dev server if in development mode

@@ -3,9 +3,12 @@
     class="flex flex-col items-end justify-end p-16 overflow-hidden min-h-screen"
   >
     <div>
-      <transition name="slide" appear>
+      <transition name="slide" appear @after-leave="startBreak()">
         <BaseCard class="pointer-events-auto" v-show="showBreakCard">
-          <ContentBeforeBreak @break="startBreak()" @skip="skipBreak()" />
+          <ContentBeforeBreak
+            @break.once="beforeStartBreak()"
+            @skip.once="skipBreak()"
+          />
         </BaseCard>
       </transition>
     </div>
@@ -36,15 +39,15 @@ export default mixins(TransparentClickEngine).extend({
     }
   },
   methods: {
-    startBreak() {
+    beforeStartBreak() {
       this.showBreakCard = false
+    },
+    startBreak() {
       StartBreak.ask({})
-      setTimeout(() => {
-        this.$router.push({ name: 'Index' })
-      }, 300)
+      this.$router.push({ name: 'Index' })
     },
     async skipBreak() {
-      await setNextBreak.ask({ forceNextBreakIn: 5 * 60 })
+      await setNextBreak.ask({})
       const window = remote.getCurrentWindow()
       window.close()
     },
