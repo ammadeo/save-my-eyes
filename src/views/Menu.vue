@@ -1,10 +1,30 @@
 <template>
   <div
-    class="flex flex-col justify-end overflow-hidden px-16 flex-grow min-h-screen"
+    class="flex flex-col max-w-full justify-end overflow-hidden px-16 flex-grow min-h-screen"
   >
-    <transition-group name="slide" appear>
+    <transition name="slide" appear mode="out-in">
       <CardCloseable
-        v-if="openedKeys.includes('menu')"
+        v-if="openedKey === 'stop-protection'"
+        key="stop-protection"
+        color="secondary-600"
+        class="pointer-events-auto shadow-2xl mb-8"
+        @close="closeWindow()"
+      >
+        <ContentStopProtection @close="closeWindow()" />
+      </CardCloseable>
+
+      <CardCloseable
+        v-else-if="openedKey === 'settings'"
+        key="settings"
+        color="secondary-600"
+        :content="cardSettingsContent"
+        class="pointer-events-auto shadow-2xl mb-8"
+        @close="closeWindow()"
+      >
+        <ContentSettings force-large @changed="settingsChanged = true" />
+      </CardCloseable>
+      <CardCloseable
+        v-else-if="openedKey === 'menu'"
         key="menu"
         color="secondary-600"
         class="pointer-events-auto shadow-2xl mb-8"
@@ -12,25 +32,7 @@
       >
         <ContentMenu @run="run($event)" />
       </CardCloseable>
-      <CardCloseable
-        v-if="openedKeys.includes('settings')"
-        key="settings"
-        color="secondary-600"
-        class="pointer-events-auto mb-8"
-        @close="removeFromOpenedKeys('settings')"
-      >
-        <ContentSettings force-large />
-      </CardCloseable>
-      <CardCloseable
-        v-if="openedKeys.includes('stop-protection')"
-        key="stop-protection"
-        color="secondary-600"
-        class="pointer-events-auto mb-8"
-        @close="removeFromOpenedKeys('stop-protection')"
-      >
-        <ContentStopProtection @close="closeWindow()" />
-      </CardCloseable>
-    </transition-group>
+    </transition>
   </div>
 </template>
 
@@ -45,9 +47,10 @@ import { rendererSetNextBreak as setNextBreak } from '@/background/ipc'
 import { TransparentClickEngine } from '@/utils/mixins/transparentClickEngine'
 import mixins from 'vue-typed-mixins'
 
-type Keys = 'menu' | 'settings' | 'stop-protection'
+type Key = 'menu' | 'settings' | 'stop-protection' | ''
 interface Data {
-  openedKeys: Keys[]
+  openedKey: Key
+  settingsChanged: boolean
 }
 
 export default mixins(TransparentClickEngine).extend({
@@ -59,34 +62,26 @@ export default mixins(TransparentClickEngine).extend({
   },
   data() {
     return {
-      openedKeys: ['menu'],
+      openedKey: 'menu',
+      settingsChanged: false,
     } as Data
   },
-  watch: {
-    openedKeys(to: Keys[]) {
-      if (to.length <= 0) this.closeWindow()
+  computed: {
+    cardSettingsContent(): string {
+      // todo merge with IndexSettings version when localizing
+      return this.settingsChanged ? 'Save changes' : ''
     },
   },
   methods: {
     closeWindow() {
-      this.removeFromOpenedKeys('menu')
+      this.openedKey = ''
       setTimeout(() => {
         const window = remote.getCurrentWindow()
         window.close()
       }, 350)
     },
-    addToOpenedKeys(key: Keys) {
-      const openedKeys = this.openedKeys
-      if (!openedKeys.includes(key)) {
-        openedKeys.push(key)
-        // todo scrool down
-      }
-    },
-    removeFromOpenedKeys(key: Keys) {
-      const openedKeys = this.openedKeys
-      if (openedKeys.includes(key)) {
-        this.openedKeys = openedKeys.filter((openedKey) => openedKey !== key)
-      }
+    open(key: Key) {
+      this.openedKey = key
     },
     run(event: RunKey) {
       console.log(event)
@@ -97,9 +92,9 @@ export default mixins(TransparentClickEngine).extend({
             forceNextBreakType: 'long',
           })
         case 'open-stop-protection':
-          return this.addToOpenedKeys('stop-protection')
+          return this.open('stop-protection')
         case 'open-settings':
-          return this.addToOpenedKeys('settings')
+          return this.open('settings')
       }
     },
   },

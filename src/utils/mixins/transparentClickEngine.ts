@@ -22,9 +22,9 @@ export const TransparentClickEngine = vue.extend({
       })
 
       setIgnoreMouseEvents(false)
-      setTimeout(() => {
+      // setTimeout(() => {
         setIgnoreMouseEvents(true, { forward: true })
-      }, 1)
+      // }, 1)
     }
   },
   beforeDestroy() {

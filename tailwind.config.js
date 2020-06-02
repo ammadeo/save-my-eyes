@@ -94,6 +94,7 @@ module.exports = {
         )} - 100%)`,
       }),
       spacing: {
+        '80': '20rem',
         '120': '30rem',
       },
       minHeight: (theme) => ({
@@ -104,6 +105,7 @@ module.exports = {
         'screen-24': `calc(100vh - ${theme('spacing.24')})`,
         'screen-32': `calc(100vh - ${theme('spacing.32')})`,
       }),
+      minWidth: (theme) => theme('spacing'),
       borderRadius: {
         inherit: 'inherit',
       },

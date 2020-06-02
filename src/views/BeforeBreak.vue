@@ -2,7 +2,7 @@
   <div
     class="flex flex-col items-end justify-end p-16 overflow-hidden min-h-screen"
   >
-    <div>
+    <div class=" min-w-80">
       <transition name="slide" appear @after-leave="startBreak()">
         <BaseCard class="pointer-events-auto" v-show="showBreakCard">
           <ContentBeforeBreak

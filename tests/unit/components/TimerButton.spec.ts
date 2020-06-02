@@ -3,20 +3,23 @@ import Component from '@/components/IndexTimerButton.vue'
 
 const contentOptions = {
   long: {
-    default: 'Skip a long break',
-    finished: 'Finish a long break',
+    default: 'Skip long break',
+    finished: 'Finish long break',
   },
   short: {
-    default: 'Skip for 5 minutes',
-    finished: 'Finish a short break',
+    default: 'Skip short break',
+    finished: 'Finish short break',
   },
 }
+
+jest.useFakeTimers()
 
 describe('components/IndexTimerButton.vue', () => {
   test('on click emit click', async () => {
     const { getByText, emitted } = render(Component)
     const button = getByText(contentOptions.short.default)
     await fireEvent.click(button)
+    jest.runAllTimers()
     expect(emitted().click).toBeTruthy()
   })
 

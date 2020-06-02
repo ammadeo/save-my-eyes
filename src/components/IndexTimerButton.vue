@@ -5,7 +5,7 @@
     :icon="icon"
     :content="content"
     class="flex-0 self-start min-h-12"
-    @click="$emit('click')"
+    @click="delayClick()"
   />
   <!-- <p
       class="py-2 px-4 font-display"
@@ -34,13 +34,20 @@ export default Vue.extend({
       default: false,
     },
   },
+  methods: {
+    delayClick() {
+      setTimeout(() => {
+        this.$emit('click')
+      }, 50)
+    },
+  },
   computed: {
     content() {
       if (this.long)
-        if (this.finished) return 'Finish a long break'
-        else return 'Skip a long break'
-      if (this.finished) return 'Finish a short break'
-      return 'Skip for 5 minutes'
+        if (this.finished) return 'Finish long break'
+        else return 'Skip long break'
+      if (this.finished) return 'Finish short break'
+      return 'Skip short break'
     },
     icon() {
       // todo set proper icon

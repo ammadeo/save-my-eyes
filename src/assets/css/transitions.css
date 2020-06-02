@@ -4,6 +4,9 @@
 {
   transition: transform 300ms ease-in-out
 }
+.slide-leave-active.slide-leave-absolute{
+  @apply absolute;
+}
 
 .slide-enter {
   transform: translateY(150%);
