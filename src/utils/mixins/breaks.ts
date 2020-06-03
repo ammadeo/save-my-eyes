@@ -2,6 +2,7 @@ import vue from 'vue'
 import { rendererGetBreakData } from '@/background/ipc'
 
 import { getUserSettingsStore } from '@/background/db'
+import { differenceInMinutes, formatDistanceStrict } from 'date-fns'
 
 export const CheckIsLongBreak = vue.extend({
   methods: {
@@ -31,3 +32,22 @@ export const GetBreakTime = vue.extend({
     },
   },
 })
+
+export const TimeAgoContent = vue.extend({
+         methods: {
+           timeAgoContent(endDate: Date): string {
+             const nowDate = new Date()
+             if (differenceInMinutes(nowDate, endDate) >= 1) {
+               const formattedDistance = formatDistanceStrict(
+                 new Date(),
+                 endDate,
+                 {
+                   roundingMethod: 'floor',
+                 }
+               )
+               return `${formattedDistance} ago`
+             }
+             return ''
+           },
+         },
+       })

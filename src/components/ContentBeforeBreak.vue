@@ -1,9 +1,7 @@
 <template>
   <div class="flex flex-col text-secondary-100 py-6 px-4">
     <h1 class="text-xl font-display uppercase mb-2">save my eyes</h1>
-    <p :class="waiting ? ['mb-6'] : ['mb-2']">
-      {{ breakName }} break will start {{ breakStatus }}
-    </p>
+    <p class="mb-2">{{ breakName }} break will start {{ breakStatus }}</p>
     <div class="h-8 w-full mb-6" v-show="!waiting">
       <ProgressbarIcon
         :min="0"
@@ -14,7 +12,7 @@
     </div>
     <!-- <p class="mb-2">You've already skiped 3 times</p> -->
     <ButtonIcon
-      :class="waiting ? ['mb-4'] : []"
+      :class="waiting ? ['mb-6'] : []"
       :icon="breakIcon"
       :primary="waiting"
       :content="breakContent"
@@ -34,18 +32,28 @@ import ProgressbarIcon from './ProgressbarIcon.vue'
 import ButtonIcon from './ButtonIcon.vue'
 import { CreateTimer } from '@/utils/mixins/createTimer'
 import { CheckIsLongBreak } from '@/utils/mixins/breaks'
+import { TimeAgoContent } from '@/utils/mixins/breaks'
+
 import mixins from 'vue-typed-mixins'
 
-export default mixins(CreateTimer, CheckIsLongBreak).extend({
+interface Data {
+  allTime: number
+  isLong: boolean
+  waiting: boolean
+  waitingFrom?: Date
+}
+
+export default mixins(CreateTimer, CheckIsLongBreak, TimeAgoContent).extend({
   components: {
     ProgressbarIcon,
     ButtonIcon,
   },
-  data() {
+  data(): Data {
     return {
       allTime: 5000,
       isLong: false,
       waiting: false,
+      waitingFrom: undefined,
     }
   },
   computed: {
@@ -70,6 +78,7 @@ export default mixins(CreateTimer, CheckIsLongBreak).extend({
       if (this.waiting) {
         this.emitBreak()
       } else {
+        this.$emit('wait')
         this.pauseAnime()
       }
       this.waiting = true
@@ -77,6 +86,9 @@ export default mixins(CreateTimer, CheckIsLongBreak).extend({
     pauseAnime() {
       const anime = this.anime
       if (anime) anime.pause()
+    },
+    startTimer() {
+      this.waitingFrom = new Date()
     },
     emitBreak() {
       this.$emit('break')

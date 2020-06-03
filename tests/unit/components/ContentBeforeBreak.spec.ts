@@ -79,6 +79,7 @@ describe('components/ContentBeforeBreak.vue', () => {
     const { getByText, emitted } = base.render()
 
     const WaitButton = await toWaitState(getByText)
+    expect(emitted().wait).toHaveLength(1)
 
     await fireEvent.click(WaitButton)
     expect(emitted().break).toHaveLength(1)

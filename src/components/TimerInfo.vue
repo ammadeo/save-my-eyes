@@ -6,9 +6,10 @@
 
 <script lang="ts">
 import { formatDistanceStrict, differenceInMinutes } from 'date-fns'
+import { TimeAgoContent } from '@/utils/mixins/breaks'
+import mixins from 'vue-typed-mixins'
 
-import Vue from 'vue'
-export default Vue.extend({
+export default mixins(TimeAgoContent).extend({
   props: {
     startDate: {
       required: true,
@@ -41,7 +42,7 @@ export default Vue.extend({
       handler(val) {
         if (val === true) {
           this.timeAfterInterval = setInterval(() => {
-            this.timeAfterBreakInfo = this.timeAfterBreak()
+            this.timeAfterBreakInfo = this.timeAgoContent(this.endDate)
           }, 60 * 1000)
         }
       },
@@ -50,23 +51,6 @@ export default Vue.extend({
   beforeDestroy() {
     const timeAfterInterval = this.timeAfterInterval
     if (timeAfterInterval) clearInterval(timeAfterInterval)
-  },
-  methods: {
-    timeAfterBreak(): string {
-      const endDate = this.endDate
-      const nowDate = new Date()
-      if (differenceInMinutes(nowDate, endDate) >= 1) {
-        const formatedDistance = formatDistanceStrict(
-          new Date(),
-          this.endDate,
-          {
-            roundingMethod: 'floor',
-          }
-        )
-        return `${formatedDistance} ago`
-      }
-      return ''
-    },
   },
   computed: {
     breakTime(): string {
