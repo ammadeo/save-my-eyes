@@ -32,7 +32,6 @@
 <script lang="ts">
 import Vue from 'vue'
 import BaseButton from './BaseButton.vue'
-// import mixins from 'vue-typed-mixins'
 
 export default Vue.extend({
   components: {
