@@ -1,4 +1,5 @@
 import { Howl } from 'howler'
+import vuex from '@/store'
 import shortBreakSound from '../assets/music/tone.mp3'
 
 const howlShortBreak = new Howl({
@@ -6,6 +7,8 @@ const howlShortBreak = new Howl({
 })
 
 const howlPlay = (howlInstance: Howl) => async () => {
+  if (!vuex.state.sounds.ui) return;
+
   howlInstance.play()
   return new Promise((resolve) => {
     howlInstance.on('end', resolve)

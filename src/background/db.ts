@@ -1,4 +1,5 @@
 import Store from 'electron-store'
+import { Languages } from '@/store/i18n'
 
 interface TypedStore {
   breaks: {
@@ -16,7 +17,7 @@ interface TypedStore {
     ui: boolean
     voice: boolean
   }
-  lang: string
+  lang: Languages
 }
 
 interface UserSettingsSchema {
@@ -88,7 +89,7 @@ const userSettingsDefaults = {
     ui: true,
     voice: true,
   },
-  lang: '',
+  lang: 'en',
 }
 
 const userSettings = 'user-settings'

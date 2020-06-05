@@ -52,9 +52,43 @@
       :center="5"
       :max="60"
       :scale="60"
-      class="mb-6"
+      class="mb-4"
       suffix="min."
     />
+    <p class="font-display mb-1  text-secondary-100">
+      Sounds
+    </p>
+    <ButtonToggleLabeled
+      :on="sounds.ui"
+      @toggle="setSounds($event)"
+      stateOn="Playing sounds"
+      stateOff="Muting sounds"
+      class="mb-4"
+    >
+      <template #iconOn>
+        <BaseIcon class="h-4" icon="sound" />
+      </template>
+      <template #iconOff>
+        <BaseIcon class="h-4" icon="mute" />
+      </template>
+    </ButtonToggleLabeled>
+    <p class="font-display mb-1  text-secondary-100">
+      Language
+    </p>
+    <ButtonToggleLabeled
+      :on="lang === 'en'"
+      @toggle="setLang($event)"
+      stateOn="Zmień na Polski (Polish)"
+      stateOff="Change to English (Angielski)"
+      class="mb-6"
+    >
+      <template #iconOn>
+        <p class="text-secondary-100">EN</p>
+      </template>
+      <template #iconOff>
+        <p class="text-secondary-100">PL</p>
+      </template>
+    </ButtonToggleLabeled>
     <h3 class="font-preset-card-title mb-1  text-secondary-100">
       Credentials
     </h3>
@@ -78,12 +112,35 @@
 
 <script lang="ts">
 import BaseInputRange from './BaseInputRange.vue'
+import BaseIcon from './BaseIcon.vue'
+import ButtonToggleLabeled from './ButtonToggleLabeled.vue'
 
 import { getUserSettingsStore } from '@/background/db'
 import Vue from 'vue'
+import { Languages } from '../store/i18n'
+
+interface Data {
+  every: number
+  short: {
+    last: number
+  }
+  long: {
+    last: number
+    every: number
+  }
+  sounds: {
+    ui: boolean
+    voice: boolean
+  }
+  lang: Languages
+  changed: boolean
+}
+
 export default Vue.extend({
   components: {
     BaseInputRange,
+    ButtonToggleLabeled,
+    BaseIcon,
   },
   props: {
     forceLarge: {
@@ -91,7 +148,7 @@ export default Vue.extend({
       default: false,
     },
   },
-  data() {
+  data(): Data {
     return {
       every: 15 * 60,
       short: {
@@ -101,6 +158,11 @@ export default Vue.extend({
         last: 5 * 60,
         every: 3,
       },
+      sounds: {
+        ui: true,
+        voice: true,
+      },
+      lang: 'en',
       changed: false,
     }
   },
@@ -112,17 +174,29 @@ export default Vue.extend({
     },
   },
   beforeMount() {
-    const breaks = getUserSettingsStore().get('breaks')
+    const store = getUserSettingsStore()
+    const breaks = store.get('breaks')
+    const sounds = store.get('sounds')
+    const lang = store.get('lang')
     const { every, short, long } = breaks
-    if (every && short && long) {
+    if (every && short && long && sounds && lang) {
       this.every = every
       this.short = short
       this.long = long
+      this.sounds = sounds
+      this.lang = lang
 
       this.$watch(
         () => {
           const { last: longLast, every: longEvery } = this.long
-          return [this.every, this.short.last, longLast, longEvery]
+          return [
+            this.every,
+            this.short.last,
+            longLast,
+            longEvery,
+            this.sounds.ui,
+            this.lang,
+          ]
         },
         () => {
           this.changed = true
@@ -135,8 +209,7 @@ export default Vue.extend({
   },
   methods: {
     setStore() {
-      // todo implement setStore only if any value has changed
-      const { every, short, long } = this
+      const { every, short, long, sounds, lang } = this
       if (!this.changed) return
 
       getUserSettingsStore().set({
@@ -145,11 +218,18 @@ export default Vue.extend({
           short,
           long,
         },
-        sounds: {
-          ui: true,
-          voice: true,
-        },
+        sounds,
+        lang,
       })
+    },
+    setLang(to: boolean) {
+      const lang: Languages = to ? 'en' : 'pl'
+      this.lang = lang
+      this.$store.commit('i18n/setLang', lang)
+    },
+    setSounds(to: boolean) {
+      this.sounds.ui = to
+      this.$store.commit('setSounds', { ui: to, voice: true })
     },
   },
 })
