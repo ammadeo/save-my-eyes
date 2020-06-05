@@ -8,7 +8,7 @@ const base = new Base(Component)
 
 describe("components/<%= h.changeCase.pascal(name) %>.vue", () => {
   test.todo("implement tests!")
-  test("", () => {
+  test("", async () => {
     const { getByText } = base.render()
   });
 });
