@@ -41,6 +41,20 @@
     :alt="iconAlt"
     :class="classes"
   />
+  <img
+    v-else-if="showIcon('mute')"
+    svg-inline
+    src="@/assets/icons/mute.svg"
+    :alt="iconAlt"
+    :class="classes"
+  />
+  <img
+    v-else-if="showIcon('sound')"
+    svg-inline
+    src="@/assets/icons/sound.svg"
+    :alt="iconAlt"
+    :class="classes"
+  />
 </template>
 
 <script lang="ts">

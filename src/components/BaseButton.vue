@@ -1,6 +1,7 @@
 <template>
   <button
-    class="group flex flex-col rounded-full items-stretch focus:outline-none relative transition-shadow duration-100 shadow-lg-revers active:shadow-revers"
+    class="group flex flex-col rounded-full items-stretch focus:outline-none  transition-shadow duration-100 shadow-lg-revers active:shadow-revers"
+    :class="absolute ? ['absolute'] : ['relative']"
     @click="$emit('click')"
   >
     <div
@@ -26,6 +27,10 @@ export default Vue.extend({
       type: Boolean,
     },
     center: {
+      default: false,
+      type: Boolean,
+    },
+    absolute: {
       default: false,
       type: Boolean,
     },
