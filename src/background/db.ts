@@ -1,6 +1,6 @@
 import Store from 'electron-store'
 import { Languages } from '@/store/i18n'
-
+import {isProdBuild } from './env'
 interface TypedStore {
   breaks: {
     every: number
@@ -97,7 +97,7 @@ const userSettingsSchema: UserSettingsSchema = {
 //   lang: 'en',
 // }
 
-const userSettings = 'user-settings'
+const userSettings = isProdBuild ? 'user-settings' : 'user-settings-dev'
 
 export const getUserSettingsStore = () =>
   new Store<TypedStore>({
