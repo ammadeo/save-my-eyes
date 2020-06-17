@@ -11,7 +11,7 @@
       @close="closeWindow()"
     />
     <p v-if="!ready" class="font-preset-info mb-8">
-      Loading...
+      {{ $t('loading') }}
     </p>
     <template v-else>
       <TimerInfo
@@ -93,8 +93,11 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       closing: false,
     }
   },
-  // async beforeMount() {
-  //   },
+  beforeMount() {
+    this.$useI18n((t) => ({
+      loading: t('loading...', 'wczytuję...'),
+    }))
+  },
   async mounted() {
     await this.setup()
     await play.sound.short()

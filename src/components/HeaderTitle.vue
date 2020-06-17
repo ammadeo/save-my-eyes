@@ -3,7 +3,7 @@
     <h1
       class="text-4xl leading-none font-display font-bold text-secondary-50 tracking-wider uppercase font-bold"
     >
-      save my eyes
+      {{ $tGlobal('title') }}
     </h1>
   </header>
 </template>

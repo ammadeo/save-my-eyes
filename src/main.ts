@@ -2,6 +2,10 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+
+import {Lang} from "@/utils/mixins/i18n"
+Vue.mixin(Lang)
+
 require('@/assets/css/main.css')
 
 Vue.config.productionTip = false

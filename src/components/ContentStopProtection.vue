@@ -1,7 +1,7 @@
 <template>
   <div class="flex-grow">
     <p class="mb-2 text-lg  text-secondary-100">
-      Stop protection for
+      {{ $t('stopFor') }}
     </p>
     <div class="flex mb-4 w-full">
       <BaseButton
@@ -15,18 +15,18 @@
       >
     </div>
     <p class="mb-2 text-lg  text-secondary-100">
-      Turn off protection
+      {{ $t('turnOffTitle') }}
     </p>
     <ButtonIcon
       primary
       class="mb-2 w-full"
       @click="closeApp()"
-      content="for this session"
+      :content="$t('turnOffContent')"
       icon="stop"
       data-testid="button-close-app"
     />
     <p class="text-secondary-200 text-center">
-      App will start again with your computer
+      {{ $t('turnOffInfo') }}
     </p>
   </div>
 </template>
@@ -56,19 +56,33 @@ export default Vue.extend({
       await rendererCloseApp.ask({})
     },
   },
+  beforeMount() {
+    this.$useI18n((t) => ({
+      stopFor: t('Stop protection for', 'Wstrzymaj ochronę na'),
+      turnOffTitle: t('Turn off protection', 'Wyłącz ochronę'),
+      turnOffContent: t('for this session', 'podczas tej sesji'),
+      turnOffInfo: t(
+        'App will start again with your computer',
+        'Aplikacja uruchomi się, gdy ponownie włączysz komputer'
+      ),
+      hour1: t('1 hour', '1 godzinę'),
+      hour2: t('2 hours', '2 godziny'),
+      hour3: t('3 hours', '3 godziny'),
+    }))
+  },
   computed: {
     pauseLenghts(): PauseLenght[] {
       return [
         {
-          content: '1 hour',
+          content: this.$t('hour1'),
           lenght: 60 * 60,
         },
         {
-          content: '2 hours',
+          content: this.$t('hour2'),
           lenght: 2 * 60 * 60,
         },
         {
-          content: '3 hours',
+          content: this.$t('hour3'),
           lenght: 3 * 60 * 60,
         },
       ]

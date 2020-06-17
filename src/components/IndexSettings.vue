@@ -3,7 +3,7 @@
     <ButtonIcon
       class="w-full"
       icon="settings"
-      content="Show settings"
+      :content="$t('open')"
       @click="setShowSettings(true)"
     >
     </ButtonIcon>
@@ -12,7 +12,7 @@
         v-if="showSettings"
         color="secondary-300"
         :content="closeContent"
-        title="settings"
+        :title="$t('title')"
         absolute
         class="bottom-0 right-0 z-40 slide-leave-bottom max-h-screen-16 lg:max-h-screen-24 xl:max-h-screen-32"
         @close="setShowSettings(false)"
@@ -43,6 +43,13 @@ export default Vue.extend({
       changed: false,
     }
   },
+  beforeMount() {
+    this.$useI18n((t) => ({
+      save: t('Save changes', 'Zapisz zmiany'),
+      open: t('Show settings', 'Ustawienia'),
+      title: t('Settings', 'Ustawienia'),
+    }))
+  },
   methods: {
     setShowSettings(to: boolean) {
       this.$emit('changeAutoFinishLock', to)
@@ -52,7 +59,7 @@ export default Vue.extend({
   },
   computed: {
     closeContent(): string {
-      return this.changed ? 'Save changes' : ''
+      return this.changed ? this.$t('save') : ''
     },
   },
 })

@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { formatDistanceStrict, differenceInMinutes } from 'date-fns'
+import { formatDistanceStrict } from '@/utils/dateFnsI18n'
 import { TimeAgoContent } from '@/utils/mixins/breaks'
 import mixins from 'vue-typed-mixins'
 
@@ -47,10 +47,45 @@ export default mixins(TimeAgoContent).extend({
         }
       },
     },
+    $langLanguage: {
+      handler() {
+        this.timeAfterBreakInfo = this.timeAgoContent(this.endDate)
+      },
+    },
   },
   beforeDestroy() {
     const timeAfterInterval = this.timeAfterInterval
     if (timeAfterInterval) clearInterval(timeAfterInterval)
+  },
+  beforeMount() {
+    const shortBreak = 'short break'
+    const shortBreakPl = 'krótka przerwa'
+    const longBreak = 'long break'
+    const longBreakPl = 'długa przerwa'
+    const hasEnded = 'has ended'
+    const hasEndedPl = 'zakończyła się'
+    const take = 'take a'
+    const forTime = 'for'
+    const forTimePl = 'przez'
+
+    this.$useI18n((t) => ({
+      shortBreakFinished: t(
+        `${shortBreak} ${hasEnded}`,
+        `${shortBreakPl} ${hasEndedPl}`
+      ),
+      longBreakFinished: t(
+        `${longBreak} ${hasEnded}`,
+        `${longBreakPl} ${hasEndedPl}`
+      ),
+      shortBreakStarted: t(
+        `${take} ${shortBreak} ${forTime}`,
+        `${shortBreakPl} ${forTimePl}`
+      ),
+      longBreakStarted: t(
+        `${take} ${longBreak} ${forTime}`,
+        `${longBreakPl} ${forTimePl}`
+      ),
+    }))
   },
   computed: {
     breakTime(): string {
@@ -58,17 +93,17 @@ export default mixins(TimeAgoContent).extend({
         roundingMethod: 'floor',
       })
     },
-    breakType(): string {
-      const type = this.long ? 'long' : 'short'
-      return `${type} break`
+    breakTypeId(): string {
+      return this.long ? 'longBreak' : 'shortBreak'
     },
-
     breakInfo(): string {
       if (this.finished) {
-        return `${this.breakType} has ended ${this.timeAfterBreakInfo}`
+        return `${this.$t(this.breakTypeId + 'Finished')} ${
+          this.timeAfterBreakInfo
+        }`
       }
 
-      return `take a ${this.breakType} for ${this.breakTime}`
+      return `${this.$t(this.breakTypeId + 'Started')} ${this.breakTime}`
     },
   },
 })

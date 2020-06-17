@@ -32,7 +32,6 @@ const userSettingsSchema: UserSettingsSchema = {
     properties: {
       every: {
         type: 'number',
-        default: 15 * 60,
         minimum: 60,
         maximum: 60 * 60,
       },
@@ -41,7 +40,6 @@ const userSettingsSchema: UserSettingsSchema = {
         properties: {
           last: {
             type: 'number',
-            default: 30,
             minimum: 1,
             maximum: 60,
           },
@@ -52,13 +50,11 @@ const userSettingsSchema: UserSettingsSchema = {
         properties: {
           last: {
             type: 'number',
-            default: 5 * 60,
             minimum: 60,
             maximum: 60 * 60,
           },
           every: {
             type: 'number',
-            default: 3,
             minimum: 1,
             maximum: 10,
           },
@@ -69,39 +65,38 @@ const userSettingsSchema: UserSettingsSchema = {
   sounds: {
     type: 'object',
     properties: {
-      ui: { type: 'boolean', default: true },
-      voice: { type: 'boolean', default: true },
+      ui: { type: 'boolean'},
+      voice: { type: 'boolean'},
     },
   },
   lang: {
     type: 'string',
-    default: 'en',
   },
 }
 
-// const userSettingsDefaults = {
-//   breaks: {
-//     every: 15 * 60,
-//     short: {
-//       last: 30,
-//     },
-//     long: {
-//       last: 5 * 60,
-//       every: 3,
-//     },
-//   },
-//   sounds: {
-//     ui: true,
-//     voice: true,
-//   },
-//   lang: 'en',
-// }
+const userSettingsDefaults = {
+  breaks: {
+    every: 15 * 60,
+    short: {
+      last: 30,
+    },
+    long: {
+      last: 5 * 60,
+      every: 3,
+    },
+  },
+  sounds: {
+    ui: true,
+    voice: true,
+  },
+  lang: 'en' as Languages,
+}
 
 const userSettings = isProdBuild ? 'user-settings' : 'user-settings-dev'
 
 export const getUserSettingsStore = () =>
   new Store<TypedStore>({
     schema: userSettingsSchema,
-    // defaults: userSettingsDefaults,
+    defaults: userSettingsDefaults,
     name: userSettings,
   })

@@ -1,26 +1,26 @@
 <template>
   <div class="flex-grow">
     <p class="mb-4 text-lg uppercase text-secondary-200">
-      next {{ nextBreakName }} in
+      {{ $t('breakNext') }} {{ nextBreakName }} {{ $t('breakIn') }}
       <span class="text-secondary-100">{{ nextBreakTime }}</span>
     </p>
     <ButtonIcon
       primary
       class="mb-8 w-full"
       @click="emitRun('start-long-break')"
-      content="Start a long break now"
+      :content="$t('buttonStartLongBreak')"
       icon="start"
     ></ButtonIcon>
     <ButtonIcon
       class="mb-4 w-full"
       @click="emitRun('open-stop-protection')"
-      content="Stop protection"
+      :content="$t('buttonStopProtection')"
       icon="pause"
     ></ButtonIcon>
     <ButtonIcon
       class="mb-4 w-full"
       @click="emitRun('open-settings')"
-      content="Settings"
+      :content="$t('buttonSettings')"
       icon="settings"
     ></ButtonIcon>
   </div>
@@ -29,7 +29,8 @@
 <script lang="ts">
 import ButtonIcon from './ButtonIcon.vue'
 import { RunKey } from '@/types/menu'
-import { formatDistanceStrict, addSeconds, parseISO } from 'date-fns'
+import { addSeconds, parseISO } from 'date-fns'
+import { formatDistanceStrict } from '@/utils/dateFnsI18n'
 import { CheckIsLongBreak } from '@/utils/mixins/breaks'
 import { rendererGetBreakData } from '@/background/ipc'
 
@@ -48,6 +49,18 @@ export default mixins(CheckIsLongBreak).extend({
     const isLong = await this.checkIsLongBreak()
     this.nextBreakName = this.breakName(isLong)
     this.runClock()
+  },
+  beforeMount() {
+    this.$useI18n((t) => ({
+      breakNext: t('Next', 'Następna'),
+      breakIn: t('in', 'za'),
+      buttonStartLongBreak: t(
+        'Start a long break now',
+        'Zacznij długą przewę teraz'
+      ),
+      buttonStopProtection: t('Stop protection', 'Wstrzymaj ochronę'),
+      buttonSettings: t('Settings', 'Ustawienia'),
+    }))
   },
   methods: {
     emitRun(key: RunKey) {
@@ -80,8 +93,7 @@ export default mixins(CheckIsLongBreak).extend({
       })
     },
     breakName(isLong: boolean): string {
-      const name = isLong ? 'long' : 'short'
-      return `${name} break`
+      return isLong ? this.$tGlobal('breakLong') : this.$tGlobal('breakShort')
     },
   },
 })

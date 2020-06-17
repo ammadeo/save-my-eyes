@@ -1,7 +1,9 @@
 <template>
   <div class="flex flex-col text-secondary-100 py-6 px-4">
-    <h1 class="text-xl font-display uppercase mb-2">save my eyes</h1>
-    <p class="mb-2">{{ breakName }} break will start {{ breakStatus }}</p>
+    <h1 class="text-xl font-display uppercase mb-2">{{ $tGlobal('title') }}</h1>
+    <p class="mb-2 first-letter:uppercase">
+      {{ breakName }} {{ $t('contentBase') }} {{ breakStatus }}
+    </p>
     <div class="h-8 w-full mb-6" v-show="!waiting">
       <ProgressbarIcon
         :min="0"
@@ -56,21 +58,32 @@ export default mixins(CreateTimer, CheckIsLongBreak, TimeAgoContent).extend({
       waitingFrom: undefined,
     }
   },
+  beforeMount() {
+    this.$useI18n((t) => ({
+      contentStart: t('start break now', 'zacznij przerwę teraz'),
+      contentWait: t('wait', 'zaczekaj chwilę'),
+      contentBase: t('will start', 'zacznie się'),
+      statusWaiting: t('when You ready', 'kiedy zechcesz'),
+      statusStarting: t('in 5 seconds', 'za 5 sekund'),
+    }))
+  },
   computed: {
     timeLeftPercent(): number {
       return (this.timePassedObj.timePassed / this.allTime) * 100
     },
     breakName(): string {
-      return this.isLong ? 'Long' : 'Short'
+      return this.isLong
+        ? this.$tGlobal('breakLong')
+        : this.$tGlobal('breakShort')
     },
     breakIcon(): string {
       return this.waiting ? 'start' : 'pause'
     },
     breakContent(): string {
-      return this.waiting ? 'start break now' : 'wait'
+      return this.waiting ? this.$t('contentStart') : this.$t('contentWait')
     },
     breakStatus(): string {
-      return this.waiting ? 'when you ready' : 'in 5 seconds'
+      return this.waiting ? this.$t('statusWaiting') : this.$t('statusStarting')
     },
   },
   methods: {

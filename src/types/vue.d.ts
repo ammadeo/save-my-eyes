@@ -1,11 +1,19 @@
-// // 1. Make sure to import 'vue' before declaring augmented types
-// import Vue from 'vue'
-// import store from '@/store'
-// // 2. Specify a file with the types you want to augment
-// //    Vue has the constructor type in types/vue.d.ts
-// declare module 'vue/types/vue' {
-//   // 3. Declare augmentation for Vue
-//   interface Vue {
-//     $storeTyped: typeof store
-//   }
-// }
+import Vue from 'vue'
+import {
+  Languages,
+  I18nComponent,
+  Translate,
+  I18nGlobal,
+} from '@/store/i18n'
+type TranslateFunction =  ((id: string, global: false) => string) | ((id: keyof I18nGlobal, global: true) => string)
+
+declare module 'vue/types/vue' {
+  interface Vue {
+   $langGlobal: I18nGlobal;
+   $langLanguage: Languages
+   $lang: I18nComponent;
+   $useI18n: (generator: (translate: Translate) => I18nComponent) => void;
+   $t: (id: string) => string;
+   $tGlobal: (id: keyof I18nGlobal) => string
+  }
+}

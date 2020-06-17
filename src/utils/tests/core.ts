@@ -19,6 +19,7 @@ type LiteralUnion<T extends U, U = string> = T | (U & never)
 interface Temp<V extends Vue> {
   options?: RenderOptions<V>
   testName?: string
+  renderer?: ComponentHarness
 }
 
 type select = (renderer: ComponentHarness) => HTMLElement | never
@@ -35,11 +36,13 @@ export class Base<V extends Vue> {
     protected options: RenderOptions<V> = {}
   ) {}
   render(additionalOptions?: RenderOptions<V>) {
-    return render(this.Component, {
+    const renderer = render(this.Component, {
       ...this.options,
       ...this.temp.options,
       ...additionalOptions,
     })
+    this.temp.renderer = renderer
+    return renderer
   }
 
   clear() {
@@ -50,8 +53,10 @@ export class Base<V extends Vue> {
     this.temp.options = tempOptions
   }
 
-  selectRoot(renderer: ComponentHarness) {
-    const firstElementChild = renderer.container.firstElementChild
+  selectRoot(renderer?: ComponentHarness) {
+    const bestRenderer = renderer ?? this.temp.renderer
+    if (!bestRenderer) throw new Error('no renderer awaitable')
+    const firstElementChild = bestRenderer.container.firstElementChild
     if (firstElementChild) return firstElementChild as HTMLElement
     throw new Error('no root container with first child found')
   }
@@ -66,6 +71,7 @@ export class Base<V extends Vue> {
 
     const Slot = getByText(testText)
     expect(Slot).toBeVisible()
+    this.clear()
   }
 
   async testEmitter(
@@ -78,6 +84,7 @@ export class Base<V extends Vue> {
 
     await fireEvent[eventName](EventSource)
     expect(renderer.emitted()[emitName]).toBeTruthy()
+    this.clear()
   }
 
   testPropInline(select: select, propsOverload?: object) {
@@ -86,11 +93,13 @@ export class Base<V extends Vue> {
       : this.render()
     const PropTarget = select(renderer)
     expect(PropTarget).toBeVisible()
+    this.clear()
   }
 
   testHtmlVisibility(select: select, optionsOverload: RenderOptions<V> = {}) {
     const renderer = this.render(optionsOverload)
     expect(select(renderer)).toBeVisible()
+    this.clear()
   }
 
   testHtmlTag(
@@ -100,5 +109,6 @@ export class Base<V extends Vue> {
   ) {
     const renderer = this.render(optionsOverload)
     expect(select(renderer).tagName.toLowerCase()).toBe(tag.toLowerCase())
+    this.clear()
   }
 }

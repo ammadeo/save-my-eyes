@@ -20,7 +20,8 @@
 </template>
 
 <script lang="ts">
-import { format, addMilliseconds } from 'date-fns'
+import { addMilliseconds } from 'date-fns'
+import { format } from '@/utils/dateFnsI18n'
 import BaseProgressbar from './BaseProgressbar.vue'
 import { CreateTimer } from '@/utils/mixins/createTimer'
 import mixins from 'vue-typed-mixins'
