@@ -19,14 +19,14 @@ const store: StoreOptions<RootStore> = {
   state: {
     sounds: {
       ui: true,
-      voice: true
-    }
+      voice: true,
+    },
   },
   mutations: {
-    setSounds(state, to){
+    setSounds(state, to) {
       state.sounds = to
-    }
-  }
+    },
+  },
 }
 
 export default new Vuex.Store<RootStore>(store)

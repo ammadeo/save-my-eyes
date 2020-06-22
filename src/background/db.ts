@@ -1,6 +1,6 @@
 import Store from 'electron-store'
 import { Languages } from '@/store/i18n'
-import {isProdBuild } from './env'
+import { isProdBuild } from './env'
 interface TypedStore {
   breaks: {
     every: number
@@ -65,8 +65,8 @@ const userSettingsSchema: UserSettingsSchema = {
   sounds: {
     type: 'object',
     properties: {
-      ui: { type: 'boolean'},
-      voice: { type: 'boolean'},
+      ui: { type: 'boolean' },
+      voice: { type: 'boolean' },
     },
   },
   lang: {

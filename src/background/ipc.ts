@@ -5,7 +5,12 @@ import {
   lastSchedulerJobDate,
   lastSchedulerJobLength,
 } from './store'
-import { createWindowIndexChildren, focusOn, setBackgroundOf, rendererWindows } from './windows'
+import {
+  createWindowIndexChildren,
+  focusOn,
+  setBackgroundOf,
+  rendererWindows,
+} from './windows'
 import { setNewBreak, NewBreakOptions } from './breaker'
 import { isProdBuild } from './env'
 import { app, ipcMain, ipcRenderer } from 'electron'
@@ -64,15 +69,14 @@ class IpcChanel<RendererAskPayload extends {}, RendererAskAnswer extends {}> {
       ipcMain.on(
         this.rendererChanelId,
         (event, payload: RendererAskPayload) => {
-          if (this.respondToAll)
-          {
-           const windowsEntries = Object.entries(rendererWindows)
-            windowsEntries.forEach(([_key, win])=>{
-              if(win) {
+          if (this.respondToAll) {
+            const windowsEntries = Object.entries(rendererWindows)
+            windowsEntries.forEach(([_key, win]) => {
+              if (win) {
                 win.webContents.send(this.mainChanelId, answerHandler(payload))
               }
             })
-          }else{
+          } else {
             event.reply(this.mainChanelId, answerHandler(payload))
           }
         }
@@ -87,7 +91,9 @@ class IpcChanelFactory {
     this.index++
     return `auto-generated-${this.index}`
   }
-  static create<RendererAskPayload extends {}, RendererAskAnswer extends {}>(respondToAll = false) {
+  static create<RendererAskPayload extends {}, RendererAskAnswer extends {}>(
+    respondToAll = false
+  ) {
     const id = this.generateId()
     return new IpcChanel<RendererAskPayload, RendererAskAnswer>(
       id,

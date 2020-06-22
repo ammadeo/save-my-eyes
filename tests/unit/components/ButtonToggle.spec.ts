@@ -31,7 +31,7 @@ describe('components/ButtonToggle.vue', () => {
     expect(iconOns).toHaveLength(2)
     expect(iconOffs).toHaveLength(1)
     expect(Thumb).not.toHaveClass('translate-x-8')
-    await updateProps({on: false})
+    await updateProps({ on: false })
 
     iconOns = getAllByText(iconOnContent)
     iconOffs = getAllByText(iconOffContent)

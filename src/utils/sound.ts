@@ -7,7 +7,7 @@ const howlShortBreak = new Howl({
 })
 
 const howlPlay = (howlInstance: Howl) => async () => {
-  if (!vuex.state.sounds.ui) return;
+  if (!vuex.state.sounds.ui) return
 
   howlInstance.play()
   return new Promise((resolve) => {

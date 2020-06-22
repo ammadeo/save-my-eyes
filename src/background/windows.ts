@@ -68,7 +68,7 @@ const createWindow = (
       },
       ...options,
     })
-    if(options.transparent) {
+    if (options.transparent) {
       newWindow.setIgnoreMouseEvents(true)
     }
     rendererWindows[windowKey] = newWindow
