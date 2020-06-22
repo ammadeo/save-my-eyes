@@ -1,6 +1,7 @@
 <template>
   <BaseButton
     :primary="primary"
+    :absolute="absolute"
     class="flex-0 flex  min-h-12"
     @click="$emit('click')"
   >
@@ -33,6 +34,10 @@ export default Vue.extend({
     primary: {
       type: Boolean,
       default: false,
+    },
+    absolute: {
+      default: false,
+      type: Boolean,
     },
   },
 })

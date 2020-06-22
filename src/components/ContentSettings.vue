@@ -103,7 +103,7 @@
         hreflang="en"
         target="_blank"
         rel="noopener noreferrer"
-        class="underline font-bold"
+        class="underline font-semibold"
         >Katerina Limpitsouni</a
       >
       {{ $t('thanksFor') }}
@@ -117,6 +117,7 @@ import BaseIcon from './BaseIcon.vue'
 import ButtonToggleLabeled from './ButtonToggleLabeled.vue'
 
 import { getUserSettingsStore } from '@/background/db'
+import { rendererEmitLanguage as emitLanguage } from '@/background/ipc'
 import Vue from 'vue'
 import { Languages } from '../store/i18n'
 
@@ -173,6 +174,9 @@ export default Vue.extend({
         this.$emit('changed')
       }
     },
+    $langLanguage(to: Languages) {
+      this.lang = to
+    },
   },
   beforeMount() {
     const store = getUserSettingsStore()
@@ -186,7 +190,6 @@ export default Vue.extend({
       this.long = long
       this.sounds = sounds
       this.lang = lang
-
       this.$watch(
         () => {
           const { last: longLast, every: longEvery } = this.long
@@ -248,6 +251,7 @@ export default Vue.extend({
       const lang: Languages = to ? 'en' : 'pl'
       this.lang = lang
       this.$store.commit('i18n/setLang', lang)
+      emitLanguage.ask({ lang })
     },
     setSounds(to: boolean) {
       this.sounds.ui = to

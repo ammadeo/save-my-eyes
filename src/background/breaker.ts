@@ -1,10 +1,7 @@
 import { scheduleJob, Job } from 'node-schedule'
 import { addSeconds } from 'date-fns'
 import { isProd, isProdBuild, isDevProdTest } from './env'
-import {
-  createWindowIndex,
-  closeAllWindows,
-} from './windows'
+import { createWindowIndex, closeAllWindows } from './windows'
 import {
   breakIndex,
   breakId,
@@ -59,6 +56,8 @@ const getNewBreakIndex = (
   return oldIndex
 }
 export const setNewBreak = async (options: NewBreakOptions) => {
+  closeAllWindows()
+
   const nextBreakIn = options?.forceNextBreakIn ?? getEveryFromDB()
 
   breakIndex.value = getNewBreakIndex(breakIndex.value, options)

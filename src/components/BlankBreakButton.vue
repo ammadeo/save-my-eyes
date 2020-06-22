@@ -1,10 +1,10 @@
 <template>
   <ButtonIcon
-    :primary="finished"
     centered
     :icon="icon"
     :content="content"
-    class="flex-0 self-start min-h-12"
+    absolute
+    class="bottom-0 right-0 m-8 lg:m-12 xl:m-16 transform scale-75 origin-bottom-right tracking-wide font-light"
     @click="delayClick()"
   />
 </template>
@@ -18,13 +18,9 @@ export default Vue.extend({
     ButtonIcon,
   },
   props: {
-    long: {
-      type: Boolean,
-      default: false,
-    },
     finished: {
       type: Boolean,
-      default: false,
+      required: true,
     },
   },
   methods: {
@@ -36,19 +32,14 @@ export default Vue.extend({
   },
   beforeMount() {
     this.$useI18n((t) => ({
-      finishLong: t('Finish long break', 'Zakończ długą przerwę'),
-      finishShort: t('Finish short break', 'Zakończ krótką przerwę'),
-      skipLong: t('Skip long break', 'Pomiń długą przerwę'),
-      skipShort: t('Skip short break', 'Pomiń krótką przerwę'),
+      finish: t('Finish this break', 'Zakończ przerwę'),
+      skip: t('Skip this break', 'Pomiń przerwę'),
     }))
   },
   computed: {
     content(): string {
-      if (this.long)
-        if (this.finished) return this.$t('finishLong')
-        else return this.$t('skipLong')
-      if (this.finished) return this.$t('finishShort')
-      return this.$t('skipShort')
+      if (this.finished) return this.$t('finish')
+      return this.$t('skip')
     },
     icon(): string {
       return this.finished ? 'close' : 'skip'

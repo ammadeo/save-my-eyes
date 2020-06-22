@@ -60,7 +60,10 @@ import IndexIdea from '../components/IndexIdea.vue'
 import IndexSettings from '../components/IndexSettings.vue'
 import HeaderTitle from '../components/HeaderTitle.vue'
 import { remote } from 'electron'
-import { rendererSetNextBreak as setNextBreak } from '@/background/ipc'
+import {
+  rendererSetNextBreak as setNextBreak,
+  rendererEmitEndBreak as emitEndBreak,
+} from '@/background/ipc'
 import { addSeconds } from 'date-fns'
 import { CheckIsLongBreak, GetBreakTime } from '@/utils/mixins/breaks'
 import { play } from '../utils/sound'
@@ -139,6 +142,8 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       const preventFinish = this.autoFinishLock || this.long
       if (!preventFinish) {
         this.hideWindow()
+      } else {
+        emitEndBreak.ask({})
       }
 
       await play.sound.short()

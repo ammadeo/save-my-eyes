@@ -5,7 +5,7 @@ import {
   lastSchedulerJobDate,
   lastSchedulerJobLength,
 } from './store'
-import {createWindowIndexChildren, focusOn, setBackgroundOf} from './windows'
+import { createWindowIndexChildren, focusOn, setBackgroundOf, rendererWindows } from './windows'
 import { setNewBreak, NewBreakOptions } from './breaker'
 import { isProdBuild } from './env'
 import { app, ipcMain, ipcRenderer } from 'electron'
@@ -21,7 +21,7 @@ export interface OptionsSetBreak {
 class IpcChanel<RendererAskPayload extends {}, RendererAskAnswer extends {}> {
   private readonly mainChanelId: string
   private readonly rendererChanelId: string
-  constructor(baseChanelId: string) {
+  constructor(baseChanelId: string, private readonly respondToAll: boolean) {
     this.mainChanelId = `${baseChanelId}-main`
     this.rendererChanelId = `${baseChanelId}-renderer`
   }
@@ -46,6 +46,15 @@ class IpcChanel<RendererAskPayload extends {}, RendererAskAnswer extends {}> {
         }
         ipcRenderer.send(this.rendererChanelId, options)
       }),
+    listen: async (): Promise<RendererAskAnswer> =>
+      new Promise((resolve) => {
+        ipcRenderer.on(
+          this.mainChanelId,
+          (_event, answer: RendererAskAnswer) => {
+            resolve(answer)
+          }
+        )
+      }),
   }
 
   readonly main = {
@@ -55,7 +64,17 @@ class IpcChanel<RendererAskPayload extends {}, RendererAskAnswer extends {}> {
       ipcMain.on(
         this.rendererChanelId,
         (event, payload: RendererAskPayload) => {
-          event.reply(this.mainChanelId, answerHandler(payload))
+          if (this.respondToAll)
+          {
+           const windowsEntries = Object.entries(rendererWindows)
+            windowsEntries.forEach(([_key, win])=>{
+              if(win) {
+                win.webContents.send(this.mainChanelId, answerHandler(payload))
+              }
+            })
+          }else{
+            event.reply(this.mainChanelId, answerHandler(payload))
+          }
         }
       )
     },
@@ -68,9 +87,12 @@ class IpcChanelFactory {
     this.index++
     return `auto-generated-${this.index}`
   }
-  static create<RendererAskPayload extends {}, RendererAskAnswer extends {}>() {
+  static create<RendererAskPayload extends {}, RendererAskAnswer extends {}>(respondToAll = false) {
     const id = this.generateId()
-    return new IpcChanel<RendererAskPayload, RendererAskAnswer>(id)
+    return new IpcChanel<RendererAskPayload, RendererAskAnswer>(
+      id,
+      respondToAll
+    )
   }
 }
 
@@ -100,6 +122,16 @@ export const {
   renderer: rendererStartBreak,
 } = IpcChanelFactory.create<{}, {}>()
 
+export const {
+  main: mainEmitLanguage,
+  renderer: rendererEmitLanguage,
+} = IpcChanelFactory.create<{ lang: string }, { lang: string }>(true)
+
+export const {
+  main: mainEmitEndBreak,
+  renderer: rendererEmitEndBreak,
+} = IpcChanelFactory.create<{}, {}>(true)
+
 //? ipc for main
 export const useIpcMain = () => {
   mainGetBreakData.listen(() => ({
@@ -125,4 +157,7 @@ export const useIpcMain = () => {
     await createWindowIndexChildren()
     return {}
   })
+
+  mainEmitLanguage.listen(({ lang }) => ({ lang }))
+  mainEmitEndBreak.listen(() => ({}))
 }

@@ -3,7 +3,7 @@ import { isProd, isProdBuild, isDevProdTest } from './env'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 export const backgroundDefault = '#121959'
 export const backgroundTransparent = '#00000000'
-const windows: {
+export const rendererWindows: {
   [key: string]: BrowserWindow | undefined
   windowIndex: undefined | BrowserWindow
   windowTray: undefined | BrowserWindow
@@ -13,19 +13,19 @@ const windows: {
 }
 
 export const closeAllWindows = () => {
-  windows.windowIndex?.close()
-  windows.windowTray?.close()
+  rendererWindows.windowIndex?.close()
+  rendererWindows.windowTray?.close()
 }
 
-export const focusOn = (windowKey: keyof typeof windows) => {
-  windows[windowKey]?.focus()
+export const focusOn = (windowKey: keyof typeof rendererWindows) => {
+  rendererWindows[windowKey]?.focus()
 }
 
 export const setBackgroundOf = (
-  windowKey: keyof typeof windows,
+  windowKey: keyof typeof rendererWindows,
   to: string = backgroundDefault
 ) => {
-  windows[windowKey]?.setBackgroundColor(to)
+  rendererWindows[windowKey]?.setBackgroundColor(to)
 }
 
 const baseWindowSettings: Electron.BrowserWindowConstructorOptions = {
@@ -51,14 +51,14 @@ const getExternalDisplays = (): Electron.Display[] => {
 type WindowFunction = (window: BrowserWindow) => void
 
 const createWindow = (
-  windowKey: keyof typeof windows,
+  windowKey: keyof typeof rendererWindows,
   url: string,
   options: Electron.BrowserWindowConstructorOptions,
   extendWindow?: WindowFunction,
   showFocused = true
 ) => {
   // Create the browser window.
-  if (!windows[windowKey]) {
+  if (!rendererWindows[windowKey]) {
     const newWindow = new BrowserWindow({
       width: 800,
       height: 600,
@@ -71,7 +71,7 @@ const createWindow = (
     if(options.transparent) {
       newWindow.setIgnoreMouseEvents(true)
     }
-    windows[windowKey] = newWindow
+    rendererWindows[windowKey] = newWindow
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       // Load the url of the dev server if in development mode
       const path = (process.env.WEBPACK_DEV_SERVER_URL as string) + url
@@ -84,15 +84,15 @@ const createWindow = (
     }
 
     newWindow.on('closed', () => {
-      windows[windowKey] = undefined
+      rendererWindows[windowKey] = undefined
     })
 
     if (extendWindow) extendWindow(newWindow)
   }
   if (showFocused) {
-    windows[windowKey]?.show()
+    rendererWindows[windowKey]?.show()
   } else {
-    windows[windowKey]?.showInactive()
+    rendererWindows[windowKey]?.showInactive()
   }
 }
 
@@ -141,14 +141,14 @@ const createWindowIndexChild = async (
   const url = '/#/blank'
   const { height, width, x, y } = bounds
 
-  if (windows.windowIndex) {
+  if (rendererWindows.windowIndex) {
     return createWindow(`windowChild-${index}`, url, {
       width,
       height,
       y,
       x,
       backgroundColor: backgroundDefault,
-      parent: windows.windowIndex,
+      parent: rendererWindows.windowIndex,
       ...baseWindowSettings,
     })
   }

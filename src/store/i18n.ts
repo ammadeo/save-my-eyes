@@ -35,7 +35,8 @@ const globalTranslations = {
   title: t('Save My Eyes', 'Save My Eyes'),
   breakLong: t('long break', 'długa przerwa'),
   breakShort: t('short break', 'krótka przerwa'),
-  timeAgoContentAgo: t('ago', 'temu')
+  timeAgoContentAgo: t('ago', 'temu'),
+  settingsSave: t('Save changes', 'Zapisz zmiany'),
 }
 type Global = typeof globalTranslations
 interface GlobalObject {

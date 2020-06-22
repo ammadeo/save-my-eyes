@@ -69,7 +69,7 @@ export default mixins(TransparentClickEngine).extend({
   computed: {
     cardSettingsContent(): string {
       // todo merge with IndexSettings version when localizing
-      return this.settingsChanged ? 'Save changes' : ''
+      return this.settingsChanged ? this.$tGlobal('settingsSave') : ''
     },
   },
   methods: {

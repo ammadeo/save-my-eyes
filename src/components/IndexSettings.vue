@@ -45,7 +45,6 @@ export default Vue.extend({
   },
   beforeMount() {
     this.$useI18n((t) => ({
-      save: t('Save changes', 'Zapisz zmiany'),
       open: t('Show settings', 'Ustawienia'),
       title: t('Settings', 'Ustawienia'),
     }))
@@ -59,7 +58,7 @@ export default Vue.extend({
   },
   computed: {
     closeContent(): string {
-      return this.changed ? this.$t('save') : ''
+      return this.changed ? this.$tGlobal('settingsSave') : ''
     },
   },
 })
