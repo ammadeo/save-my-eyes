@@ -57,8 +57,10 @@ module.exports = {
       body: ['Source Sans Pro', 'roboto', 'sans-serif'],
     },
     fontWeight: {
+      light: 300,
       normal: 400,
-      bold: 600,
+      medium: 500,
+      semibold: 600,
     },
     borderWidth: {
       default: '1px',

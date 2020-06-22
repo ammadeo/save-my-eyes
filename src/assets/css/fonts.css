@@ -1,20 +1,35 @@
+/* source-sans-pro-300 - latin-ext_latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Source Sans Pro Light'), local('SourceSansPro-Light'),
+       url('../fonts/source-sans-pro-v13-latin-ext_latin-300.woff2') format('woff2');
+}
 /* source-sans-pro-regular - latin-ext_latin */
 @font-face {
   font-family: 'Source Sans Pro';
   font-style: normal;
   font-weight: 400;
   src: local('Source Sans Pro Regular'), local('SourceSansPro-Regular'),
-       url('../fonts/source-sans-pro-v13-latin-ext_latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+       url('../fonts/source-sans-pro-v13-latin-ext_latin-regular.woff2') format('woff2');
+}
+/* source-sans-pro-600 - latin-ext_latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Source Sans Pro SemiBold'), local('SourceSansPro-SemiBold'),
+       url('../fonts/source-sans-pro-v13-latin-ext_latin-600.woff2') format('woff2');
 }
 
-/* oxanium-regular - latin-ext_latin */
 /* comfortaa-300 - latin-ext_latin */
 @font-face {
   font-family: 'Comfortaa';
   font-style: normal;
   font-weight: 300;
   src: local(''),
-       url('../fonts/comfortaa-v28-latin-ext_latin-300.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+       url('../fonts/comfortaa-v28-latin-ext_latin-300.woff2') format('woff2');
 }
 /* comfortaa-regular - latin-ext_latin */
 @font-face {
@@ -22,7 +37,15 @@
   font-style: normal;
   font-weight: 400;
   src: local(''),
-       url('../fonts/comfortaa-v28-latin-ext_latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+       url('../fonts/comfortaa-v28-latin-ext_latin-regular.woff2') format('woff2');
+}
+/* comfortaa-500 - latin-ext_latin */
+@font-face {
+  font-family: 'Comfortaa';
+  font-style: normal;
+  font-weight: 500;
+  src: local(''),
+       url('../fonts/comfortaa-v28-latin-ext_latin-500.woff2') format('woff2');
 }
 
 .font-preset-info {
@@ -30,7 +53,7 @@
 }
 
 .font-preset-card-title {
-  @apply font-display font-bold text-sm;
+  @apply font-display font-medium text-sm;
   @screen md {
       @apply text-base;
   }

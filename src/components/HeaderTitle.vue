@@ -1,7 +1,7 @@
 <template>
   <header class="pb-2">
     <h1
-      class="text-4xl leading-none font-display font-bold text-secondary-50 tracking-wider uppercase font-bold"
+      class="text-4xl leading-none font-display font-medium text-secondary-50 tracking-wider uppercase"
     >
       {{ $tGlobal('title') }}
     </h1>

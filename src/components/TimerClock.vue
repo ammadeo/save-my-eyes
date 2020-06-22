@@ -4,7 +4,7 @@
     :class="timeLeft <= 0 ? ['opacity-25'] : []"
   >
     <p
-      class="font-body flex-grow-0 flex-shrink-0 font-bold text-secondary-100 leading-none pr-6 text-3xl"
+      class="font-body flex-grow-0 flex-shrink-0 font-semibold text-secondary-100 leading-none pr-6 text-3xl"
     >
       {{ timeLeftInfo }}
     </p>
