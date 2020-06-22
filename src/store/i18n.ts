@@ -9,14 +9,14 @@ export const translate = (en = '', pl = '') => ({
 const t = translate
 export type TranslateResult = ReturnType<typeof translate>
 export type Translate = typeof translate
-export interface Card {
+export interface Idea {
   title: TranslateResult
   img: {
     src: string
     alt: TranslateResult
   }
   content: TranslateResult
-  link: {
+  link?: {
     src: TranslateResult
     content: TranslateResult
   }

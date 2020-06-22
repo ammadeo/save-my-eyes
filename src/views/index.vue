@@ -38,6 +38,7 @@
     </template>
     <IndexIdea
       class="col-start-1 row-start-4"
+      :long="long"
       @changeAutoFinishLock="setAutoFinishLock($event)"
     />
     <IndexSettings

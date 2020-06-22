@@ -2,7 +2,7 @@
   <div>
     <transition name="fade" appear>
       <p
-        class="mb-2 delay-500 duration-300 text-secondary-200 selection-darker font-display text-lg"
+        class="mb-4 delay-500 duration-300 text-secondary-200 selection-darker font-display text-lg"
       >
         {{ $t('title') }}
       </p>
@@ -37,12 +37,16 @@
 <script lang="ts">
 import BaseCard from './BaseCard.vue'
 import Vue from 'vue'
-import { Card, translate } from '@/store/i18n'
+import { Idea, translate } from '@/store/i18n'
 
 // ? ideas cards images
 import windowImg from '@/assets/images/window.svg'
-import plantImg from '@/assets/images/plant.svg'
-import eyesImg from '@/assets/images/eyes.svg'
+import plantsImg from '@/assets/images/plants.svg'
+import blinkImg from '@/assets/images/blink.svg'
+//* long ideas images
+import mindfulnessImg from '@/assets/images/mindfulness.svg'
+import outsideImg from '@/assets/images/outside.svg'
+import workoutImg from '@/assets/images/workout.svg'
 
 export default Vue.extend({
   components: {
@@ -53,6 +57,12 @@ export default Vue.extend({
       ideaIndex: -1,
     }
   },
+  props: {
+    long: {
+      type: Boolean,
+      required: true,
+    },
+  },
   beforeMount() {
     this.ideaIndex = this.random(3)
     this.$useI18n((t) => ({
@@ -60,9 +70,9 @@ export default Vue.extend({
     }))
   },
   computed: {
-    card(): Card | undefined {
+    card(): Idea | undefined {
       const ideaIndex = this.ideaIndex
-      if (ideaIndex >= 0) return this.generateIdeas()[ideaIndex]
+      if (ideaIndex >= 0) return this.generateIdeas(this.long)[ideaIndex]
       return undefined
     },
   },
@@ -70,55 +80,72 @@ export default Vue.extend({
     random(max: number) {
       return Math.floor(Math.random() * max)
     },
-    generateIdeas() {
+    generateIdeas(long: boolean): Idea[] {
       const t = translate
-      return [
-        {
-          title: t('Look out the window', 'Wyjrzyj przez okno'),
-          img: {
-            src: windowImg,
-            alt: t('Woman looks out the window'),
-          },
-          content: t(
-            'Look far away through a window to help your eyes relax',
-            'Patrzenie w dal pomoże Ci uniknąć krótko wzroczności'
-          ),
-          link: {
-            src: t(''),
-            content: t(''),
-          },
-        },
-        {
-          title: t('Look at a plant', 'Popatrz na rośliny'),
-          img: {
-            src: plantImg,
-            alt: t('Woman is sitting in front of flowers'),
-          },
-          content: t(
-            'Green plants will help relax your eyes',
-            'Spojżenie na rośliny pomoże Ci zrelaksować oczy i odprężyć umysł'
-          ),
-          link: {
-            src: t(''),
-            content: t(''),
-          },
-        },
-        {
-          title: t('Blink your eyes', 'Pomrugaj oczami'),
-          img: {
-            src: eyesImg,
-            alt: t('Face emoji is blinking its eyes'),
-          },
-          content: t(
-            'Blink few times to clean your eyes',
-            'Mrugnij kilka razy, aby oczyścić oczy'
-          ),
-          link: {
-            src: t(''),
-            content: t(''),
-          },
-        },
-      ] as Card[]
+
+      return long
+        ? [
+            {
+              title: t('Do some exercises', 'Poćwicz chwilę'),
+              img: {
+                src: workoutImg,
+                alt: t('Woman dancing'),
+              },
+              content: t('', ''),
+            },
+            {
+              title: t('Go outside', 'Wyjdź na świerze powietrze'),
+              img: {
+                src: outsideImg,
+                alt: t('Woman walk through a forest'),
+              },
+              content: t('', ''),
+            },
+            {
+              title: t('Realax a bit', 'Zrelaksuj się'),
+              img: {
+                src: mindfulnessImg,
+                alt: t('Woman meditating in front of ancient tample'),
+              },
+              content: t('', ''),
+            },
+          ]
+        : [
+            // ? short break ideas
+            {
+              title: t('Look out the window', 'Wyjrzyj przez okno'),
+              img: {
+                src: windowImg,
+                alt: t('Woman looks out the window'),
+              },
+              content: t(
+                'Look far away through a window to help your eyes relax',
+                'Patrzenie w dal pomoże Ci uniknąć krótko wzroczności'
+              ),
+            },
+            {
+              title: t('Look at a plants', 'Popatrz na rośliny'),
+              img: {
+                src: plantsImg,
+                alt: t('Woman is sitting in front of flowers'),
+              },
+              content: t(
+                'Green plants will help relax your eyes',
+                'Spojżenie na rośliny pomoże Ci zrelaksować oczy i odprężyć umysł'
+              ),
+            },
+            {
+              title: t('Blink your eyes', 'Pomrugaj oczami'),
+              img: {
+                src: blinkImg,
+                alt: t('Face emoji is blinking its eyes'),
+              },
+              content: t(
+                'Blink few times to clean your eyes',
+                'Mrugnij kilka razy, aby oczyścić oczy'
+              ),
+            },
+          ]
     },
   },
 })
