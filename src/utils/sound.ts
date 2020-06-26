@@ -8,7 +8,7 @@ import longBreakEndSound from '../assets/music/longEnd.mp3'
 const howlPlay = (...src: string[]) => async () => {
   if (!vuex.state.sounds.ui) return
   const howlInstance = new Howl({
-    src: src
+    src: src,
   })
   howlInstance.play()
   return new Promise((resolve) => {
