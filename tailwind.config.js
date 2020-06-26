@@ -70,11 +70,15 @@ module.exports = {
       '6': '6px',
       '8': '8px',
     },
+
     extend: {
-      gridTemplateColumns: {
-        base:
-          'minmax(min-content, 5fr) minmax(2rem, 4rem) minmax(min-content, 2fr)',
-      },
+      gridTemplateColumns: (theme) => ({
+        base: `minmax(${theme('spacing.80')}, 1fr) minmax(${theme(
+          'spacing.8'
+        )}, ${theme('spacing.16')}) minmax(min-content, ${theme(
+          'spacing.80'
+        )})`,
+      }),
       gridTemplateRows: {
         base: 'auto auto 1fr auto',
       },
@@ -146,6 +150,7 @@ module.exports = {
       // 'focus-within',
       // todo fix focus within or add support by js
     ],
+    opacity: ['responsive', 'hover', 'focus', 'disabled'],
     backgroundColor: [
       'responsive',
       'hover',
@@ -155,6 +160,7 @@ module.exports = {
       'group-focus',
       'group-hocus',
     ],
+    cursor: ['disabled'],
   },
   plugins: [
     require('tailwindcss-interaction-variants'),

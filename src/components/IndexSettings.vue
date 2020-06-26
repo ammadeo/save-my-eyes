@@ -9,7 +9,7 @@
     </ButtonIcon>
     <transition name="slide">
       <CardCloseable
-        v-if="showSettings"
+        v-if="showSettings || hasFixLog"
         color="secondary-300"
         :content="closeContent"
         :title="$t('title')"
@@ -17,7 +17,19 @@
         class="bottom-0 right-0 z-40 slide-leave-bottom max-h-screen-16 lg:max-h-screen-24 xl:max-h-screen-32"
         @close="setShowSettings(false)"
       >
-        <ContentSettings @changed="changed = true" />
+        <div v-if="hasFixLog">
+          <p class="text-secondary-100">
+            <span class="text-lg">Poprawiam ustawienia</span><br />{{
+              fixLogToText
+            }}
+          </p>
+        </div>
+
+        <ContentSettings
+          v-else
+          @changed="setChanged"
+          @fixing="fixingSettingWarning($event)"
+        />
       </CardCloseable>
     </transition>
   </div>
@@ -27,9 +39,22 @@
 import ButtonIcon from './ButtonIcon.vue'
 import CardCloseable from './CardCloseable.vue'
 import ContentSettings from './ContentSettings.vue'
+import { FixLog } from '@/types/settings'
 
 import Vue from 'vue'
 // import mixins from 'vue-typed-mixins'
+
+interface Data {
+  showSettings: boolean
+  changed: boolean
+  fixLog: FixLog
+}
+
+const getCleanFixLog = () => ({
+  code: '',
+  from: 0,
+  to: 0,
+})
 
 export default Vue.extend({
   components: {
@@ -37,10 +62,11 @@ export default Vue.extend({
     CardCloseable,
     ContentSettings,
   },
-  data() {
+  data(): Data {
     return {
       showSettings: false,
       changed: false,
+      fixLog: getCleanFixLog(),
     }
   },
   beforeMount() {
@@ -50,15 +76,33 @@ export default Vue.extend({
     }))
   },
   methods: {
-    setShowSettings(to: boolean) {
+    setShowSettings(to: boolean): void {
+      this.fixLog = getCleanFixLog()
       this.$emit('changeAutoFinishLock', to)
       this.showSettings = to
       if (to === false) this.changed = false
+    },
+    setChanged(): void {
+      this.changed = true
+      this.$emit('changed')
+    },
+    fixingSettingWarning(fixLog: FixLog): void {
+      this.fixLog = fixLog
+      setTimeout(() => (this.fixLog = getCleanFixLog()), 6000)
     },
   },
   computed: {
     closeContent(): string {
       return this.changed ? this.$tGlobal('settingsSave') : ''
+    },
+    hasFixLog(): boolean {
+      return !!this.fixLog.code
+    },
+    fixLogToText(): string {
+      const { from, to } = this.fixLog
+      return `Poprawiłem ilość długich przerw, aby odbywały się co ${Number(
+        to
+      ) / 60} minut, a nie co ${Number(from) / 60}`
     },
   },
 })

@@ -56,7 +56,7 @@ const userSettingsSchema: UserSettingsSchema = {
           every: {
             type: 'number',
             minimum: 1,
-            maximum: 10,
+            maximum: 30,
           },
         },
       },

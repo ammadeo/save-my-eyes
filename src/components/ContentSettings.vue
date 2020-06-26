@@ -8,9 +8,8 @@
       v-model="every"
       :name="$t('inputShortEvery')"
       :forceLarge="forceLarge"
-      :min="1"
-      :center="15"
-      :max="60"
+      :min="5"
+      :max="30"
       :scale="60"
       suffix="min."
       class="mb-2 mt-2"
@@ -19,28 +18,19 @@
       v-model="short.last"
       :name="$t('inputShortLast')"
       :forceLarge="forceLarge"
-      :min="1"
-      :center="30"
+      :min="5"
       :max="60"
       class="mb-6"
-      suffix="sec."
+      :suffix="$t('secondsSuffix')"
     />
     <BaseInputRange
       v-model="long.every"
       :name="$t('inputLongEvery')"
       :forceLarge="forceLarge"
       :min="every / 60"
-      :center="(every * 3) / 60"
-      :max="(every * 10) / 60"
-      :scale="60 / every"
+      :max="120"
+      :scale="60"
       :step="every / 60"
-      :additional-validator="
-        (value) =>
-          value % (every / 60) === 0
-            ? true
-            : `You have to set value that can be devided to ${every /
-                60} min. parts`
-      "
       class="mb-2"
       suffix="min."
     />
@@ -49,7 +39,6 @@
       :name="$t('inputLongLast')"
       :forceLarge="forceLarge"
       :min="1"
-      :center="5"
       :max="60"
       :scale="60"
       class="mb-4"
@@ -120,7 +109,7 @@ import { getUserSettingsStore } from '@/background/db'
 import { rendererEmitLanguage as emitLanguage } from '@/background/ipc'
 import Vue from 'vue'
 import { Languages } from '../store/i18n'
-
+import { FixLog } from '@/types/settings'
 interface Data {
   every: number
   short: {
@@ -187,7 +176,7 @@ export default Vue.extend({
     if (every && short && long && sounds && lang) {
       this.every = every
       this.short = short
-      this.long = long
+      this.long = { last: long.last, every: long.every * every }
       this.sounds = sounds
       this.lang = lang
       this.$watch(
@@ -227,6 +216,7 @@ export default Vue.extend({
       author: t('Amadeus Chomiak', 'Amadeusza Chomiaka'),
       thanksTo: t('Thanks to', 'Dzięki'),
       thanksFor: t('for awesome drawings', 'za świetne rysunki'),
+      secondsSuffix: t('sec.', 'sek.'),
     }))
   },
   beforeDestroy() {
@@ -241,11 +231,25 @@ export default Vue.extend({
         breaks: {
           every,
           short,
-          long,
+          long: {
+            every: this.longBreakEveryToClosest(long.every),
+            last: long.last,
+          },
         },
         sounds,
         lang,
       })
+    },
+    longBreakEveryToClosest(everyInMinutes: number): number {
+      const every = this.every
+      const longBreakEvery = Math.round(everyInMinutes / every)
+      if (longBreakEvery !== everyInMinutes / every)
+        this.$emit('fixing', {
+          code: 'longEvery',
+          from: everyInMinutes,
+          to: longBreakEvery * every,
+        } as FixLog<number>)
+      return longBreakEvery > 0 ? longBreakEvery : 1
     },
     setLang(to: boolean) {
       const lang: Languages = to ? 'en' : 'pl'

@@ -8,7 +8,7 @@
     >
       {{ timeLeftInfo }}
     </p>
-    <div class="max-w-6xl h-12 w-full">
+    <div class="h-12 w-full">
       <BaseProgressbar
         color="primary-400"
         :min="0"

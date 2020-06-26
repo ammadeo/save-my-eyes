@@ -2,6 +2,7 @@
   <BaseButton
     :primary="primary"
     :absolute="absolute"
+    :disabled="disabled"
     class="flex-0 flex  min-h-12"
     @click="$emit('click')"
   >
@@ -23,6 +24,10 @@ export default Vue.extend({
     BaseIcon,
   },
   props: {
+    disabled: {
+      default: false,
+      type: Boolean,
+    },
     content: {
       type: String,
       required: true,

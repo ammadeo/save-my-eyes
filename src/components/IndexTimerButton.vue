@@ -4,6 +4,7 @@
     centered
     :icon="icon"
     :content="content"
+    :disabled="disabled"
     class="flex-0 self-start min-h-12"
     @click="delayClick()"
   />
@@ -25,6 +26,10 @@ export default Vue.extend({
     finished: {
       type: Boolean,
       default: false,
+    },
+    disabled: {
+      default: false,
+      type: Boolean,
     },
   },
   methods: {

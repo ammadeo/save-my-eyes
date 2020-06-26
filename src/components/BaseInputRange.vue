@@ -8,7 +8,7 @@
     </p>
 
     <div
-      class="lg:col-span-1 row-span-1 w-24 cursor-text flex justify-center bg-primary-700 hover:bg-primary-800 focus-within:bg-primary-800 text-secondary-100 shadow-inner-1 rounded-full px-2"
+      class="md:col-span-1 row-span-1 w-24 cursor-text flex justify-center bg-primary-700 hover:bg-primary-800 focus-within:bg-primary-800 text-secondary-100 shadow-inner-1 rounded-full px-2"
       :class="onForceLargeClasses(['col-span-1'], ['col-span-6'])"
       @click="focusOnInput(true)"
     >
@@ -28,7 +28,7 @@
     </div>
     <input
       type="range"
-      class="bg-transparent col-span-5 lg:block"
+      class="bg-transparent col-span-5 md:block"
       :class="onForceLargeClasses([], ['hidden'])"
       :max="max"
       :min="min"
@@ -40,13 +40,13 @@
     />
 
     <p
-      class="col-start-2 col-end-4 text-secondary-200 lg:block"
+      class="col-start-2 col-end-4 text-secondary-200 md:block"
       :class="onForceLargeClasses([], ['hidden'])"
     >
       {{ min }} {{ suffix }}
     </p>
     <p
-      class="col-start-4 col-end-7 text-right text-secondary-200 lg:block"
+      class="col-start-4 col-end-7 text-right text-secondary-200 md:block"
       :class="onForceLargeClasses([], ['hidden'])"
     >
       {{ max }} {{ suffix }}
@@ -54,7 +54,7 @@
     <transition name="fade">
       <p
         v-if="warning"
-        class="text-sm w-full shadow bottom-full absolute rounded-sm bg-warn-400 mt-2 px-2 py-1"
+        class="text-sm w-full shadow top-full absolute rounded-sm bg-warn-400 px-2 py-1 z-10"
       >
         {{ warning }}
       </p>
@@ -128,6 +128,12 @@ export default Vue.extend({
       }
     },
   },
+  beforeMount() {
+    this.$useI18n((t) => ({
+      warningToMuch: t("You can't set more than", 'Musi być mniejsza niż'),
+      warningToSmall: t("You can't set less than", 'Musi być większa niż'),
+    }))
+  },
   methods: {
     emitChange(event: Event) {
       const input = event.target as HTMLInputElement
@@ -150,9 +156,9 @@ export default Vue.extend({
     validateInput(value: number) {
       const { min, max, suffix, scale } = this
       if (value < min)
-        return (this.warning = `You can't set less than ${min} ${suffix}`)
+        return (this.warning = `${this.$t('warningToSmall')} ${min} ${suffix}`)
       if (value > max)
-        return (this.warning = `You can't set more than ${max} ${suffix}`)
+        return (this.warning = `${this.$t('warningToMuch')} ${max} ${suffix}`)
 
       console.log(
         'value',
