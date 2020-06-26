@@ -7,7 +7,7 @@
     <HeaderTitle class="col-start-1 col-end-3 row-start-1" />
     <IndexStopProtection
       class="col-start-3 row-start-1"
-      @changeAutoFinishLock="setAutoFinishLock($event)"
+      @changeAutoFinishLock="setLocks($event, true)"
       @close="closeWindow()"
     />
     <p v-if="!ready" class="font-preset-info mb-8">
@@ -33,6 +33,7 @@
         class="row-start-3 col-start-3"
         :long="long"
         :finished="finished"
+        :disabled="forceCloseLock"
         @click="finishForce()"
       />
     </template>
@@ -43,7 +44,8 @@
     />
     <IndexSettings
       class="row-start-4 col-start-3"
-      @changeAutoFinishLock="setAutoFinishLock($event)"
+      @changeAutoFinishLock="setLocks($event)"
+      @changed="setLocks(true, true)"
     />
   </div>
 </template>
@@ -94,6 +96,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       // ? closing
       finished: false,
       autoFinishLock: false,
+      forceCloseLock: false,
       closing: false,
     }
   },
@@ -104,7 +107,11 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
   },
   async mounted() {
     await this.setup()
-    await play.sound.short()
+    if (this.long) {
+      await play.sound.long.start()
+    } else {
+      await play.sound.short.start()
+    }
   },
   methods: {
     async setup() {
@@ -127,8 +134,15 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
         behavior: 'auto',
       })
     },
+    setLocks(to: boolean, forceClose = false) {
+      this.setAutoFinishLock(to)
+      if (forceClose || !to) this.setForceCloseLock(forceClose ? to : false)
+    },
     setAutoFinishLock(to: boolean) {
       this.autoFinishLock = to
+    },
+    setForceCloseLock(to: boolean) {
+      this.forceCloseLock = to
     },
     closeWindow() {
       const window = remote.getCurrentWindow()
@@ -147,7 +161,11 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
         emitEndBreak.ask({})
       }
 
-      await play.sound.short()
+      if (this.long) {
+        await play.sound.long.end()
+      } else {
+        await play.sound.short.end()
+      }
 
       if (!preventFinish) {
         this.close()
