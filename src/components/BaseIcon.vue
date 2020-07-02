@@ -55,6 +55,13 @@
     :alt="iconAlt"
     :class="classes"
   />
+  <img
+    v-else-if="showIcon('finish')"
+    svg-inline
+    src="@/assets/icons/finish.svg"
+    :alt="iconAlt"
+    :class="classes"
+  />
 </template>
 
 <script lang="ts">

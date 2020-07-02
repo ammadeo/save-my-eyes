@@ -56,7 +56,7 @@ export default Vue.extend({
       return this.$t('skipShort')
     },
     icon(): string {
-      return this.finished ? 'close' : 'skip'
+      return this.finished ? 'finish' : 'skip'
     },
   },
 })

@@ -42,7 +42,7 @@ export default Vue.extend({
       return this.$t('skip')
     },
     icon(): string {
-      return this.finished ? 'close' : 'skip'
+      return this.finished ? 'finish' : 'skip'
     },
   },
 })
