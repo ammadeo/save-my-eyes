@@ -107,11 +107,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
   },
   async mounted() {
     await this.setup()
-    if (this.long) {
-      await play.sound.long.start()
-    } else {
-      await play.sound.short.start()
-    }
+    await this.playBreakSound()
   },
   methods: {
     async setup() {
@@ -133,6 +129,13 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
         left: 0,
         behavior: 'auto',
       })
+    },
+    async playBreakSound() {
+      if (this.long) {
+        await play.sound.long()
+      } else {
+        await play.sound.short()
+      }
     },
     setLocks(to: boolean, forceClose = false) {
       this.setAutoFinishLock(to)
@@ -161,11 +164,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
         emitEndBreak.ask({})
       }
 
-      if (this.long) {
-        await play.sound.long.end()
-      } else {
-        await play.sound.short.end()
-      }
+      await this.playBreakSound()
 
       if (!preventFinish) {
         this.close()

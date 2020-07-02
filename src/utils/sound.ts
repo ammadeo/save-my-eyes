@@ -1,9 +1,7 @@
 import { Howl } from 'howler'
 import vuex from '@/store'
-import shortBreakStartSound from '../assets/music/shortStart.mp3'
-import shortBreakEndSound from '../assets/music/shortEnd.mp3'
-import longBreakStartSound from '../assets/music/longStart.mp3'
-import longBreakEndSound from '../assets/music/longEnd.mp3'
+import shortBreakSound from '../assets/music/short.mp3'
+import longBreakSound from '../assets/music/long.mp3'
 
 const howlPlay = (...src: string[]) => async () => {
   if (!vuex.state.sounds.ui) return
@@ -18,14 +16,9 @@ const howlPlay = (...src: string[]) => async () => {
 
 export const play = Object.freeze({
   sound: {
-    short: {
-      start: howlPlay(shortBreakStartSound),
-      end: howlPlay(shortBreakEndSound),
-    },
-    long: {
-      start: howlPlay(longBreakStartSound),
-      end: howlPlay(longBreakEndSound),
-    },
+    short: howlPlay(shortBreakSound),
+
+    long: howlPlay(longBreakSound),
   },
   // comment: {},
 })
