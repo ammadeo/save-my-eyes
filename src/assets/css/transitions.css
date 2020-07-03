@@ -30,12 +30,10 @@
 
 .fade-enter-active, .fade-leave-active
 {
-  @apply transition-opacity duration-100
+  transition: opacity 100ms
 }
 
-.fade-enter {
-  @apply opacity-0
-}
+.fade-enter,
 .fade-leave-to {
-  @apply opacity-100
+  @apply opacity-0
 }
