@@ -79,6 +79,9 @@ module.exports = {
           'spacing.80'
         )})`,
       }),
+      opacity: {
+        85: '0.85',
+      },
       gridTemplateRows: {
         base: 'auto auto 1fr auto',
       },
@@ -106,6 +109,7 @@ module.exports = {
         '120': '30rem',
       },
       minHeight: (theme) => ({
+        8: theme('spacing.8'),
         12: theme('spacing.12'),
       }),
       maxHeight: (theme) => ({

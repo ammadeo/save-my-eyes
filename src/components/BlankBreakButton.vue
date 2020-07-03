@@ -4,7 +4,7 @@
     :icon="icon"
     :content="content"
     absolute
-    class="bottom-0 right-0 m-8 lg:m-12 xl:m-16 transform scale-75 origin-bottom-right tracking-wide font-light"
+    class="bottom-0 right-0 m-8 lg:m-12 xl:m-16 transform scale-75 origin-bottom-right tracking-wider font-light"
     @click="delayClick()"
   />
 </template>
