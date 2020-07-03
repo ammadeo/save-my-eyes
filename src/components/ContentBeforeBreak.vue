@@ -9,6 +9,7 @@
         :min="0"
         :max="100"
         :value="timeLeftPercent"
+        small
         icon="start"
       />
     </div>

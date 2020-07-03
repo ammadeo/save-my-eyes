@@ -23,7 +23,7 @@
       />
       <TimerClock
         class="col-start-1 row-start-3"
-        :long="long"
+        :auto-finish="!long && !autoFinishLock"
         :start-date="startDate"
         :end-date="endDate"
         @finished="finish"

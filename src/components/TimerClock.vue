@@ -9,11 +9,12 @@
       {{ timeLeftInfo }}
     </p>
     <div class="h-12 w-full">
-      <BaseProgressbar
+      <ProgressbarIcon
         color="primary-400"
         :min="0"
         :max="100"
         :value="timePercentage"
+        :icon="icon"
       />
     </div>
   </div>
@@ -22,13 +23,13 @@
 <script lang="ts">
 import { addMilliseconds } from 'date-fns'
 import { format } from '@/utils/dateFnsI18n'
-import BaseProgressbar from './BaseProgressbar.vue'
+import ProgressbarIcon from './ProgressbarIcon.vue'
 import { CreateTimer } from '@/utils/mixins/createTimer'
 import mixins from 'vue-typed-mixins'
 
 export default mixins(CreateTimer).extend({
   components: {
-    BaseProgressbar,
+    ProgressbarIcon,
   },
   props: {
     startDate: {
@@ -38,6 +39,10 @@ export default mixins(CreateTimer).extend({
     endDate: {
       required: true,
       type: Date,
+    },
+    autoFinish: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
@@ -56,6 +61,9 @@ export default mixins(CreateTimer).extend({
     },
     timePercentage(): number {
       return (this.timePassedObj.timePassed / this.allTime) * 100
+    },
+    icon(): string {
+      return this.autoFinish ? 'finish' : ''
     },
   },
   mounted() {
