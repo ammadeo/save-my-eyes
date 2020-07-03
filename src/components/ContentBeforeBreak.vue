@@ -1,9 +1,18 @@
 <template>
   <div class="flex flex-col text-secondary-100 py-6 px-4">
     <h1 class="text-xl font-display uppercase mb-2">{{ $tGlobal('title') }}</h1>
-    <p class="mb-2 first-letter:uppercase">
+    <p
+      class="first-letter:uppercase"
+      :class="waiting ? (waitingInfo ? [] : ['mb-4']) : ['mb-2']"
+    >
       {{ breakName }} {{ $t('contentBase') }} {{ breakStatus }}
     </p>
+    <transition name="fade">
+      <p class="mb-4 first-letter:uppercase" v-show="waitingInfo">
+        {{ $t('waitingPrefix') }}
+        <span class="font-semibold">{{ waitingInfo }}</span>
+      </p>
+    </transition>
     <div class="h-8 w-full mb-6" v-show="!waiting">
       <ProgressbarIcon
         :min="0"
@@ -13,19 +22,18 @@
         icon="start"
       />
     </div>
-    <!-- <p class="mb-2">You've already skiped 3 times</p> -->
     <ButtonIcon
-      :class="waiting ? ['mb-6'] : []"
+      v-show="waiting"
+      icon="skip"
+      class="opacity-85 mb-6"
+      content="Skip break"
+      @click="$emit('skip')"
+    ></ButtonIcon>
+    <ButtonIcon
       :icon="breakIcon"
       :primary="waiting"
       :content="breakContent"
       @click="wait()"
-    ></ButtonIcon>
-    <ButtonIcon
-      v-show="waiting"
-      icon="skip"
-      content="Skip break"
-      @click="$emit('skip')"
     ></ButtonIcon>
   </div>
 </template>
@@ -43,7 +51,9 @@ interface Data {
   allTime: number
   isLong: boolean
   waiting: boolean
-  waitingFrom?: Date
+  waitingFrom: Date
+  waitingInterval?: NodeJS.Timeout
+  waitingInfo: string
 }
 
 export default mixins(CreateTimer, CheckIsLongBreak, TimeAgoContent).extend({
@@ -56,7 +66,9 @@ export default mixins(CreateTimer, CheckIsLongBreak, TimeAgoContent).extend({
       allTime: 5000,
       isLong: false,
       waiting: false,
-      waitingFrom: undefined,
+      waitingFrom: new Date(),
+      waitingInterval: undefined,
+      waitingInfo: '',
     }
   },
   beforeMount() {
@@ -66,6 +78,7 @@ export default mixins(CreateTimer, CheckIsLongBreak, TimeAgoContent).extend({
       contentBase: t('will start', 'zacznie się'),
       statusWaiting: t('when You ready', 'kiedy zechcesz'),
       statusStarting: t('in 5 seconds', 'za 5 sekund'),
+      waitingPrefix: t("You're waiting for", 'Czekasz już'),
     }))
   },
   computed: {
@@ -94,6 +107,7 @@ export default mixins(CreateTimer, CheckIsLongBreak, TimeAgoContent).extend({
       } else {
         this.$emit('wait')
         this.pauseAnime()
+        this.startTimer()
       }
       this.waiting = true
     },
@@ -103,6 +117,16 @@ export default mixins(CreateTimer, CheckIsLongBreak, TimeAgoContent).extend({
     },
     startTimer() {
       this.waitingFrom = new Date()
+      this.waitingInterval = setInterval(() => {
+        let timeAgoInfo = this.timeAgoContent(this.waitingFrom, false)
+        if (this.$langLanguage === 'pl' && timeAgoInfo.includes('minuta'))
+          timeAgoInfo = 'minutę'
+        this.waitingInfo = timeAgoInfo
+      }, 60 * 1000)
+    },
+    stopTimer() {
+      const waitingInterval = this.waitingInterval
+      if (waitingInterval) clearInterval(waitingInterval)
     },
     emitBreak() {
       this.$emit('break')
@@ -119,6 +143,7 @@ export default mixins(CreateTimer, CheckIsLongBreak, TimeAgoContent).extend({
   },
   beforeDestroy() {
     this.pauseAnime()
+    this.stopTimer()
   },
 })
 </script>

@@ -36,12 +36,12 @@ export const GetBreakTime = vue.extend({
 
 export const TimeAgoContent = vue.extend({
   methods: {
-    timeAgoContent(endDate: Date): string {
+    timeAgoContent(endDate: Date, withSuffix = true): string {
       const nowDate = new Date()
       if (differenceInMinutes(nowDate, endDate) >= 1) {
         const formattedDistance = formatDistanceStrict(endDate, new Date(), {
           roundingMethod: 'floor',
-          addSuffix: true,
+          addSuffix: withSuffix,
         })
         return `${formattedDistance}`
       }
