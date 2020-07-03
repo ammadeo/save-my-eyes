@@ -14,6 +14,14 @@
   src: local('Source Sans Pro Regular'), local('SourceSansPro-Regular'),
        url('../fonts/source-sans-pro-v13-latin-ext_latin-regular.woff2') format('woff2');
 }
+/* source-sans-pro-italic - latin-ext_latin */
+/* @font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Source Sans Pro Italic'), local('SourceSansPro-Italic'),
+       url('../fonts/source-sans-pro-v13-latin-ext_latin-italic.woff2') format('woff2');
+} */
 /* source-sans-pro-600 - latin-ext_latin */
 @font-face {
   font-family: 'Source Sans Pro';
