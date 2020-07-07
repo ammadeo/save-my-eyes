@@ -36,7 +36,7 @@
       :step="step"
       tabindex="-1"
       @input="emitChange($event)"
-      @blur="blurInput()"
+      @change="blurInput()"
     />
 
     <p
@@ -63,7 +63,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue'
+import Vue from 'vue'
 export default Vue.extend({
   props: {
     value: {
@@ -85,10 +85,6 @@ export default Vue.extend({
     step: {
       type: Number,
       default: 1,
-    },
-    additionalValidator: {
-      type: Function as PropType<(value: number) => boolean>,
-      default: () => () => true,
     },
     suffix: {
       type: String,
@@ -152,29 +148,16 @@ export default Vue.extend({
     },
     async blurInput() {
       this.warning = ''
+      this.$emit('blur')
     },
     validateInput(value: number) {
       const { min, max, suffix, scale } = this
-      if (value < min)
-        return (this.warning = `${this.$t('warningToSmall')} ${min} ${suffix}`)
-      if (value > max)
-        return (this.warning = `${this.$t('warningToMuch')} ${max} ${suffix}`)
-
-      console.log(
-        'value',
-        value,
-        'scale',
-        scale,
-        '(value * scale)',
-        value * scale,
-        '(value * scale) % scale',
-        (value * scale) % scale
-      )
-      const customValidatorResult = this.additionalValidator(value)
-      if (typeof customValidatorResult === 'string')
-        return (this.warning = customValidatorResult)
-      this.$emit('input', value * scale)
       this.warning = ''
+      if (value < min)
+        this.warning = `${this.$t('warningToSmall')} ${min} ${suffix}`
+      if (value > max)
+        this.warning = `${this.$t('warningToMuch')} ${max} ${suffix}`
+      this.$emit('input', value * scale)
     },
   },
 })

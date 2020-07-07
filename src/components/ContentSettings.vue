@@ -11,6 +11,7 @@
       :min="5"
       :max="30"
       :scale="60"
+      @blur="updateLongEvery()"
       suffix="min."
       class="mb-2 mt-2"
     />
@@ -21,7 +22,7 @@
       :min="5"
       :max="60"
       class="mb-6"
-      :suffix="$t('secondsSuffix')"
+      :suffix="$tGlobal('secondsSuffix')"
     />
     <BaseInputRange
       v-model="long.every"
@@ -106,11 +107,17 @@ import BaseIcon from './BaseIcon.vue'
 import ButtonToggleLabeled from './ButtonToggleLabeled.vue'
 
 import { getUserSettingsStore } from '@/background/db'
+import {
+  FixLogCode,
+  FixLog,
+  FixSettings,
+  TimeFormat,
+  FixNumber,
+} from '@/utils/db'
 import { rendererEmitLanguage as emitLanguage } from '@/background/ipc'
 import Vue from 'vue'
 import { Languages } from '../store/i18n'
-import { FixLog } from '@/types/settings'
-interface Data {
+interface BreaksData {
   every: number
   short: {
     last: number
@@ -119,12 +126,22 @@ interface Data {
     last: number
     every: number
   }
-  sounds: {
-    ui: boolean
-    voice: boolean
-  }
+}
+
+interface SoundsData {
+  ui: boolean
+  voice: boolean
+}
+
+interface SettingsData {
+  breaks: BreaksData
+  sounds: SoundsData
   lang: Languages
+}
+interface Data extends BreaksData {
   changed: boolean
+  sounds: SoundsData
+  lang: Languages
 }
 
 export default Vue.extend({
@@ -173,29 +190,27 @@ export default Vue.extend({
     const sounds = store.get('sounds')
     const lang = store.get('lang')
     const { every, short, long } = breaks
-    if (every && short && long && sounds && lang) {
-      this.every = every
-      this.short = short
-      this.long = { last: long.last, every: long.every * every }
-      this.sounds = sounds
-      this.lang = lang
-      this.$watch(
-        () => {
-          const { last: longLast, every: longEvery } = this.long
-          return [
-            this.every,
-            this.short.last,
-            longLast,
-            longEvery,
-            this.sounds.ui,
-            this.lang,
-          ]
-        },
-        () => {
-          this.changed = true
-        }
-      )
-    }
+    this.every = every
+    this.short = short
+    this.long = { last: long.last, every: long.every * every }
+    this.sounds = sounds
+    this.lang = lang
+    this.$watch(
+      () => {
+        const { last: longLast, every: longEvery } = this.long
+        return [
+          this.every,
+          this.short.last,
+          longLast,
+          longEvery,
+          this.sounds.ui,
+          this.lang,
+        ] as [number, number, number, number, boolean, Languages]
+      },
+      () => {
+        this.changed = true
+      }
+    )
     this.$useI18n((t) => ({
       settings: t('Settings', 'Ustawienia'),
       inputShortEvery: t('Take a short break every', 'Zrób krótką przerwę co'),
@@ -216,7 +231,6 @@ export default Vue.extend({
       author: t('Amadeus Chomiak', 'Amadeusza Chomiaka'),
       thanksTo: t('Thanks to', 'Dzięki'),
       thanksFor: t('for awesome drawings', 'za świetne rysunki'),
-      secondsSuffix: t('sec.', 'sek.'),
     }))
   },
   beforeDestroy() {
@@ -224,32 +238,97 @@ export default Vue.extend({
   },
   methods: {
     setStore() {
-      const { every, short, long, sounds, lang } = this
       if (!this.changed) return
-
-      getUserSettingsStore().set({
-        breaks: {
-          every,
-          short,
-          long: {
-            every: this.longBreakEveryToClosest(long.every),
-            last: long.last,
-          },
-        },
-        sounds,
-        lang,
-      })
+      const { data, log } = this.fixSettings(this)
+      getUserSettingsStore().set(data)
+      this.$emit('fixing', log)
     },
-    longBreakEveryToClosest(everyInMinutes: number): number {
-      const every = this.every
-      const longBreakEvery = Math.round(everyInMinutes / every)
-      if (longBreakEvery !== everyInMinutes / every)
-        this.$emit('fixing', {
-          code: 'longEvery',
-          from: everyInMinutes,
-          to: longBreakEvery * every,
-        } as FixLog<number>)
-      return longBreakEvery > 0 ? longBreakEvery : 1
+    updateLongEvery() {
+      this.long.every = this.fixEvery(
+        new FixNumber(this.long.every),
+        this.every
+      ).value
+    },
+    fixEvery(fix: FixNumber, every: number): ReturnType<FixNumber['val']> {
+      return fix
+        .round()
+        .toClosest(every)
+        .min(every)
+        .max(120 * 60)
+        .val()
+    },
+    fixSettings({
+      every: originalEvery,
+      short: originalShort,
+      long: originalLong,
+      sounds,
+      lang,
+    }: Data): {
+      data: SettingsData
+      log: FixLog[]
+    } {
+      const fixer = new FixSettings(this.$tGlobal, this.$langLanguage)
+      const every = fixer.fix(
+        originalEvery,
+        (fix) =>
+          fix
+            .round()
+            .min(5 * 60)
+            .max(30 * 60)
+            .val(),
+        'shortEvery',
+        'short break every',
+        'czas między krótkimi przerwami'
+      )
+      const short = { last: 0 }
+      short.last = fixer.fix(
+        originalShort.last,
+        (fix) =>
+          fix
+            .round()
+            .min(5)
+            .max(60)
+            .val(),
+        'shortLast',
+        'short break length',
+        'długość krótkiej przerwy'
+      )
+      const long = { last: 0, every: 0 }
+
+      long.every = Math.round(
+        fixer.fix(
+          originalLong.every,
+          (fix) => this.fixEvery(fix, every),
+          'longEvery',
+          'long break every',
+          'czas między długimi przerwami'
+        ) / every
+      )
+      long.last = fixer.fix(
+        originalLong.last,
+        (fix) =>
+          fix
+            .round()
+            .min(60)
+            .max(60 * 60)
+            .val(),
+        'longLast',
+        'long break length',
+        'długość długiej przerwy'
+      )
+
+      return {
+        data: {
+          breaks: {
+            every,
+            short,
+            long,
+          },
+          sounds,
+          lang,
+        },
+        log: fixer.log,
+      }
     },
     setLang(to: boolean) {
       const lang: Languages = to ? 'en' : 'pl'

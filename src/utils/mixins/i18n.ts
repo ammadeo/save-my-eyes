@@ -33,15 +33,18 @@ export const Lang = Vue.extend({
     $t(id: string): string {
       const $lang = this.$lang
       if (id in $lang) return $lang[id][this.$langLanguage]
-
-      throw new Error('id: ' + id + ', has not been founded in $lang')
+      if (process.env.NODE_ENV === 'development')
+        throw new Error('id: ' + id + ', has not been founded in $lang')
+      return ''
     },
     $tGlobal(id: keyof I18nGlobal): string {
       const $langGlobal = this.$langGlobal
 
       if ((id as keyof I18nGlobal) in $langGlobal)
         return $langGlobal[id as keyof I18nGlobal][this.$langLanguage]
-      throw new Error('id: ' + id + ', has not been founded in $langGlobal')
+      if (process.env.NODE_ENV === 'development')
+        throw new Error('id: ' + id + ', has not been founded in $langGlobal')
+      return ''
     },
   },
 })

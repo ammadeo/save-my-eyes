@@ -16,12 +16,15 @@
         absolute
         class="bottom-0 right-0 z-40 slide-leave-bottom max-h-screen-16 lg:max-h-screen-24 xl:max-h-screen-32"
         @close="setShowSettings(false)"
+        @mouseenter.native="hovering = true"
+        @mouseleave.native="hovering = false"
       >
         <div v-if="hasFixLog">
-          <p class="text-secondary-100">
-            <span class="text-lg">Poprawiam ustawienia</span><br />{{
-              fixLogToText
-            }}
+          <p class="text-secondary-100 text-lg">
+            {{ $t('fixing') }}
+          </p>
+          <p v-for="log in fixLog" :key="log.code" class="text-secondary-100">
+            {{ log.message }}
           </p>
         </div>
 
@@ -39,22 +42,16 @@
 import ButtonIcon from './ButtonIcon.vue'
 import CardCloseable from './CardCloseable.vue'
 import ContentSettings from './ContentSettings.vue'
-import { FixLog } from '@/types/settings'
-
+import { FixLog, FixLogCode } from '@/utils/db'
 import Vue from 'vue'
 // import mixins from 'vue-typed-mixins'
 
 interface Data {
   showSettings: boolean
   changed: boolean
-  fixLog: FixLog
+  hovering: boolean
+  fixLog: FixLog[]
 }
-
-const getCleanFixLog = () => ({
-  code: '',
-  from: 0,
-  to: 0,
-})
 
 export default Vue.extend({
   components: {
@@ -66,29 +63,38 @@ export default Vue.extend({
     return {
       showSettings: false,
       changed: false,
-      fixLog: getCleanFixLog(),
+      fixLog: [],
+      hovering: false,
     }
   },
   beforeMount() {
     this.$useI18n((t) => ({
       open: t('Show settings', 'Ustawienia'),
       title: t('Settings', 'Ustawienia'),
+      fixing: t('Fixing settings', 'Poprawiam ustawienia'),
     }))
   },
   methods: {
     setShowSettings(to: boolean): void {
-      this.fixLog = getCleanFixLog()
+      this.fixLog = []
       this.$emit('changeAutoFinishLock', to)
       this.showSettings = to
       if (to === false) this.changed = false
+      this.hovering = false
     },
     setChanged(): void {
       this.changed = true
       this.$emit('changed')
     },
-    fixingSettingWarning(fixLog: FixLog): void {
+    fixingSettingWarning(fixLog: FixLog[]): void {
       this.fixLog = fixLog
-      setTimeout(() => (this.fixLog = getCleanFixLog()), 6000)
+      this.timeoutClearFixLog(2000 + fixLog.length * 4000)
+    },
+    timeoutClearFixLog(timeout: number) {
+      setTimeout(() => {
+        if (this.hovering) return this.timeoutClearFixLog(500)
+        this.fixLog = []
+      }, timeout)
     },
   },
   computed: {
@@ -96,13 +102,7 @@ export default Vue.extend({
       return this.changed ? this.$tGlobal('settingsSave') : ''
     },
     hasFixLog(): boolean {
-      return !!this.fixLog.code
-    },
-    fixLogToText(): string {
-      const { from, to } = this.fixLog
-      return `Poprawiłem ilość długich przerw, aby odbywały się co ${Number(
-        to
-      ) / 60} minut, a nie co ${Number(from) / 60}`
+      return this.fixLog.length > 0
     },
   },
 })

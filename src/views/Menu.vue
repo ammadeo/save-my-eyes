@@ -78,7 +78,7 @@ export default mixins(TransparentClickEngine).extend({
       setTimeout(() => {
         const window = remote.getCurrentWindow()
         window.close()
-      }, 350)
+      }, 1000)
     },
     open(key: Key) {
       this.openedKey = key
