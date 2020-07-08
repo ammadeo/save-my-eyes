@@ -73,12 +73,16 @@ export default mixins(TransparentClickEngine).extend({
     },
   },
   methods: {
-    closeWindow() {
+    async closeWindow() {
       this.openedKey = ''
+      if (this.settingsChanged) await this.resetNextBreak()
       setTimeout(() => {
         const window = remote.getCurrentWindow()
         window.close()
       }, 1000)
+    },
+    async resetNextBreak() {
+      await setNextBreak.ask({})
     },
     open(key: Key) {
       this.openedKey = key
