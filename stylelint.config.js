@@ -13,6 +13,7 @@ module.exports = {
           /return/,
           /function/,
           /debug/,
+          /variants/,
         ],
       },
     ],

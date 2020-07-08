@@ -1,42 +1,61 @@
 .after\:elevation {
   @apply relative;
   z-index: 1;
-  
-  &::after{
-    content: "";
+
+  &::after {
+    content: '';
     z-index: -1;
     @apply absolute w-full h-full rounded-inherit inset-0 transition-transform duration-100 transform translate-x-1 translate-y-1 shadow-inner;
   }
-  /* &:hover, &:focus {
-    &::after {
-      @apply translate-x-px translate-y-px
-    }
-  } */
-  &:active::after {
-    @apply translate-x-px translate-y-px
-  }
-  
-}
-.after\:elevation-primary {
-      &::after {
-        @apply bg-primary-600
-      }
-  
-      &:hover, &:focus {
-      &::after {
-        @apply bg-primary-700
-      }
-    } 
-    }
-  
-  .after\:elevation-secondary {
-      &::after {
-        @apply bg-secondary-800
-      }
-      &:hover, &:focus {
-      &::after {
-        @apply bg-secondary-900
-      }
-    } 
-    }
 
+  &:active::after {
+    @apply translate-x-px translate-y-px;
+  }
+}
+
+.after\:elevation-primary {
+  &::after {
+    @apply bg-primary-600;
+  }
+
+  &:hover,
+  &:focus {
+    &::after {
+      @apply bg-primary-700;
+    }
+  }
+}
+
+.after\:elevation-secondary {
+  &::after {
+    @apply bg-secondary-800;
+  }
+  &:hover,
+  &:focus {
+    &::after {
+      @apply bg-secondary-900;
+    }
+  }
+}
+
+.after\:link {
+  @apply relative;
+  &::after {
+    @apply absolute rounded-sm text-base bottom-full left-0 p-2
+       shadow tracking-wide bg-warn-400 text-black;
+  }
+}
+
+@variants hocus {
+  .after\:lang-en {
+    &::after {
+      content: 'Link will open in Your default browser. See it after this break';
+    }
+  }
+
+  .after\:lang-pl {
+    &::after {
+      content: 'Link otworzy się w przeglądarce. Sprawdź ją po przerwie';
+    }
+  }
+}

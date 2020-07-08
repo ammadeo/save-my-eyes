@@ -88,14 +88,7 @@
     </p>
     <p class=" mb-2 text-lg text-secondary-100">
       {{ $t('thanksTo') }}
-      <a
-        href="https://undraw.co/"
-        hreflang="en"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="underline font-semibold"
-        >Katerina Limpitsouni</a
-      >
+      <BaseLink href="https://undraw.co/">Katerina Limpitsouni</BaseLink>
       {{ $t('thanksFor') }}
     </p>
   </section>
@@ -104,8 +97,8 @@
 <script lang="ts">
 import BaseInputRange from './BaseInputRange.vue'
 import BaseIcon from './BaseIcon.vue'
+import BaseLink from './BaseLink.vue'
 import ButtonToggleLabeled from './ButtonToggleLabeled.vue'
-
 import { getUserSettingsStore } from '@/background/db'
 import {
   FixLogCode,
@@ -149,6 +142,7 @@ export default Vue.extend({
     BaseInputRange,
     ButtonToggleLabeled,
     BaseIcon,
+    BaseLink,
   },
   props: {
     forceLarge: {
