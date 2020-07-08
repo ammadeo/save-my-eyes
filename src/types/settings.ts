@@ -1,4 +1,4 @@
-import {TranslateResult} from '@/store/i18n'
+import { TranslateResult } from '@/store/i18n'
 
 export interface FixLog<
   T extends number | string = number | string,

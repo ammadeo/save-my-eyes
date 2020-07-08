@@ -170,5 +170,3 @@ export const createWindowTray = async () => {
     ...baseWindowSettings,
   })
 }
-
-

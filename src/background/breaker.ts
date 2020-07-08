@@ -78,7 +78,7 @@ export const setNewBreak = async (options: NewBreakOptions) => {
     'lastSchedulerJobLength.value',
     lastSchedulerJobLength.value
   )
-  const {forceSkipBeforeBreakView} = options
+  const { forceSkipBeforeBreakView } = options
   if (nextBreakIn > 0) {
     const nextBreak = calculateNextBreak(nextBreakIn)
 

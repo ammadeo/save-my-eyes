@@ -23,7 +23,10 @@ export interface OptionsSetBreak {
   forceNextBreakIn: number
 }
 
-class IpcChanel<RendererAskPayload extends {}, RendererAskAnswer extends {} | undefined> {
+class IpcChanel<
+  RendererAskPayload extends {},
+  RendererAskAnswer extends {} | undefined
+> {
   private readonly mainChanelId: string
   private readonly rendererChanelId: string
   constructor(baseChanelId: string, private readonly respondToAll: boolean) {
@@ -78,7 +81,7 @@ class IpcChanel<RendererAskPayload extends {}, RendererAskAnswer extends {} | un
             })
           } else {
             const answer = answerHandler(payload)
-            if(answer) event.reply(this.mainChanelId, answer)
+            if (answer) event.reply(this.mainChanelId, answer)
           }
         }
       )
@@ -92,9 +95,10 @@ class IpcChanelFactory {
     this.index++
     return `auto-generated-${this.index}`
   }
-  static create<RendererAskPayload extends {}, RendererAskAnswer extends {} | undefined>(
-    respondToAll = false
-  ) {
+  static create<
+    RendererAskPayload extends {},
+    RendererAskAnswer extends {} | undefined
+  >(respondToAll = false) {
     const id = this.generateId()
     return new IpcChanel<RendererAskPayload, RendererAskAnswer>(
       id,
