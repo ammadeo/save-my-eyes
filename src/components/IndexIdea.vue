@@ -91,7 +91,10 @@ export default Vue.extend({
                 src: workoutImg,
                 alt: t('Woman dancing'),
               },
-              content: t('', ''),
+              content: t(
+                'Few minutes of workout will help You relax from sitting position',
+                'Kilka minut ćwiczeń pomoże ci się zrelaksować'
+              ),
             },
             {
               title: t('Go outside', 'Wyjdź na świerze powietrze'),
@@ -99,7 +102,10 @@ export default Vue.extend({
                 src: outsideImg,
                 alt: t('Woman walk through a forest'),
               },
-              content: t('', ''),
+              content: t(
+                'Go out to a park or a forest. Being close to nature will help you relax',
+                'Pójdź na spacer do parku. Kontak z naturą pomoże ci się zrelaksować'
+              ),
             },
             {
               title: t('Realax a bit', 'Zrelaksuj się'),
@@ -107,7 +113,10 @@ export default Vue.extend({
                 src: mindfulnessImg,
                 alt: t('Woman meditating in front of ancient tample'),
               },
-              content: t('', ''),
+              content: t(
+                'Do what You do to relax. It could be drinking tea, meditating or wothever You like. But remember not to use Your phone or computer now',
+                'Zrób to co zwykle, gdy potrzebujesz się odprężyć. Przykładowo wypij herbatę, bądź pomedytuj. Pamiętaj, żeby nie używać do tego komputera, ani telefonu'
+              ),
             },
           ]
         : [
