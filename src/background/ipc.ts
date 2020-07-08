@@ -23,7 +23,7 @@ export interface OptionsSetBreak {
   forceNextBreakIn: number
 }
 
-class IpcChanel<RendererAskPayload extends {}, RendererAskAnswer extends {}> {
+class IpcChanel<RendererAskPayload extends {}, RendererAskAnswer extends {} | undefined> {
   private readonly mainChanelId: string
   private readonly rendererChanelId: string
   constructor(baseChanelId: string, private readonly respondToAll: boolean) {
@@ -77,7 +77,8 @@ class IpcChanel<RendererAskPayload extends {}, RendererAskAnswer extends {}> {
               }
             })
           } else {
-            event.reply(this.mainChanelId, answerHandler(payload))
+            const answer = answerHandler(payload)
+            if(answer) event.reply(this.mainChanelId, answer)
           }
         }
       )
@@ -91,7 +92,7 @@ class IpcChanelFactory {
     this.index++
     return `auto-generated-${this.index}`
   }
-  static create<RendererAskPayload extends {}, RendererAskAnswer extends {}>(
+  static create<RendererAskPayload extends {}, RendererAskAnswer extends {} | undefined>(
     respondToAll = false
   ) {
     const id = this.generateId()
@@ -121,7 +122,7 @@ export const {
 export const {
   main: mainCloseApp,
   renderer: rendererCloseApp,
-} = IpcChanelFactory.create<{}, {}>()
+} = IpcChanelFactory.create<{}, undefined>()
 
 export const {
   main: mainStartBreak,
@@ -153,7 +154,7 @@ export const useIpcMain = () => {
 
   mainCloseApp.listen(() => {
     app.quit()
-    return {}
+    return undefined
   })
 
   mainStartBreak.listen(async () => {
