@@ -49,13 +49,13 @@
 @variants hocus {
   .after\:lang-en {
     &::after {
-      content: 'Link will open in Your default browser. See it after this break';
+      content: 'The link will open in Your default browser';
     }
   }
 
   .after\:lang-pl {
     &::after {
-      content: 'Link otworzy się w przeglądarce. Sprawdź ją po przerwie';
+      content: 'Link otworzy się w przeglądarce';
     }
   }
 }
