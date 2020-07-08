@@ -94,6 +94,7 @@ export default mixins(TransparentClickEngine).extend({
           return setNextBreak.ask({
             forceNextBreakIn: 0,
             forceNextBreakType: 'long',
+            forceSkipBeforeBreakView: true,
           })
         case 'open-stop-protection':
           return this.open('stop-protection')

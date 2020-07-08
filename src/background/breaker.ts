@@ -27,6 +27,7 @@ const calculateNextBreak = (nextBreakIn: number) => {
 export interface NewBreakOptions {
   forceNextBreakIn?: number
   forceNextBreakType?: 'long' | 'short'
+  forceSkipBeforeBreakView?: true
 }
 
 const getNewBreakIndex = (
@@ -77,17 +78,18 @@ export const setNewBreak = async (options: NewBreakOptions) => {
     'lastSchedulerJobLength.value',
     lastSchedulerJobLength.value
   )
+  const {forceSkipBeforeBreakView} = options
   if (nextBreakIn > 0) {
     const nextBreak = calculateNextBreak(nextBreakIn)
 
     breakSchedule = scheduleJob(nextBreak, async () => {
       if (keyBreakId === breakId.value) {
         closeAllWindows()
-        await createWindowIndex()
+        await createWindowIndex({ forceSkipBeforeBreakView })
       }
     })
   } else {
     closeAllWindows()
-    await createWindowIndex()
+    await createWindowIndex({ forceSkipBeforeBreakView })
   }
 }

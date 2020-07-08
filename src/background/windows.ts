@@ -1,6 +1,7 @@
 import { screen, BrowserWindow } from 'electron'
 import { isProd, isProdBuild, isDevProdTest } from './env'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import { NewBreakOptions } from './breaker'
 export const backgroundDefault = '#121959'
 export const backgroundTransparent = '#00000000'
 export const rendererWindows: {
@@ -96,42 +97,8 @@ const createWindow = (
   }
 }
 
-export const createWindowIndex = async () => {
-  const url = '/#/BeforeBreak'
-  const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
-
-  return createWindow(
-    'windowIndex',
-    url,
-    {
-      width: screenWidth,
-      height: screenHeight,
-      y: 0,
-      x: 0,
-      backgroundColor: backgroundTransparent,
-      transparent: isProd,
-      ...baseWindowSettings,
-    },
-    undefined,
-    false
-  )
-}
-
-export const createWindowTray = async () => {
-  const url = '/#/menu'
-  const width = 500
-  const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
-  const x = screenWidth - width
-
-  return createWindow('windowTray', url, {
-    width,
-    height: screenHeight,
-    y: 0,
-    x,
-    backgroundColor: backgroundTransparent,
-    transparent: isProd,
-    ...baseWindowSettings,
-  })
+interface CreateWindowIndexOptions {
+  forceSkipBeforeBreakView?: NewBreakOptions['forceSkipBeforeBreakView']
 }
 
 const createWindowIndexChild = async (
@@ -162,3 +129,46 @@ export const createWindowIndexChildren = async () => {
     })
   )
 }
+
+export const createWindowIndex = async ({
+  forceSkipBeforeBreakView,
+}: CreateWindowIndexOptions) => {
+  const url = forceSkipBeforeBreakView ? '/#/' : '/#/BeforeBreak'
+  const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
+
+  createWindow(
+    'windowIndex',
+    url,
+    {
+      width: screenWidth,
+      height: screenHeight,
+      y: 0,
+      x: 0,
+      backgroundColor: backgroundTransparent,
+      transparent: isProd,
+      ...baseWindowSettings,
+    },
+    undefined,
+    false
+  )
+  if (forceSkipBeforeBreakView) await createWindowIndexChildren()
+}
+
+export const createWindowTray = async () => {
+  const url = '/#/menu'
+  const width = 500
+  const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
+  const x = screenWidth - width
+
+  return createWindow('windowTray', url, {
+    width,
+    height: screenHeight,
+    y: 0,
+    x,
+    backgroundColor: backgroundTransparent,
+    transparent: isProd,
+    ...baseWindowSettings,
+  })
+}
+
+
