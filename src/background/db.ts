@@ -1,6 +1,7 @@
 import Store from 'electron-store'
 import { Languages } from '@/store/i18n'
 import { isProdBuild } from './env'
+import { app } from 'electron'
 interface TypedStore {
   breaks: {
     every: number
@@ -89,7 +90,7 @@ const userSettingsDefaults = {
     ui: true,
     voice: true,
   },
-  lang: 'en' as Languages,
+  lang: (app.getLocale().toLowerCase().includes('pl') ? 'pl' : 'en') as Languages,
 }
 
 const userSettings = isProdBuild ? 'user-settings' : 'user-settings-dev'
