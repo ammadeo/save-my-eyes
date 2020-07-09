@@ -102,7 +102,10 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
   },
   beforeMount() {
     this.$useI18n((t) => ({
-      loading: t('loading...', 'wczytuję...'),
+      loading: t(
+        "We're loading a timer. You can start Your break now",
+        'Nakręcamy zegar. Możesz już zacząć przerwę'
+      ),
     }))
   },
   async mounted() {
