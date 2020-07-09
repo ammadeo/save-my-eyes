@@ -56,7 +56,8 @@ const createWindow = async (
   url: string,
   options: Electron.BrowserWindowConstructorOptions,
   extendWindow?: WindowFunction,
-  showFocused = true
+  showFocused = true,
+  waitForURLLoad = true
 ) => {
   // Create the browser window.
   if (!rendererWindows[windowKey]) {
@@ -77,7 +78,8 @@ const createWindow = async (
       // Load the url of the dev server if in development mode
       const path = (process.env.WEBPACK_DEV_SERVER_URL as string) + url
       try {
-        await newWindow.loadURL(path)
+        if (waitForURLLoad) await newWindow.loadURL(path)
+        else newWindow.loadURL(path)
       } catch (e) {
         console.error(e)
       }
@@ -86,7 +88,8 @@ const createWindow = async (
       createProtocol('app')
       // Load the index.html when not in development
       try {
-        await newWindow.loadURL(`app://./index.html/${url}`)
+        if (waitForURLLoad) await newWindow.loadURL(`app://./index.html/${url}`)
+        else newWindow.loadURL(`app://./index.html/${url}`)
       } catch (e) {
         console.error(e)
       }
@@ -138,7 +141,7 @@ export const createWindowIndexChildren = async () => {
       })
     )
   } catch (e) {
-      console.error(e)
+    console.error(e)
   }
 }
 
@@ -156,12 +159,15 @@ export const createWindowIndex = async ({
       height: screenHeight,
       y: 0,
       x: 0,
-      backgroundColor: forceSkipBeforeBreakView ? backgroundDefault : backgroundTransparent,
+      backgroundColor: forceSkipBeforeBreakView
+        ? backgroundDefault
+        : backgroundTransparent,
       transparent: forceSkipBeforeBreakView ? false : isProd,
       ...baseWindowSettings,
     },
     undefined,
-    false
+    forceSkipBeforeBreakView ?? false,
+    forceSkipBeforeBreakView ?? false
   )
   if (forceSkipBeforeBreakView) await createWindowIndexChildren()
 }
@@ -180,5 +186,5 @@ export const createWindowTray = async () => {
     backgroundColor: backgroundTransparent,
     transparent: isProd,
     ...baseWindowSettings,
-  })
+  }, undefined, undefined, false)
 }
