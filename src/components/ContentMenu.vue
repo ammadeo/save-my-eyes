@@ -1,8 +1,11 @@
 <template>
   <div class="flex-grow">
     <p class="mb-4 text-lg uppercase text-secondary-200">
-      {{ $t('breakNext') }} {{ nextBreakName }} {{ $t('breakIn') }}
-      <span class="text-secondary-100">{{ nextBreakTime }}</span>
+      {{ isBreakNow ? '' : $t('breakNext') }} {{ nextBreakName }}
+      {{ isBreakNow ? $t('breakIsNow') : $t('breakIn') }}
+      <span v-if="!isBreakNow" class="text-secondary-100">{{
+        nextBreakTime
+      }}</span>
     </p>
     <ButtonIcon
       primary
@@ -35,14 +38,24 @@ import { CheckIsLongBreak } from '@/utils/mixins/breaks'
 import { rendererGetBreakData } from '@/background/ipc'
 
 import mixins from 'vue-typed-mixins'
+
+interface Data {
+  nextBreakName: string
+  nextBreakTime: string
+  nextBreakDate?: Date
+  isBreakNow: boolean
+}
+
 export default mixins(CheckIsLongBreak).extend({
   components: {
     ButtonIcon,
   },
-  data() {
+  data(): Data {
     return {
       nextBreakName: '',
       nextBreakTime: '',
+      nextBreakDate: undefined,
+      isBreakNow: false,
     }
   },
   async mounted() {
@@ -54,6 +67,7 @@ export default mixins(CheckIsLongBreak).extend({
     this.$useI18n((t) => ({
       breakNext: t('Next', 'Następna'),
       breakIn: t('in', 'za'),
+      breakIsNow: t('is still going', 'trwa'),
       buttonStartLongBreak: t(
         'Start a long break now',
         'Zacznij długą przewę teraz'
@@ -77,7 +91,7 @@ export default mixins(CheckIsLongBreak).extend({
         setTimeout(this.runClock, 1000)
       }
     },
-    async nextBreakDate(): Promise<Date> {
+    async getNextBreakDate(): Promise<Date> {
       const {
         lastSchedulerJobDate,
         lastSchedulerJobLength,
@@ -86,11 +100,21 @@ export default mixins(CheckIsLongBreak).extend({
       return addSeconds(parseISO(lastSchedulerJobDate), lastSchedulerJobLength)
     },
     async nextBreakIn(): Promise<string> {
-      const nextBreakDate = await this.nextBreakDate()
-      console.log('new Date()', new Date(), 'nextBreakDate', nextBreakDate)
-      return formatDistanceStrict(new Date(), nextBreakDate, {
-        roundingMethod: 'floor',
-      })
+      let nextBreakDate = this.nextBreakDate
+      if (!this.nextBreakDate) {
+        nextBreakDate = await this.getNextBreakDate()
+        this.nextBreakDate = nextBreakDate
+      }
+      if (nextBreakDate) {
+        if (nextBreakDate.getTime() < new Date().getTime()) {
+          this.isBreakNow = true
+        }
+        console.log('new Date()', new Date(), 'nextBreakDate', nextBreakDate)
+        return formatDistanceStrict(new Date(), nextBreakDate, {
+          roundingMethod: 'floor',
+        })
+      }
+      return ''
     },
     breakName(isLong: boolean): string {
       return isLong ? this.$tGlobal('breakLong') : this.$tGlobal('breakShort')

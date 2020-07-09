@@ -11,6 +11,7 @@ const routes: Array<RouteConfig> = [
   {
     path: '/',
     name: 'Index',
+    alias: '/index',
     component: Index,
   },
   {

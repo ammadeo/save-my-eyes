@@ -51,7 +51,7 @@ const getExternalDisplays = (): Electron.Display[] => {
 
 type WindowFunction = (window: BrowserWindow) => void
 
-const createWindow = (
+const createWindow = async (
   windowKey: keyof typeof rendererWindows,
   url: string,
   options: Electron.BrowserWindowConstructorOptions,
@@ -76,12 +76,20 @@ const createWindow = (
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       // Load the url of the dev server if in development mode
       const path = (process.env.WEBPACK_DEV_SERVER_URL as string) + url
-      newWindow.loadURL(path)
+      try {
+        await newWindow.loadURL(path)
+      } catch (e) {
+        console.error(e)
+      }
       if (!isProd) newWindow.webContents.openDevTools()
     } else {
       createProtocol('app')
       // Load the index.html when not in development
-      newWindow.loadURL(`app://./index.html/${url}`)
+      try {
+        await newWindow.loadURL(`app://./index.html/${url}`)
+      } catch (e) {
+        console.error(e)
+      }
     }
 
     newWindow.on('closed', () => {
@@ -109,7 +117,7 @@ const createWindowIndexChild = async (
   const { height, width, x, y } = bounds
 
   if (rendererWindows.windowIndex) {
-    return createWindow(`windowChild-${index}`, url, {
+    return await createWindow(`windowChild-${index}`, url, {
       width,
       height,
       y,
@@ -123,20 +131,24 @@ const createWindowIndexChild = async (
 
 export const createWindowIndexChildren = async () => {
   const externalDisplays = getExternalDisplays()
-  return Promise.all(
-    externalDisplays.map((display, index) => {
-      return createWindowIndexChild(index, display.bounds)
-    })
-  )
+  try {
+    await Promise.all(
+      externalDisplays.map((display, index) => {
+        return createWindowIndexChild(index, display.bounds)
+      })
+    )
+  } catch (e) {
+      console.error(e)
+  }
 }
 
 export const createWindowIndex = async ({
   forceSkipBeforeBreakView,
 }: CreateWindowIndexOptions) => {
-  const url = forceSkipBeforeBreakView ? '/#/' : '/#/BeforeBreak'
+  const url = forceSkipBeforeBreakView ? '/#/index' : '/#/BeforeBreak'
   const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
 
-  createWindow(
+  await createWindow(
     'windowIndex',
     url,
     {
@@ -160,7 +172,7 @@ export const createWindowTray = async () => {
   const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
   const x = screenWidth - width
 
-  return createWindow('windowTray', url, {
+  return await createWindow('windowTray', url, {
     width,
     height: screenHeight,
     y: 0,

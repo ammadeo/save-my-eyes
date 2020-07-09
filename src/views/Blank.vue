@@ -25,10 +25,13 @@ export default Vue.extend({
         contentFinished: t('Break has ended', 'Przerwa zakończyła się'),
       }
     })
-    rendererEmitEndBreak.listen().then(() => {
-      console.log('ipc finished break')
-      this.finished = true
-    })
+    rendererEmitEndBreak
+      .listen()
+      .then(() => {
+        console.log('ipc finished break')
+        this.finished = true
+      })
+      .catch((e) => console.error(e))
   },
   data() {
     return {

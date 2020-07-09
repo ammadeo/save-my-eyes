@@ -22,11 +22,14 @@ export default Vue.extend({
   },
   methods: {
     listenToLang() {
-      rendererEmitLanguage.listen().then(({ lang }) => {
-        console.log('ipc changed lang')
-        this.$store.commit('i18n/setLang', lang)
-        this.listenToLang()
-      })
+      rendererEmitLanguage
+        .listen()
+        .then(({ lang }) => {
+          console.log('ipc changed lang')
+          this.$store.commit('i18n/setLang', lang)
+          this.listenToLang()
+        })
+        .catch((e) => console.error(e))
     },
   },
 })
