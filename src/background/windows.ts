@@ -36,7 +36,7 @@ const baseWindowSettings: Electron.BrowserWindowConstructorOptions = {
   fullscreenable: !isProd,
   resizable: !isProd,
   alwaysOnTop: isProd,
-  skipTaskbar: isProd,
+  skipTaskbar: isProdBuild,
   frame: !isProd,
   autoHideMenuBar: true,
 }
@@ -145,7 +145,7 @@ export const createWindowIndexChildren = async () => {
 export const createWindowIndex = async ({
   forceSkipBeforeBreakView,
 }: CreateWindowIndexOptions) => {
-  const url = forceSkipBeforeBreakView ? '/#/index' : '/#/BeforeBreak'
+  const url = forceSkipBeforeBreakView ? '/#/Index' : '/#/BeforeBreak'
   const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
 
   await createWindow(
@@ -156,8 +156,8 @@ export const createWindowIndex = async ({
       height: screenHeight,
       y: 0,
       x: 0,
-      backgroundColor: backgroundTransparent,
-      transparent: isProd,
+      backgroundColor: forceSkipBeforeBreakView ? backgroundDefault : backgroundTransparent,
+      transparent: forceSkipBeforeBreakView ? false : isProd,
       ...baseWindowSettings,
     },
     undefined,
