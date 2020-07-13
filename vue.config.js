@@ -1,14 +1,17 @@
+const LicenseWebpackPlugin = require('license-webpack-plugin')
+  .LicenseWebpackPlugin
+
 module.exports = {
-  pluginOptions: {
-    electronBuilder: {
-      builderOptions: {
-        win: {
-          icon: './public/icon.png',
-        },
-      },
-    },
+  configureWebpack: {
+    plugins: [
+      new LicenseWebpackPlugin({
+        preferredLicenseTypes: ['MIT'],
+        unacceptableLicenseTest: (licenseType) => licenseType === 'GPL'
+      }),
+    ],
   },
-  chainWebpack: (config) => {
+
+  chainWebpack: (config) =>
     config.module
       .rule('vue')
       .use('vue-svg-inline-loader')
@@ -16,5 +19,21 @@ module.exports = {
       .options({
         /* ... */
       })
+      .end(),
+
+  pluginOptions: {
+    electronBuilder: {
+      builderOptions: {
+        copyright: 'Copyright © 2020 ${author}',
+        win: {
+          icon: './public/icon.png',
+        },
+        nsis: {
+          deleteAppDataOnUninstall: true,
+          createDesktopShortcut: false,
+          createStartMenuShortcut: false,
+        },
+      },
+    },
   },
 }
