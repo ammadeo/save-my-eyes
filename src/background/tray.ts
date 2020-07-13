@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { Tray } from 'electron'
 import { isProdBuild } from './env'
 import { createWindowTray } from './windows'
@@ -6,9 +5,7 @@ import { getUserSettingsStore, TypedStore } from './db'
 import { formatDistanceStrict, addSeconds } from 'date-fns'
 import { pl, enGB } from 'date-fns/locale'
 import ElectronStore from 'electron-store'
-const iconPath = isProdBuild
-  ? join('resources', 'app.asar', 'icon.png')
-  : join('public', 'icon.png')
+import {appIcon} from './paths'
 
 const getNextBreakIn = (store: ElectronStore<TypedStore>) => {
   const every = store.get('breaks').every
@@ -26,7 +23,7 @@ const generateBallonContent = () => {
 }
 
 export const useTray = () => {
-  const tray = new Tray(iconPath)
+  const tray = new Tray(appIcon)
   tray.setToolTip(
     isProdBuild ? 'Save your eyes' : 'Save your eyes (Development)'
   )
@@ -34,7 +31,7 @@ export const useTray = () => {
   tray.on('right-click', createWindowTray)
   tray.on('balloon-click', createWindowTray)
   tray.displayBalloon({
-    icon: iconPath,
+    icon: appIcon,
     title: 'Save My Eyes',
     content: generateBallonContent(),
   })

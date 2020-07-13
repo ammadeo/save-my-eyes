@@ -1,7 +1,9 @@
 import { screen, BrowserWindow } from 'electron'
 import { isProd, isProdBuild, isDevProdTest } from './env'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import { NewBreakOptions } from './breaker'
+import { NewBreakOptions, setNewBreak } from './breaker'
+import { appIcon } from './paths'
+
 export const backgroundDefault = '#121959'
 export const backgroundTransparent = '#00000000'
 export const rendererWindows: {
@@ -39,6 +41,7 @@ const baseWindowSettings: Electron.BrowserWindowConstructorOptions = {
   skipTaskbar: isProdBuild,
   frame: !isProd,
   autoHideMenuBar: true,
+  icon: appIcon,
 }
 
 const getPrimaryDisplay = () => screen.getPrimaryDisplay().workAreaSize
@@ -97,6 +100,10 @@ const createWindow = async (
 
     newWindow.on('closed', () => {
       rendererWindows[windowKey] = undefined
+      if (windowKey === 'windowIndex') {
+        // console.warn('warn', 'handling force close of index window, without prior new break set')
+        setNewBreak({})
+      }
     })
 
     if (extendWindow) extendWindow(newWindow)
@@ -178,13 +185,20 @@ export const createWindowTray = async () => {
   const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
   const x = screenWidth - width
 
-  return await createWindow('windowTray', url, {
-    width,
-    height: screenHeight,
-    y: 0,
-    x,
-    backgroundColor: backgroundTransparent,
-    transparent: isProd,
-    ...baseWindowSettings,
-  }, undefined, undefined, false)
+  return await createWindow(
+    'windowTray',
+    url,
+    {
+      width,
+      height: screenHeight,
+      y: 0,
+      x,
+      backgroundColor: backgroundTransparent,
+      transparent: isProd,
+      ...baseWindowSettings,
+    },
+    undefined,
+    undefined,
+    false
+  )
 }

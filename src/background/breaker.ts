@@ -1,5 +1,5 @@
-import { scheduleJob, Job } from 'node-schedule'
-import { addSeconds } from 'date-fns'
+import { scheduleJob, Job  } from 'node-schedule'
+import { addSeconds, parseISO } from 'date-fns'
 import { isProd, isProdBuild, isDevProdTest } from './env'
 import { createWindowIndex, closeAllWindows } from './windows'
 import {
@@ -93,3 +93,13 @@ export const setNewBreak = async (options: NewBreakOptions) => {
     await createWindowIndex({ forceSkipBeforeBreakView })
   }
 }
+
+//? no need for this check for now
+// export const isBreakSet = () => {
+//   const now = new Date()
+//   const breakStart = addSeconds(
+//     parseISO(lastSchedulerJobDate.value),
+//     lastSchedulerJobLength.value
+//   )
+//   return now.getTime() <= breakStart.getTime()
+// }
