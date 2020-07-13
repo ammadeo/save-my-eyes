@@ -5,11 +5,11 @@ import { getUserSettingsStore, TypedStore } from './db'
 import { formatDistanceStrict, addSeconds } from 'date-fns'
 import { pl, enGB } from 'date-fns/locale'
 import ElectronStore from 'electron-store'
-import {appIcon} from './paths'
+import { appIcon } from './paths'
 
 const getNextBreakIn = (store: ElectronStore<TypedStore>) => {
   const every = store.get('breaks').every
-  const now = new Date();
+  const now = new Date()
   return formatDistanceStrict(now, addSeconds(now, every), {
     roundingMethod: 'floor',
     locale: store.get('lang') === 'en' ? enGB : pl,
@@ -19,7 +19,9 @@ const getNextBreakIn = (store: ElectronStore<TypedStore>) => {
 const generateBallonContent = () => {
   const store = getUserSettingsStore()
   const nextBreakIn = getNextBreakIn(store)
-  return store.get('lang') === 'en' ? `Your eyes are protected. Next break will start in ${nextBreakIn}. Click to find out more` : `Dbamy o Twoje oczy. Następna przerwa rozpocznie się za ${nextBreakIn}. Kliknij, aby dowiedzieć się więcej`
+  return store.get('lang') === 'en'
+    ? `Your eyes are protected. Next break will start in ${nextBreakIn}. Click to find out more`
+    : `Dbamy o Twoje oczy. Następna przerwa rozpocznie się za ${nextBreakIn}. Kliknij, aby dowiedzieć się więcej`
 }
 
 export const useTray = () => {

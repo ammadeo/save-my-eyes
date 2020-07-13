@@ -13,7 +13,7 @@ protocol.registerSchemesAsPrivileged([
 
 app.on('window-all-closed', (e: Event) => e.preventDefault())
 app.setLoginItemSettings({
-  openAtLogin: true
+  openAtLogin: true,
 })
 
 app.on('ready', async () => {

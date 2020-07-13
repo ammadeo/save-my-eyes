@@ -1,4 +1,4 @@
-import { scheduleJob, Job  } from 'node-schedule'
+import { scheduleJob, Job } from 'node-schedule'
 import { addSeconds, parseISO } from 'date-fns'
 import { isProd, isProdBuild, isDevProdTest } from './env'
 import { createWindowIndex, closeAllWindows } from './windows'
