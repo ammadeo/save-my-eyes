@@ -4,7 +4,7 @@
   "description": "App that helps you protect your eyes while working long on a computer",
   "author": "Amadeusz Chomiak",
   "private": true,
-  "repository": "https://github.com/amadeusz-chomiak/save-my-eyes-vue.git",
+  "repository": "https://github.com/amadeusz-chomiak/save-my-eyes.git",
   "license": "GPLv3",
   "scripts": {
     "electron:serve": "vue-cli-service electron:serve",
