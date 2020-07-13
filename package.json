@@ -5,7 +5,7 @@
   "author": "Amadeusz Chomiak",
   "private": true,
   "repository": "https://github.com/amadeusz-chomiak/save-my-eyes-vue.git",
-  "license": "MIT",
+  "license": "GPLv3",
   "scripts": {
     "electron:serve": "vue-cli-service electron:serve",
     "electron:build": "vue-cli-service electron:build",
