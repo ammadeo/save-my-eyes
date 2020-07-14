@@ -10,6 +10,7 @@ import Vue from 'vue'
 import { Generate } from '@/utils/tests/dataGenerator'
 import { VNode } from 'vue/types/umd'
 import { RecordPropsDefinition } from 'vue/types/options'
+import store from '@/store'
 
 const testText = Generate.string()
 const testTag = `<p>${testText}</p>`
@@ -37,6 +38,7 @@ export class Base<V extends Vue> {
   ) {}
   render(additionalOptions?: RenderOptions<V>) {
     const renderer = render(this.Component, {
+      store,
       ...this.options,
       ...this.temp.options,
       ...additionalOptions,
