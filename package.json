@@ -1,7 +1,7 @@
 {
   "name": "save-my-eyes",
   "version": "0.1.1",
-  "description": "App that helps you protect your eyes while working long on a computer",
+  "description": "App that helps you protect your eyes while working long hours on a computer",
   "author": "Amadeusz Chomiak",
   "private": true,
   "repository": "https://github.com/amadeusz-chomiak/save-my-eyes.git",
