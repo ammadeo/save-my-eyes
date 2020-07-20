@@ -9,7 +9,7 @@ import path from 'path'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 const appFolder = path.dirname(process.execPath)
 const appPath = path.resolve(appFolder, 'save-my-eyes.exe')
-let tray: Electron.Tray
+let tray: Electron.Tray | undefined
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } },
@@ -18,7 +18,7 @@ protocol.registerSchemesAsPrivileged([
 app.on('window-all-closed', (e: Event) => e.preventDefault())
 
 app.on('ready', async () => {
-  verbose('app ready event fired')
+  info('app ready event fired')
   if (isDevelopment) {
     try {
       await installVueDevtools()

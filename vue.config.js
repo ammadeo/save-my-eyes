@@ -6,7 +6,7 @@ module.exports = {
     plugins: [
       new LicenseWebpackPlugin({
         preferredLicenseTypes: ['MIT'],
-        unacceptableLicenseTest: (licenseType) => licenseType === 'GPL'
+        unacceptableLicenseTest: (licenseType) => licenseType === 'GPL',
       }),
     ],
   },
@@ -27,6 +27,7 @@ module.exports = {
         copyright: 'Copyright © 2020 ${author}',
         win: {
           icon: './public/icon.png',
+          target: 'nsis',
         },
         nsis: {
           deleteAppDataOnUninstall: true,

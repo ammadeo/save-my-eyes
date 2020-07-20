@@ -1,5 +1,7 @@
 import { testProd } from './env.changeable'
 
+//? for testing real production build in debug mode
+export { debugProd } from './env.changeable'
 //? for easier testing production long task
 export const isDevProdTest = process.env.NODE_ENV === 'development' && testProd
 //? for testing real prod in dev environment

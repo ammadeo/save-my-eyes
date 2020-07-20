@@ -1,6 +1,9 @@
 import { isProdBuild } from './env'
 import { join } from 'path'
-
-export const appIcon = isProdBuild
-  ? join('resources', 'app.asar', 'icon.png')
-  : join('public', 'icon.png')
+import { app } from 'electron'
+const appPath = () => {
+  if (app) return app.getAppPath()
+  throw new Error('path icon: no app instance')
+}
+export const appIcon = () =>
+  isProdBuild ? join(appPath(), 'icon.png') : join('public', 'icon.png')

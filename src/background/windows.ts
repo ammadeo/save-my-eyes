@@ -1,8 +1,9 @@
 import { screen, BrowserWindow } from 'electron'
-import { isProd, isProdBuild, isDevProdTest } from './env'
+import { isProd, isProdBuild, isDevProdTest, debugProd } from './env'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { NewBreakOptions, setNewBreak } from './breaker'
 import { appIcon } from './paths'
+import { error } from 'electron-log'
 
 export const backgroundDefault = '#121959'
 export const backgroundTransparent = '#00000000'
@@ -31,18 +32,18 @@ export const setBackgroundOf = (
   rendererWindows[windowKey]?.setBackgroundColor(to)
 }
 
-const baseWindowSettings: Electron.BrowserWindowConstructorOptions = {
+const baseWindowSettings: () => Electron.BrowserWindowConstructorOptions = () => ({
   show: false,
   minimizable: !isProd,
   movable: !isProd,
   fullscreenable: !isProd,
   resizable: !isProd,
   alwaysOnTop: isProd,
-  skipTaskbar: isProdBuild,
-  frame: !isProd,
+  skipTaskbar: !debugProd && isProdBuild,
+  frame: !isProd || debugProd,
   autoHideMenuBar: true,
-  icon: appIcon,
-}
+  icon: appIcon(),
+})
 
 const getPrimaryDisplay = () => screen.getPrimaryDisplay().workAreaSize
 const getExternalDisplays = (): Electron.Display[] => {
@@ -69,7 +70,7 @@ const createWindow = async (
       height: 600,
       webPreferences: {
         nodeIntegration: true,
-        devTools: true || !isProdBuild,
+        devTools: debugProd || !isProdBuild,
       },
       ...options,
     })
@@ -84,7 +85,7 @@ const createWindow = async (
         if (waitForURLLoad) await newWindow.loadURL(path)
         else newWindow.loadURL(path)
       } catch (e) {
-        console.error(e)
+        error(e)
       }
       if (!isProd) newWindow.webContents.openDevTools()
     } else {
@@ -94,7 +95,7 @@ const createWindow = async (
         if (waitForURLLoad) await newWindow.loadURL(`app://./index.html/${url}`)
         else newWindow.loadURL(`app://./index.html/${url}`)
       } catch (e) {
-        console.error(e)
+        error(e)
       }
     }
 
@@ -123,7 +124,7 @@ const createWindowIndexChild = async (
   index: number,
   bounds: Electron.Rectangle
 ) => {
-  const url = '/#/blank'
+  const url = '/#/Blank'
   const { height, width, x, y } = bounds
 
   if (rendererWindows.windowIndex) {
@@ -134,7 +135,7 @@ const createWindowIndexChild = async (
       x,
       backgroundColor: backgroundDefault,
       parent: rendererWindows.windowIndex,
-      ...baseWindowSettings,
+      ...baseWindowSettings(),
     })
   }
 }
@@ -170,7 +171,7 @@ export const createWindowIndex = async ({
         ? backgroundDefault
         : backgroundTransparent,
       transparent: forceSkipBeforeBreakView ? false : isProd,
-      ...baseWindowSettings,
+      ...baseWindowSettings(),
     },
     undefined,
     forceSkipBeforeBreakView ?? false,
@@ -180,7 +181,7 @@ export const createWindowIndex = async ({
 }
 
 export const createWindowTray = async () => {
-  const url = '/#/menu'
+  const url = '/#/Menu'
   const width = 500
   const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
   const x = screenWidth - width
@@ -194,8 +195,8 @@ export const createWindowTray = async () => {
       y: 0,
       x,
       backgroundColor: backgroundTransparent,
-      transparent: isProd,
-      ...baseWindowSettings,
+      transparent: isProd && !debugProd,
+      ...baseWindowSettings(),
     },
     undefined,
     undefined,

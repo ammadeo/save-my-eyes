@@ -6,9 +6,10 @@
 import { getUserSettingsStore } from '@/background/db'
 import Vue from 'vue'
 import { rendererEmitLanguage } from '@/background/ipc'
-
+import { verbose } from 'electron-log'
 export default Vue.extend({
   beforeMount() {
+    verbose('render app: before mount init')
     let code = navigator.language
     console.log('lang code', code)
     const store = getUserSettingsStore()
@@ -19,6 +20,7 @@ export default Vue.extend({
 
     const sounds = store.get('sounds')
     this.$store.commit('setSounds', sounds)
+    verbose('render app: before mount finished')
   },
   methods: {
     listenToLang() {
