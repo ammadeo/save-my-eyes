@@ -19,12 +19,19 @@
             class="mr-4 h-32 md:h-40 lg:h-48"
             :src="card.img.src"
             :alt="card.img.alt[$langLanguage]"
+            data-testid="idea-img"
           />
           <div class="flex flex-col">
-            <h3 class="font-preset-card-title mb-2 text-secondary-50">
+            <h3
+              class="font-preset-card-title mb-2 text-secondary-50"
+              data-testid="idea-title"
+            >
               {{ card.title[$langLanguage] }}
             </h3>
-            <p class="mb-4 text-lg text-secondary-100">
+            <p
+              class="mb-4 text-lg text-secondary-100"
+              data-testid="idea-content"
+            >
               {{ card.content[$langLanguage] }}
             </p>
           </div>

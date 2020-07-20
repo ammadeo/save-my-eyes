@@ -2,7 +2,9 @@ import { render, fireEvent, waitFor } from '@testing-library/vue'
 import Component from '@/components/ContentMenu.vue'
 import { Generate } from '@/utils/tests/dataGenerator'
 import { formatISO, addMinutes } from 'date-fns'
+import { Base } from '@/utils/tests/core'
 const mockDateIso = formatISO(addMinutes(new Date(), 15))
+const base = new Base(Component)
 
 jest.mock('vue-cli-plugin-electron-builder/lib', () => ({
   createProtocol: () => {},
@@ -35,7 +37,7 @@ jest.mock('@/background/db', () => ({
 
 describe('components/ContentMenu.vue', () => {
   test('has next break time info', async () => {
-    const { getByText } = render(Component)
+    const { getByText } = base.render()
     await waitFor(() => {
       const ContentBox = getByText('next short break in')
       expect(ContentBox).toBeVisible()
@@ -45,7 +47,7 @@ describe('components/ContentMenu.vue', () => {
   })
 
   test('has start a long break now button', async () => {
-    const { getByText, emitted } = render(Component)
+    const { getByText, emitted } = base.render()
 
     const Button = getByText('start a long break now', { exact: false })
     expect(Button).toBeVisible()
@@ -54,7 +56,7 @@ describe('components/ContentMenu.vue', () => {
   })
 
   test('has stop protection button', async () => {
-    const { getByText, emitted } = render(Component)
+    const { getByText, emitted } = base.render()
 
     const Button = getByText('stop protection', { exact: false })
     expect(Button).toBeVisible()
@@ -63,7 +65,7 @@ describe('components/ContentMenu.vue', () => {
   })
 
   test('has settings button', async () => {
-    const { getByText, emitted } = render(Component)
+    const { getByText, emitted } = base.render()
 
     const Button = getByText('settings', { exact: false })
     expect(Button).toBeVisible()

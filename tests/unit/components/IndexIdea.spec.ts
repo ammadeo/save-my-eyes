@@ -1,27 +1,27 @@
-import { render, fireEvent } from '@testing-library/vue'
+import { render, fireEvent, getNodeText } from '@testing-library/vue'
 import Component from '@/components/IndexIdea.vue'
-import store from '@/store'
+import { Base } from '@/utils/tests/core'
+const base = new Base(Component, {
+  methods: {
+    random() {
+      return 0
+    },
+  },
+})
 
 describe('components/IndexIdea.vue', () => {
   test('render 1 card with title, content and image', () => {
-    const { getByText, getByAltText } = render(Component, {
-      store,
-      methods: {
-        random() {
-          return 0
-        },
-      },
-    })
-    // @ts-ignore
-    const IdeaTitle = getByText(store.state.i18n.ideas.cards[0].title['en'])
+    const { getByTestId } = base.render()
+    const IdeaTitle = getByTestId('idea-title')
     expect(IdeaTitle).toBeVisible()
+    expect(getNodeText(IdeaTitle).length).toBeGreaterThan(10)
 
-    // @ts-ignore
-    const IdeaContent = getByText(store.state.i18n.ideas.cards[0].content['en'])
+    const IdeaContent = getByTestId('idea-content')
     expect(IdeaContent).toBeVisible()
+    expect(getNodeText(IdeaContent).length).toBeGreaterThan(10)
 
-    // @ts-ignore
-    const IdeaImg = getByAltText(store.state.i18n.ideas.cards[0].img.alt['en'])
+    const IdeaImg = getByTestId('idea-img')
     expect(IdeaImg).toBeVisible()
+    expect(IdeaImg.getAttribute('alt')?.length).toBeGreaterThan(5)
   })
 })

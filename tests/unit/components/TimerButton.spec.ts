@@ -1,6 +1,7 @@
 import { render, fireEvent } from '@testing-library/vue'
 import Component from '@/components/IndexTimerButton.vue'
-
+import { Base } from '@/utils/tests/core'
+const base = new Base(Component)
 const contentOptions = {
   long: {
     default: 'Skip long break',
@@ -16,7 +17,7 @@ jest.useFakeTimers()
 
 describe('components/IndexTimerButton.vue', () => {
   test('on click emit click', async () => {
-    const { getByText, emitted } = render(Component)
+    const { getByText, emitted } = base.render()
     const button = getByText(contentOptions.short.default)
     await fireEvent.click(button)
     jest.runAllTimers()
@@ -24,7 +25,7 @@ describe('components/IndexTimerButton.vue', () => {
   })
 
   test('change content based on props', async () => {
-    const { getByText, updateProps } = render(Component)
+    const { getByText, updateProps } = base.render()
     //? default
     expect(getByText(contentOptions.short.default)).toBeVisible()
     //? short finished
