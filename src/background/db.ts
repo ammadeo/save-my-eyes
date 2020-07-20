@@ -75,7 +75,7 @@ const userSettingsSchema: UserSettingsSchema = {
   },
 }
 
-const userSettingsDefaults = {
+const userSettingsDefaults = () => ({
   breaks: {
     every: 15 * 60,
     short: {
@@ -90,14 +90,21 @@ const userSettingsDefaults = {
     ui: true,
     voice: true,
   },
-  lang: 'en' as Languages,
-}
+  lang: (app
+    ? app
+        .getLocale()
+        .toLowerCase()
+        .includes('pl')
+      ? 'pl'
+      : 'en'
+    : 'en') as Languages,
+})
 
 const userSettings = isProdBuild ? 'user-settings' : 'user-settings-dev'
 
 export const getUserSettingsStore = () =>
   new Store<TypedStore>({
     schema: userSettingsSchema,
-    defaults: userSettingsDefaults,
+    defaults: userSettingsDefaults(),
     name: userSettings,
   })
