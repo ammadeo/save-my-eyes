@@ -2,6 +2,7 @@
   <BaseButton
     :primary="primary"
     :center="round"
+    :disabled="disabled"
     class="flex-0 align-baseline"
     :class="[...(round ? ['w-8', 'h-8'] : ['min-h-8'])]"
     @click="$emit('click')"
@@ -34,6 +35,10 @@ export default Vue.extend({
     primary: {
       type: Boolean,
       default: false,
+    },
+    disabled: {
+      default: false,
+      type: Boolean,
     },
   },
   computed: {

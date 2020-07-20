@@ -2,18 +2,24 @@
   <div class="relative w-full">
     <div class="flex justify-end items-center">
       <p
-        class="font-display selection-darker text-sm tracking-wide mr-2 uppercase text-secondary-400"
+        class="font-display selection-darker text-sm tracking-wide mr-2 uppercase "
+        :class="
+          disabled
+            ? ['cursor-not-allowed', 'text-secondary-500']
+            : ['text-secondary-400']
+        "
       >
         {{ $t('title') }}
       </p>
       <ButtonRoundable
         icon="pause"
+        :disabled="disabled"
         @click="setShowStopProtection(true)"
       ></ButtonRoundable>
     </div>
     <transition name="slide">
       <CardCloseable
-        v-show="showStopProtection"
+        v-show="showStopProtection && !disabled"
         absolute
         :title="$t('title')"
         class="right-0 top-0 z-30 max-h-screen-16 slide-enter-right lg:max-h-screen-24 xl:max-h-screen-32"
@@ -38,6 +44,12 @@ export default Vue.extend({
     ButtonRoundable,
     CardCloseable,
     ContentStopProtection,
+  },
+  props: {
+    disabled: {
+      default: false,
+      type: Boolean,
+    },
   },
   data() {
     return {

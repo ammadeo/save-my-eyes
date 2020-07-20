@@ -7,7 +7,8 @@
     <HeaderTitle class="col-start-1 col-end-3 row-start-1" />
     <IndexStopProtection
       class="col-start-3 row-start-1"
-      @changeAutoFinishLock="setLocks($event, true)"
+      :disabled="forceCloseLock"
+      @changeAutoFinishLock="setLocks($event)"
       @close="closeWindow()"
     />
     <p v-if="!ready" class="font-preset-info mb-8">
