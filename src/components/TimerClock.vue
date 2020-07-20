@@ -56,7 +56,10 @@ export default mixins(CreateTimer).extend({
     },
     timeLeftInfo(): string {
       const timeLeft = this.timeLeft
-      const helperDate = addMilliseconds(new Date(0), timeLeft)
+      const helperDate = addMilliseconds(
+        new Date(0),
+        timeLeft > 0 ? timeLeft + 1000 : 0
+      )
       return format(helperDate, 'mm : ss')
     },
     timePercentage(): number {
