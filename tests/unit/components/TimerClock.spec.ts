@@ -53,10 +53,10 @@ describe('components/TimerClock.vue', () => {
     )
   })
 
-  test('set progress bar label to 20 minutes at start', async () => {
+  test('set progress bar label for 20 minutes at start to 20 : 01', async () => {
     const { getByText } = base.render()
 
-    const component = getByText('20 : 00')
+    const component = getByText('20 : 01')
 
     expect(component).toBeVisible()
   })

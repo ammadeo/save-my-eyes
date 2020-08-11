@@ -69,10 +69,14 @@ describe('components/ContentBeforeBreak.vue', () => {
 
   test('has working status text', async () => {
     const { getByText } = base.render()
-    expect(getByText('Short break will start in 5 seconds')).toBeVisible()
+    expect(
+      getByText('Short break will start in 5 seconds', { exact: false })
+    ).toBeVisible()
 
     await toWaitState(getByText)
-    expect(getByText('Short break will start when you ready')).toBeVisible()
+    expect(
+      getByText('Short break will start when you ready', { exact: false })
+    ).toBeVisible()
   })
 
   test('has working wait and proceed button', async () => {
