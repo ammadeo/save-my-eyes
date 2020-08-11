@@ -1,8 +1,12 @@
 <template>
   <div class="flex-grow">
     <p class="mb-4 text-lg uppercase text-secondary-200">
-      {{ isBreakNow ? '' : $t('breakNext') }} {{ nextBreakName }}
-      {{ isBreakNow ? $t('breakIsNow') : $t('breakIn') }}
+      {{
+        (isBreakNow ? '' : $t('breakNext') + ' ') +
+          nextBreakName +
+          ' ' +
+          (isBreakNow ? $t('breakIsNow') : $t('breakIn'))
+      }}
       <span v-if="!isBreakNow" class="text-secondary-100">{{
         nextBreakTime
       }}</span>
