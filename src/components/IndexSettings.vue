@@ -42,7 +42,7 @@
 import ButtonIcon from './ButtonIcon.vue'
 import CardCloseable from './CardCloseable.vue'
 import ContentSettings from './ContentSettings.vue'
-import { FixLog, FixLogCode } from '@/utils/db'
+import { FixLogSettings } from '@/utils/db'
 import Vue from 'vue'
 // import mixins from 'vue-typed-mixins'
 
@@ -50,7 +50,7 @@ interface Data {
   showSettings: boolean
   changed: boolean
   hovering: boolean
-  fixLog: FixLog[]
+  fixLog: FixLogSettings[]
 }
 
 export default Vue.extend({
@@ -86,7 +86,7 @@ export default Vue.extend({
       this.changed = true
       this.$emit('changed')
     },
-    fixingSettingWarning(fixLog: FixLog[]): void {
+    fixingSettingWarning(fixLog: FixLogSettings[]): void {
       this.fixLog = fixLog
       this.timeoutClearFixLog(2000 + fixLog.length * 4000)
     },
