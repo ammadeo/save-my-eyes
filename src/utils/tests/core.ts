@@ -64,6 +64,9 @@ export class Base<V extends Vue> {
   }
 
   // ? tests
+  /**
+   * Test if slot exists and is visible
+   */
   testHasSlot(slotName = 'default') {
     const { getByText } = this.render({
       slots: {
@@ -75,7 +78,10 @@ export class Base<V extends Vue> {
     expect(Slot).toBeVisible()
     this.clear()
   }
-
+  /**
+   * Test if firing event on component chosen by your query
+   * will end up with event emitted to parent component
+   */
   async testEmitter(
     select: select = this.selectRoot,
     eventName: keyof VueFireObject = 'click',
@@ -88,7 +94,9 @@ export class Base<V extends Vue> {
     expect(renderer.emitted()[emitName]).toBeTruthy()
     this.clear()
   }
-
+  /**
+   * Test if your query return visible element, let You easily override props
+   */
   testPropInline(select: select, propsOverload?: object) {
     const renderer = propsOverload
       ? this.render({ props: propsOverload })
@@ -97,13 +105,17 @@ export class Base<V extends Vue> {
     expect(PropTarget).toBeVisible()
     this.clear()
   }
-
+  /**
+   * Test if your query return visible element
+   */
   testHtmlVisibility(select: select, optionsOverload: RenderOptions<V> = {}) {
     const renderer = this.render(optionsOverload)
     expect(select(renderer)).toBeVisible()
     this.clear()
   }
-
+  /**
+   * Test if your query return element with correct name tag
+   */
   testHtmlTag(
     select: select,
     tag: LiteralUnion<'button' | 'p' | 'span' | 'div'>,
