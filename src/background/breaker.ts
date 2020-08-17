@@ -28,6 +28,7 @@ export interface NewBreakOptions {
   forceNextBreakIn?: number
   forceNextBreakType?: 'long' | 'short'
   forceSkipBeforeBreakView?: true
+  forcePreventImmediateWindowClosing?: true
 }
 
 const getNewBreakIndex = (
@@ -57,7 +58,7 @@ const getNewBreakIndex = (
   return oldIndex
 }
 export const setNewBreak = async (options: NewBreakOptions) => {
-  closeAllWindows()
+  if (!options.forcePreventImmediateWindowClosing) closeAllWindows()
 
   const nextBreakIn = options?.forceNextBreakIn ?? getEveryFromDB()
 
@@ -89,7 +90,7 @@ export const setNewBreak = async (options: NewBreakOptions) => {
       }
     })
   } else {
-    closeAllWindows()
+    if (!options.forcePreventImmediateWindowClosing) closeAllWindows()
     await createWindowIndex({ forceSkipBeforeBreakView })
   }
 }

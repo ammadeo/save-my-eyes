@@ -82,7 +82,7 @@ export default mixins(TransparentClickEngine).extend({
       }, 1000)
     },
     async resetNextBreak() {
-      await setNextBreak.ask({})
+      await setNextBreak.ask({ forcePreventImmediateWindowClosing: true })
     },
     open(key: Key) {
       this.openedKey = key
