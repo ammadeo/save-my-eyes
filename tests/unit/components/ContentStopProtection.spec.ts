@@ -40,6 +40,7 @@ describe('components/ContentStopProtection.vue', () => {
     await fireEvent.click(Button)
     expect(askToBreak).toHaveBeenCalledWith({
       forceNextBreakIn: 60 * 60,
+      forceNextBreakType: 'long',
     })
     await waitFor(() => {
       expect(emitted().close).toBeTruthy()

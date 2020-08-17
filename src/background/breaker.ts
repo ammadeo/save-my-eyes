@@ -28,41 +28,47 @@ export interface NewBreakOptions {
   forceNextBreakIn?: number
   forceNextBreakType?: 'long' | 'short'
   forceSkipBeforeBreakView?: true
-  forcePreventImmediateWindowClosing?: true
+  preventImmediateWindowClosing?: true
+  preventChangingIndex?: true
 }
 
-const getNewBreakIndex = (
-  oldIndex: number,
-  options: NewBreakOptions
-): number => {
-  const forced =
-    typeof options?.forceNextBreakIn === 'number' ||
-    !!options?.forceNextBreakType
-  console.log('getNewBreakIndex', 'oldIndex', oldIndex, 'options', options)
-  if (!forced) return ++oldIndex
-  else {
-    const forceNextBreakType = options?.forceNextBreakType
+class NewBreakIndex {
+  constructor(
+    private readonly oldIndex: number,
+    private readonly options: NewBreakOptions
+  ) {}
+  public get = () => {
+    return this.getForcedType() ?? this.getPreserve() ?? this.getDefault()
+  }
+
+  private getForcedType = () => {
+    const forceNextBreakType = this.options?.forceNextBreakType
     if (forceNextBreakType) {
       const forceLongBreak = forceNextBreakType === 'long'
       if (forceLongBreak) {
-        // console.log(
-        //   'long every',
-        //   getUserSettingsStore().get('breaks').long.every
-        // )
         return getUserSettingsStore().get('breaks').long.every
       } else {
         return 1
       }
     }
   }
-  return oldIndex
+
+  private getPreserve = () => {
+    const preserve = !!this.options.preventChangingIndex
+    if (preserve) return this.oldIndex
+  }
+
+  private getDefault = () => {
+    return this.oldIndex + 1
+  }
 }
+
 export const setNewBreak = async (options: NewBreakOptions) => {
-  if (!options.forcePreventImmediateWindowClosing) closeAllWindows()
+  if (!options.preventImmediateWindowClosing) closeAllWindows()
 
   const nextBreakIn = options?.forceNextBreakIn ?? getEveryFromDB()
 
-  breakIndex.value = getNewBreakIndex(breakIndex.value, options)
+  breakIndex.value = new NewBreakIndex(breakIndex.value, options).get()
 
   breakId.value++
   const keyBreakId = breakId.value
@@ -90,7 +96,7 @@ export const setNewBreak = async (options: NewBreakOptions) => {
       }
     })
   } else {
-    if (!options.forcePreventImmediateWindowClosing) closeAllWindows()
+    if (!options.preventImmediateWindowClosing) closeAllWindows()
     await createWindowIndex({ forceSkipBeforeBreakView })
   }
 }

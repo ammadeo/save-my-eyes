@@ -19,10 +19,6 @@ import { app, ipcMain, ipcRenderer } from 'electron'
 // export const channelCloseApp = 'close-app'
 // export const channelGetBreakerData = 'breaker-data'
 
-export interface OptionsSetBreak {
-  forceNextBreakIn: number
-}
-
 class IpcChanel<
   RendererAskPayload extends {},
   RendererAskAnswer extends {} | undefined
