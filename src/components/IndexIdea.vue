@@ -96,7 +96,7 @@ export default Vue.extend({
               title: t('Do some exercises', 'Poćwicz chwilę'),
               img: {
                 src: workoutImg,
-                alt: t('Woman dancing'),
+                alt: t('Woman dancing', 'Tańcząca kobieta'),
               },
               content: t(
                 'Few minutes of workout will help You relax from sitting position',
@@ -107,7 +107,10 @@ export default Vue.extend({
               title: t('Go outside', 'Wyjdź na świerze powietrze'),
               img: {
                 src: outsideImg,
-                alt: t('Woman walk through a forest'),
+                alt: t(
+                  'Woman walk through a forest',
+                  'Kobieta idzie przez las'
+                ),
               },
               content: t(
                 'Go out to a park or a forest. Being close to nature will help you relax',
@@ -118,7 +121,10 @@ export default Vue.extend({
               title: t('Realax a bit', 'Zrelaksuj się'),
               img: {
                 src: mindfulnessImg,
-                alt: t('Woman meditating in front of ancient tample'),
+                alt: t(
+                  'Woman meditating in front of ancient tample',
+                  'Kobieta medytuja przed świątynią'
+                ),
               },
               content: t(
                 'Do what You do to relax. It could be drinking tea, meditating or wothever You like. But remember not to use Your phone or computer now',
@@ -132,7 +138,10 @@ export default Vue.extend({
               title: t('Look out the window', 'Wyjrzyj przez okno'),
               img: {
                 src: windowImg,
-                alt: t('Woman looks out the window'),
+                alt: t(
+                  'Woman looks out the window',
+                  'Kobieta spogląda przez okno'
+                ),
               },
               content: t(
                 'Look far away through a window to help your eyes relax',
@@ -143,7 +152,10 @@ export default Vue.extend({
               title: t('Look at a plants', 'Popatrz na rośliny'),
               img: {
                 src: plantsImg,
-                alt: t('Woman is sitting in front of flowers'),
+                alt: t(
+                  'Man is sitting in front of flowers',
+                  'Mężczyzna siedzi przy kwiatach'
+                ),
               },
               content: t(
                 'Green plants will help relax your eyes',
@@ -154,7 +166,10 @@ export default Vue.extend({
               title: t('Blink your eyes', 'Pomrugaj oczami'),
               img: {
                 src: blinkImg,
-                alt: t('Face emoji is blinking its eyes'),
+                alt: t(
+                  'Man looks at the darknes',
+                  'Mężczyzna patrzy w ciemność'
+                ),
               },
               content: t(
                 'Blink few times to clean your eyes',
