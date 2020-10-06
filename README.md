@@ -1,6 +1,6 @@
 <h1> Save My Eyes </h1>
 <p>
-<h3>is an open source app that helps you protect your eyes while working long on a computer</h3>
+<h3>App that helps you protect your eyes while working long on a computer</h3>
 <img align="center" src="https://i.ibb.co/94DJ8DP/rsz-5f7c7771956a8.jpg" alt="save my eyes screenshot">
 <p align="center">Save My Eyes long break screenshot</p>
 <h3>What You can expect</h3>
