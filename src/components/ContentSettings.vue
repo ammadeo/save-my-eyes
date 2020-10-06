@@ -84,7 +84,9 @@
     </h3>
     <p class=" mb-2 text-lg text-secondary-100">
       {{ $t('createdBy') }}
-      <span> {{ $t('author') }} </span>
+      <BaseLink href="https://github.com/amadeusz-chomiak">
+        {{ $t('author') }}
+      </BaseLink>
     </p>
     <p class=" mb-2 text-lg text-secondary-100">
       {{ $t('thanksTo') }}
