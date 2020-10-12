@@ -34,7 +34,7 @@
         class="row-start-3 col-start-3"
         :long="long"
         :finished="finished"
-        :disabled="forceCloseLock"
+        :disabled="forceCloseLock || startCloseLock"
         @click="finishForce()"
       />
     </template>
@@ -98,6 +98,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       finished: false,
       autoFinishLock: false,
       forceCloseLock: false,
+      startCloseLock: true,
       closing: false,
     }
   },
@@ -125,6 +126,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       console.log('breakTime', breakTime)
       this.endDate = addSeconds(startDate, breakTime)
       this.ready = true
+      setTimeout(() => (this.startCloseLock = false), 3000)
     },
     scroolTop(target: HTMLElement) {
       // console.log('scroll', target)
