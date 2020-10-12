@@ -17,8 +17,7 @@ export const rendererWindows: {
 }
 
 export const closeAllWindows = () => {
-  rendererWindows.windowIndex?.close()
-  rendererWindows.windowTray?.close()
+  Object.values(rendererWindows).forEach(win => win?.close())
 }
 
 export const focusOn = (windowKey: keyof typeof rendererWindows) => {
@@ -174,8 +173,8 @@ export const createWindowIndex = async ({
       ...baseWindowSettings(),
     },
     undefined,
-    forceSkipBeforeBreakView ?? false,
-    forceSkipBeforeBreakView ?? false
+    !!forceSkipBeforeBreakView,
+    !!forceSkipBeforeBreakView
   )
   if (forceSkipBeforeBreakView) await createWindowIndexChildren()
 }
