@@ -179,7 +179,6 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
     },
     async close() {
       this.closing = true
-      // await setNextBreak.ask({ forceNextBreakIn }) //? moved to main process close handler
       this.closeWindow()
     },
   },
