@@ -126,8 +126,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       console.log('breakTime', breakTime)
       this.endDate = addSeconds(startDate, breakTime)
       this.ready = true
-      this.startCloseLock = false //! temp
-      setTimeout(() => (this.startCloseLock = false), 3000)
+      this.startCloseLock = false
     },
     scroolTop(target: HTMLElement) {
       // console.log('scroll', target)
