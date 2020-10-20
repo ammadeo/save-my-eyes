@@ -73,7 +73,10 @@ class IpcChanel<
               const windowsEntries = Object.entries(rendererWindows)
               windowsEntries.forEach(([_key, win]) => {
                 if (win) {
-                  win.webContents.send(this.mainChanelId, answerHandler(payload))
+                  win.webContents.send(
+                    this.mainChanelId,
+                    answerHandler(payload)
+                  )
                 }
               })
             } else {

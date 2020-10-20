@@ -28,6 +28,8 @@ describe('components/BaseLink.vue', () => {
     const Link = getByText(linkText)
     await fireEvent.click(Link)
     const localHost = 'http://localhost/'
-    expect(electron.shell.openExternal).toBeCalledWith(localHost + linkUrl)
+    expect(electron.shell.openExternal).toHaveBeenCalledWith(
+      localHost + linkUrl
+    )
   })
 })
