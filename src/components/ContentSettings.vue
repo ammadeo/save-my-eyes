@@ -326,11 +326,15 @@ export default Vue.extend({
         log: fixer.log,
       }
     },
-    setLang(to: boolean) {
+    async setLang(to: boolean) {
       const lang: Languages = to ? 'en' : 'pl'
       this.lang = lang
       this.$store.commit('i18n/setLang', lang)
-      emitLanguage.ask({ lang })
+      try {
+        await emitLanguage.ask({ lang })
+      } catch (error) {
+        console.error(error)
+      }
     },
     setSounds(to: boolean) {
       this.sounds.ui = to

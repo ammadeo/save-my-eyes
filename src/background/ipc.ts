@@ -68,16 +68,20 @@ class IpcChanel<
       ipcMain.on(
         this.rendererChanelId,
         (event, payload: RendererAskPayload) => {
-          if (this.respondToAll) {
-            const windowsEntries = Object.entries(rendererWindows)
-            windowsEntries.forEach(([_key, win]) => {
-              if (win) {
-                win.webContents.send(this.mainChanelId, answerHandler(payload))
-              }
-            })
-          } else {
-            const answer = answerHandler(payload)
-            if (answer) event.reply(this.mainChanelId, answer)
+          try {
+            if (this.respondToAll) {
+              const windowsEntries = Object.entries(rendererWindows)
+              windowsEntries.forEach(([_key, win]) => {
+                if (win) {
+                  win.webContents.send(this.mainChanelId, answerHandler(payload))
+                }
+              })
+            } else {
+              const answer = answerHandler(payload)
+              if (answer) event.reply(this.mainChanelId, answer)
+            }
+          } catch (error) {
+            console.error(error)
           }
         }
       )
@@ -147,8 +151,12 @@ export const useIpcMain = () => {
     lastSchedulerJobLength: lastSchedulerJobLength.value,
   }))
 
-  mainSetNextBreak.listen((options) => {
-    setNewBreak(options)
+  mainSetNextBreak.listen(async (options) => {
+    try {
+      await setNewBreak(options)
+    } catch (error) {
+      console.error(error)
+    }
     return {}
   })
 
@@ -161,7 +169,11 @@ export const useIpcMain = () => {
     const indexKey = 'windowIndex'
     setBackgroundOf(indexKey)
     focusOn(indexKey)
-    await createWindowIndexChildren()
+    try {
+      await createWindowIndexChildren()
+    } catch (error) {
+      console.error(error)
+    }
     return {}
   })
 

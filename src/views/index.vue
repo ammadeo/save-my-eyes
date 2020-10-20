@@ -126,6 +126,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       console.log('breakTime', breakTime)
       this.endDate = addSeconds(startDate, breakTime)
       this.ready = true
+      this.startCloseLock = false //! temp
       setTimeout(() => (this.startCloseLock = false), 3000)
     },
     scroolTop(target: HTMLElement) {
@@ -162,18 +163,22 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
       window.hide()
     },
     async finish() {
-      this.finished = true
-      const preventFinish = this.autoFinishLock || this.long
-      if (!preventFinish) {
-        this.hideWindow()
-      } else {
-        emitEndBreak.ask({})
-      }
+      try {
+        this.finished = true
+        const preventFinish = this.autoFinishLock || this.long
+        if (!preventFinish) {
+          this.hideWindow()
+        } else {
+          await emitEndBreak.ask({})
+        }
 
-      await this.playBreakSound()
+        await this.playBreakSound()
 
-      if (!preventFinish) {
-        this.close()
+        if (!preventFinish) {
+          this.close()
+        }
+      } catch (error) {
+        console.error(error)
       }
     },
     async finishForce() {

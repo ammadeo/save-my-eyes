@@ -7,7 +7,7 @@ import { error } from 'electron-log'
 
 export const backgroundDefault = '#121959'
 export const backgroundTransparent = '#00000000'
-export const rendererWindows: {
+export let rendererWindows: {
   [key: string]: BrowserWindow | undefined
   windowIndex: undefined | BrowserWindow
   windowTray: undefined | BrowserWindow
@@ -17,7 +17,14 @@ export const rendererWindows: {
 }
 
 export const closeAllWindows = () => {
-  Object.values(rendererWindows).forEach(win => win?.close())
+  console.log('rendererWindows', rendererWindows)
+  rendererWindows.windowIndex?.close()
+  rendererWindows.windowTray?.close()
+
+  rendererWindows = {
+    windowIndex: undefined,
+    windowTray: undefined,
+  }
 }
 
 export const focusOn = (windowKey: keyof typeof rendererWindows) => {
@@ -108,6 +115,7 @@ const createWindow = async (
 
     if (extendWindow) extendWindow(newWindow)
   }
+
   if (showFocused) {
     rendererWindows[windowKey]?.show()
   } else {
@@ -157,26 +165,33 @@ export const createWindowIndex = async ({
 }: CreateWindowIndexOptions) => {
   const url = forceSkipBeforeBreakView ? '/#/Index' : '/#/BeforeBreak'
   const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
-
-  await createWindow(
-    'windowIndex',
-    url,
-    {
-      width: screenWidth,
-      height: screenHeight,
-      y: 0,
-      x: 0,
-      backgroundColor: forceSkipBeforeBreakView
-        ? backgroundDefault
-        : backgroundTransparent,
-      transparent: forceSkipBeforeBreakView ? false : isProd,
-      ...baseWindowSettings(),
-    },
-    undefined,
-    !!forceSkipBeforeBreakView,
-    !!forceSkipBeforeBreakView
-  )
-  if (forceSkipBeforeBreakView) await createWindowIndexChildren()
+  try {
+    await createWindow(
+      'windowIndex',
+      url,
+      {
+        width: screenWidth,
+        height: screenHeight,
+        y: 0,
+        x: 0,
+        backgroundColor: forceSkipBeforeBreakView
+          ? backgroundDefault
+          : backgroundTransparent,
+        transparent: forceSkipBeforeBreakView ? false : isProd,
+        ...baseWindowSettings(),
+      },
+      undefined,
+      !!forceSkipBeforeBreakView,
+      !!forceSkipBeforeBreakView
+    )
+  } catch (error) {
+    console.error(error)
+  }
+  try {
+    if (forceSkipBeforeBreakView) await createWindowIndexChildren()
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 export const createWindowTray = async () => {
@@ -184,21 +199,24 @@ export const createWindowTray = async () => {
   const width = 500
   const { height: screenHeight, width: screenWidth } = getPrimaryDisplay()
   const x = screenWidth - width
-
-  return await createWindow(
-    'windowTray',
-    url,
-    {
-      width,
-      height: screenHeight,
-      y: 0,
-      x,
-      backgroundColor: backgroundTransparent,
-      transparent: isProd && !debugProd,
-      ...baseWindowSettings(),
-    },
-    undefined,
-    undefined,
-    false
-  )
+  try {
+    return await createWindow(
+      'windowTray',
+      url,
+      {
+        width,
+        height: screenHeight,
+        y: 0,
+        x,
+        backgroundColor: backgroundTransparent,
+        transparent: isProd && !debugProd,
+        ...baseWindowSettings(),
+      },
+      undefined,
+      undefined,
+      false
+    )
+  } catch (error) {
+    console.error(error)
+  }
 }

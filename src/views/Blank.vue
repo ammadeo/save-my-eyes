@@ -39,8 +39,12 @@ export default Vue.extend({
     }
   },
   methods: {
-    setNextBreak() {
-      rendererSetNextBreak.ask({})
+    async setNextBreak() {
+      try {
+        await rendererSetNextBreak.ask({})
+      } catch (error) {
+        console.error(error)
+      }
     },
   },
   computed: {

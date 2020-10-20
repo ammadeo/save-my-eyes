@@ -49,13 +49,21 @@ export default mixins(TransparentClickEngine).extend({
       this.showBreakCard = false
     },
     startBreak() {
-      StartBreak.ask({})
-      this.$router.push({ name: 'Index' })
+      try {
+        StartBreak.ask({})
+        this.$router.push({ name: 'Index' })
+      } catch (error) {
+        console.error(error)
+      }
     },
     async skipBreak() {
-      await setNextBreak.ask({})
-      const window = remote.getCurrentWindow()
-      window.close()
+      try {
+        await setNextBreak.ask({})
+        const window = remote.getCurrentWindow()
+        window.close()
+      } catch (error) {
+        console.error(error)
+      }
     },
     animateWaiting() {
       const BreakCard = (this.$refs.BreakCard as Vue).$el

@@ -82,24 +82,32 @@ export default mixins(TransparentClickEngine).extend({
       }, 1000)
     },
     async resetNextBreak() {
-      await setNextBreak.ask({ preventImmediateWindowClosing: true })
+      try {
+        await setNextBreak.ask({ preventImmediateWindowClosing: true })
+      } catch (error) {
+        console.error(error)
+      }
     },
     open(key: Key) {
       this.openedKey = key
     },
-    run(event: RunKey) {
-      console.log(event)
-      switch (event) {
-        case 'start-long-break':
-          return setNextBreak.ask({
-            forceNextBreakIn: 0,
-            forceNextBreakType: 'long',
-            forceSkipBeforeBreakView: true,
-          })
-        case 'open-stop-protection':
-          return this.open('stop-protection')
-        case 'open-settings':
-          return this.open('settings')
+    async run(event: RunKey) {
+      try {
+        console.log(event)
+        switch (event) {
+          case 'start-long-break':
+            return await setNextBreak.ask({
+              forceNextBreakIn: 0,
+              forceNextBreakType: 'long',
+              forceSkipBeforeBreakView: true,
+            })
+          case 'open-stop-protection':
+            return this.open('stop-protection')
+          case 'open-settings':
+            return this.open('settings')
+        }
+      } catch (error) {
+        console.error(error)
       }
     },
   },

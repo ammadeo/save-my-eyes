@@ -49,14 +49,22 @@ export default Vue.extend({
   },
   methods: {
     async pauseBreak(nextBreakIn: number) {
-      await rendererSetNextBreak.ask({
-        forceNextBreakIn: nextBreakIn,
-        forceNextBreakType: 'long',
-      })
-      this.$emit('close')
+      try {
+        await rendererSetNextBreak.ask({
+          forceNextBreakIn: nextBreakIn,
+          forceNextBreakType: 'long',
+        })
+        this.$emit('close')
+      } catch (error) {
+        console.error(error)
+      }
     },
     async closeApp() {
-      await rendererCloseApp.ask({})
+      try {
+        await rendererCloseApp.ask({})
+      } catch (error) {
+        console.error(error)
+      }
     },
   },
   beforeMount() {
