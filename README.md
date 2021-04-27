@@ -12,6 +12,6 @@
 <li>It's free!</li> 
 </ul>
 <br/>
-<p><a href="files/save-my-eyes Setup 0.1.2.exe">Download for windows</a> (Tested on windows 8.1)</p>
+<p><a href="https://github.com/amadeusz-chomiak/save-my-eyes/raw/master/files/save-my-eyes%20Setup%200.1.2.exe">Download for windows</a> (Tested on windows 8.1)</p>
 <br/>
 </p>
