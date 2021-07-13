@@ -9,18 +9,12 @@ jest.mock('vue-cli-plugin-electron-builder/lib', () => ({
 
 describe('components/IndexStopProtection.vue', () => {
   test('disable button by prop', () => {
-    const { getByText } = render(Component, {
+    const { getByTestId } = render(Component, {
       props: {
         disabled: true,
       },
     })
-    const Button = getByText('pause')
+    const Button = getByTestId('pause-button')
     expect(Button).toBeDisabled()
-    base.setOptions({
-      props: {
-        disabled: false,
-      },
-    })
-    expect(Button).not.toBeDisabled()
   })
 })

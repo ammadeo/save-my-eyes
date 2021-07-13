@@ -1,9 +1,7 @@
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv {
-      IS_TEST: string | undefined
-      [key: string]: string | undefined
-    }
+declare namespace NodeJS {
+  export interface ProcessEnv {
+    IS_TEST: string | undefined
+    [key: string]: string | undefined
   }
 }
 
