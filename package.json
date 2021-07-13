@@ -9,6 +9,7 @@
   "scripts": {
     "electron:serve": "vue-cli-service electron:serve",
     "electron:build": "vue-cli-service electron:build",
+    "postelectron:build": "cpy \"dist_electron/*.exe\" download --rename=save-my-eyes.exe",
     "lint": "vue-cli-service lint",
     "lint:fix": "vue-cli-service lint --fix",
     "test:unit": "vue-cli-service test:unit tests/unit",
@@ -66,6 +67,7 @@
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^5.0.2",
     "@vue/test-utils": "1.0.0-beta.31",
+    "cpy-cli": "^3.1.1",
     "electron": "^9.4.0",
     "electron-devtools-installer": "^3.2.0",
     "eslint": "^6.7.2",
