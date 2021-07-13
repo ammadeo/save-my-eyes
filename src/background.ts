@@ -1,5 +1,5 @@
 import { app, protocol, BrowserWindow } from 'electron'
-import { installVueDevtools } from 'vue-cli-plugin-electron-builder/lib'
+import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import { useTray } from '@/background/tray'
 import { isProd, isProdBuild, isDevProdTest } from '@/background/env'
 import { setNewBreak } from '@/background/breaker'
@@ -21,7 +21,7 @@ app.on('ready', async () => {
   info('app ready event fired')
   if (isDevelopment) {
     try {
-      await installVueDevtools()
+      await installExtension(VUEJS_DEVTOOLS)
     } catch (e) {
       console.error('Vue Devtools failed to install:', e.toString())
     }
