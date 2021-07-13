@@ -47,7 +47,7 @@ const toWaitState = async (getByText: (text: string) => HTMLElement) => {
 describe('components/ContentBeforeBreak.vue', () => {
   test('has skip button', async () => {
     const { getByText, emitted } = base.render()
-    const SkipButton = getByText('Skip break')
+    const SkipButton = getByText('skip a break')
     expect(SkipButton).not.toBeVisible()
     await toWaitState(getByText)
     expect(SkipButton).toBeVisible()

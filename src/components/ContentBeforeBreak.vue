@@ -26,7 +26,7 @@
       v-show="waiting"
       icon="skip"
       class="opacity-85 mb-6"
-      content="Skip break"
+      :content="$t('contentSkip')"
       @click="$emit('skip')"
     ></ButtonIcon>
     <ButtonIcon
@@ -73,8 +73,9 @@ export default mixins(CreateTimer, CheckIsLongBreak, TimeAgoContent).extend({
   },
   beforeMount() {
     this.$useI18n((t) => ({
-      contentStart: t('start break now', 'zacznij przerwę teraz'),
+      contentStart: t('start a break now', 'rozpocznij przerwę teraz'),
       contentWait: t('wait', 'zaczekaj chwilę'),
+      contentSkip: t('skip a break', 'pomiń przerwę'),
       contentBase: t('will start', 'zacznie się'),
       statusWaiting: t('when You ready', 'kiedy zechcesz'),
       statusStarting: t('in 5 seconds', 'za 5 sekund'),

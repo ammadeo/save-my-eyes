@@ -13,6 +13,7 @@
       </p>
       <ButtonRoundable
         icon="pause"
+        data-testid="pause-button"
         :disabled="disabled"
         @click="setShowStopProtection(true)"
       ></ButtonRoundable>

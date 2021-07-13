@@ -15,10 +15,10 @@ interface Data {
 export const Lang = Vue.extend({
   computed: {
     $langGlobal(): I18nGlobal {
-      return this.$store.state?.i18n?.global
+      return this.$store?.state?.i18n?.global
     },
     $langLanguage(): Languages {
-      return this.$store.state?.i18n?.lang ?? 'en'
+      return this.$store?.state?.i18n?.lang ?? 'en'
     },
   },
   data(): Data {

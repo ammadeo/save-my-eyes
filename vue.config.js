@@ -9,6 +9,7 @@ module.exports = {
         unacceptableLicenseTest: (licenseType) => licenseType === 'GPL',
       }),
     ],
+    target: 'electron-renderer',
   },
 
   chainWebpack: (config) =>

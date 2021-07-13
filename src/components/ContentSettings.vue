@@ -84,7 +84,7 @@
     </h3>
     <p class=" mb-2 text-lg text-secondary-100">
       {{ $t('createdBy') }}
-      <BaseLink href="https://github.com/amadeusz-chomiak">
+      <BaseLink href="https://ammadeo.dev">
         {{ $t('author') }}
       </BaseLink>
     </p>
@@ -224,7 +224,7 @@ export default Vue.extend({
       languageOff: t('', 'Polski (Polish)'),
       credentials: t('Credentials', 'Podziękowania'),
       createdBy: t('Created by', 'Stworzona przez'),
-      author: t('Amadeus Chomiak', 'Amadeusza Chomiaka'),
+      author: t('Ammadeo', 'Amadeusza Chomiaka'),
       thanksTo: t('Thanks to', 'Dzięki'),
       thanksFor: t('for awesome drawings', 'za świetne rysunki'),
     }))
