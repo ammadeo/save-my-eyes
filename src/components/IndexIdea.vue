@@ -2,17 +2,28 @@
   <div>
     <transition name="fade" appear>
       <p
-        class="mb-4 delay-500 duration-300 text-secondary-200 selection-darker font-display text-lg"
+        v-show="!showDonation"
+        class="mb-4 duration-300 text-secondary-200 selection-darker font-display text-lg"
+        :class="finished ? [] : ['delay-500']"
       >
         {{ $t('title') }}
       </p>
     </transition>
 
-    <transition name="slide" appear>
+    <transition name="slide" appear mode="out-in">
       <BaseCard
+        v-if="showDonation"
+        key="donation-card"
+        class="slide-leave-left max-w-3xl duration-500 delay-300"
+        data-testid="donation-card"
+      >
+        <ContentDonation :forceCloseLock="forceCloseLock" />
+      </BaseCard>
+      <BaseCard
+        v-else-if="card"
         color="secondary-500"
-        class="max-w-3xl delay-100 duration-500"
-        v-if="card"
+        key="inspiration-card"
+        class="max-w-3xl delay-100 duration-500 slide-leave-left"
       >
         <div class="flex m-4">
           <img
@@ -43,6 +54,7 @@
 
 <script lang="ts">
 import BaseCard from './BaseCard.vue'
+import ContentDonation from './ContentDonation.vue'
 import Vue from 'vue'
 import { Idea, translate } from '@/store/i18n'
 
@@ -58,39 +70,43 @@ import workoutImg from '@/assets/images/workout.svg'
 export default Vue.extend({
   components: {
     BaseCard,
-  },
-  data() {
-    return {
-      ideaIndex: -1,
-    }
+    ContentDonation,
   },
   props: {
     long: {
       type: Boolean,
       required: true,
     },
+    finished: {
+      type: Boolean,
+      required: true,
+    },
+    forceCloseLock: {
+      type: Boolean,
+      required: true,
+    },
   },
   beforeMount() {
-    this.ideaIndex = this.random(3)
     this.$useI18n((t) => ({
       title: t('Try this break idea', 'Zainspiruj się'),
     }))
   },
   computed: {
     card(): Idea | undefined {
-      const ideaIndex = this.ideaIndex
-      if (ideaIndex >= 0) return this.generateIdeas(this.long)[ideaIndex]
-      return undefined
+      return this.generateIdea(this.long)
+    },
+    showDonation(): boolean {
+      return this.long && this.finished
     },
   },
   methods: {
     random(max: number) {
       return Math.floor(Math.random() * max)
     },
-    generateIdeas(long: boolean): Idea[] {
+    generateIdea(long: boolean): Idea {
       const t = translate
 
-      return long
+      const ideas = long
         ? [
             {
               title: t('Do some exercises', 'Poćwicz chwilę'),
@@ -177,6 +193,10 @@ export default Vue.extend({
               ),
             },
           ]
+
+      const index = this.random(ideas.length)
+
+      return ideas[index]
     },
   },
 })

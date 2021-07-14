@@ -63,6 +63,13 @@
       :alt="iconAlt"
       :class="classes"
     />
+    <img
+      v-else-if="showIcon('coffee')"
+      svg-inline
+      src="@/assets/icons/coffee.svg"
+      :alt="iconAlt"
+      :class="classes"
+    />
   </transition>
 </template>
 
@@ -93,6 +100,7 @@ export default Vue.extend({
     classes() {
       return [
         'fill-current',
+        'w-auto',
         this.dark ? 'text-primary-800' : 'text-primary-100',
       ]
     },
