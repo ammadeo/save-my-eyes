@@ -1,10 +1,8 @@
-
 .slide-enter-active,
-.slide-leave-active
-{
-  transition: transform 300ms ease-in-out
+.slide-leave-active {
+  transition: transform 300ms ease-in-out;
 }
-.slide-leave-active.slide-leave-absolute{
+.slide-leave-active.slide-leave-absolute {
   @apply absolute;
 }
 
@@ -22,18 +20,32 @@
   &.slide-leave-bottom {
     transform: translateY(150%);
   }
+  &.slide-leave-left {
+    transform: translateX(-150%);
+  }
 }
 .slide-move {
-  transition: transform 700ms
+  transition: transform 700ms;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .slide-enter-active,
+  .slide-leave-active {
+    transition: opacity 100ms ease-in-out;
+  }
+  .slide-enter,
+  .slide-leave-to {
+    transform: none;
+    opacity: 0;
+  }
+}
 
-.fade-enter-active, .fade-leave-active
-{
-  transition: opacity 100ms
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 100ms;
 }
 
 .fade-enter,
 .fade-leave-to {
-  @apply opacity-0
+  @apply opacity-0;
 }

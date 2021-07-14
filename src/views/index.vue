@@ -41,6 +41,8 @@
     <IndexIdea
       class="col-start-1 row-start-4"
       :long="long"
+      :finished="finished"
+      :forceCloseLock="forceCloseLock"
       @changeAutoFinishLock="setAutoFinishLock($event)"
     />
     <IndexSettings

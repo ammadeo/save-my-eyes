@@ -41,7 +41,7 @@ export default Vue.extend({
     },
   },
   computed: {
-    classesTop() {
+    classesTop(): string[] {
       const disabled = this.disabled
       return [
         ...(this.primary
@@ -59,7 +59,7 @@ export default Vue.extend({
         ...(disabled ? [] : ['-translate-y-1', 'group-active:-translate-y-px']),
       ]
     },
-    classesBottom() {
+    classesBottom(): string[] {
       return [
         ...(this.primary
           ? [

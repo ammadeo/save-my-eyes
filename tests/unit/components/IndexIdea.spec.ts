@@ -7,6 +7,10 @@ const base = new Base(Component, {
       return 0
     },
   },
+  props: {
+    long: false,
+    finished: false,
+  },
 })
 
 describe('components/IndexIdea.vue', () => {
@@ -23,5 +27,27 @@ describe('components/IndexIdea.vue', () => {
     const IdeaImg = getByTestId('idea-img')
     expect(IdeaImg).toBeVisible()
     expect(IdeaImg.getAttribute('alt')?.length).toBeGreaterThan(5)
+  })
+
+  test('on long break finished show donation card', () => {
+    const { getByTestId } = base.render({
+      props: {
+        long: true,
+        finished: true,
+      },
+    })
+    const DonationCard = getByTestId('donation-card')
+    expect(DonationCard).toBeVisible()
+  })
+
+  test('on long break finished hide title', () => {
+    const { getByText } = base.render({
+      props: {
+        long: true,
+        finished: true,
+      },
+    })
+    const DonationCard = getByText('Try this break idea')
+    expect(DonationCard).not.toBeVisible()
   })
 })
