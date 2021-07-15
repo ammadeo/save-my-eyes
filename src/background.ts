@@ -1,11 +1,14 @@
 import { app, protocol, BrowserWindow } from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import { autoUpdater } from "electron-updater"
+import { info, verbose } from 'electron-log'
+import path from 'path'
+
 import { useTray } from '@/background/tray'
 import { isProd, isProdBuild, isDevProdTest } from '@/background/env'
 import { setNewBreak } from '@/background/breaker'
 import { useIpcMain } from '@/background/ipc'
-import { info, verbose } from 'electron-log'
-import path from 'path'
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 const appFolder = path.dirname(process.execPath)
 const appPath = path.resolve(appFolder, 'save-my-eyes.exe')
@@ -48,6 +51,9 @@ app.on('ready', async () => {
   setNewBreak({})
   verbose('app break set')
   verbose('app ended init process')
+  if (!isDevelopment) {
+    autoUpdater.checkForUpdatesAndNotify()
+  }
 })
 
 // Exit cleanly on request from parent process in development mode.

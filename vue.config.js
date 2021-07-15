@@ -25,6 +25,7 @@ module.exports = {
   pluginOptions: {
     electronBuilder: {
       builderOptions: {
+        publish: ['github'],
         copyright: 'Copyright © 2020 ${author}',
         win: {
           icon: './public/icon.png',
