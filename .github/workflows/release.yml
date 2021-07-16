@@ -16,4 +16,4 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build and release
-        run: npm electron:publish
+        run: npm run electron:publish
