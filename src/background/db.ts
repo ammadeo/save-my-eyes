@@ -77,9 +77,9 @@ const userSettingsSchema: UserSettingsSchema = {
 
 const userSettingsDefaults = () => ({
   breaks: {
-    every: 15 * 60,
+    every: 20 * 60,
     short: {
-      last: 30,
+      last: 20,
     },
     long: {
       last: 5 * 60,
