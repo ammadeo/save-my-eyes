@@ -13,6 +13,6 @@
   <li>It's free! <a href="https://www.buymeacoffee.com/ammadeo">You can buy me a coffee here :coffee:</a></li> 
 </ul>
 <br/>
-<p><a href="https://github.com/ammadeo/save-my-eyes/releases/download/v0.2.0/save-my-eyes-Setup-0.2.0.exe">Download for windows</a></p>
+<p><a href="https://github.com/ammadeo/save-my-eyes/releases/download/v0.2.2/save-my-eyes-Setup-0.2.2.exe">Download for windows</a></p>
 <br/>
 </p>
