@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import Index from '../views/Index.vue'
+import Index from '../views/index.vue'
 import Menu from '../views/Menu.vue'
 import Blank from '../views/Blank.vue'
 import BeforeBreak from '../views/BeforeBreak.vue'

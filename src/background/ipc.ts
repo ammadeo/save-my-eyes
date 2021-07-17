@@ -14,6 +14,8 @@ import {
 import { setNewBreak, NewBreakOptions } from './breaker'
 import { isProdBuild } from './env'
 import { app, ipcMain, ipcRenderer } from 'electron'
+import { error, verbose } from 'electron-log'
+
 // export const channelSetBreak = 'set-break'
 // export const channelGetBreakCount = 'break-count'
 // export const channelCloseApp = 'close-app'
@@ -63,28 +65,28 @@ class IpcChanel<
 
   readonly main = {
     listen: (
-      answerHandler: (payload: RendererAskPayload) => RendererAskAnswer
+      answerHandler: (payload: RendererAskPayload) => Promise<RendererAskAnswer>
     ) => {
       ipcMain.on(
         this.rendererChanelId,
-        (event, payload: RendererAskPayload) => {
+        async (event, payload: RendererAskPayload) => {
           try {
+            const answer = await answerHandler(payload)
+            if (!isProdBuild)
+              verbose(`ipc answer: (${this.mainChanelId})`, answer)
+
             if (this.respondToAll) {
               const windowsEntries = Object.entries(rendererWindows)
               windowsEntries.forEach(([_key, win]) => {
                 if (win) {
-                  win.webContents.send(
-                    this.mainChanelId,
-                    answerHandler(payload)
-                  )
+                  win.webContents.send(this.mainChanelId, answer)
                 }
               })
             } else {
-              const answer = answerHandler(payload)
               if (answer) event.reply(this.mainChanelId, answer)
             }
-          } catch (error) {
-            console.error(error)
+          } catch (err) {
+            error(`ipc answer error: (${this.mainChanelId})`, err)
           }
         }
       )
@@ -93,16 +95,10 @@ class IpcChanel<
 }
 
 class IpcChanelFactory {
-  private static index = 0
-  private static generateId() {
-    this.index++
-    return `auto-generated-${this.index}`
-  }
   static create<
     RendererAskPayload extends {},
     RendererAskAnswer extends {} | undefined
-  >(respondToAll = false) {
-    const id = this.generateId()
+  >(id: string, respondToAll = false) {
     return new IpcChanel<RendererAskPayload, RendererAskAnswer>(
       id,
       respondToAll
@@ -119,36 +115,39 @@ export interface GetBreakDataAnswer {
 export const {
   main: mainGetBreakData,
   renderer: rendererGetBreakData,
-} = IpcChanelFactory.create<{}, GetBreakDataAnswer>()
+} = IpcChanelFactory.create<{}, GetBreakDataAnswer>('get-break-data')
 
 export const {
   main: mainSetNextBreak,
   renderer: rendererSetNextBreak,
-} = IpcChanelFactory.create<NewBreakOptions, {}>()
+} = IpcChanelFactory.create<NewBreakOptions, {}>('set-next-break')
 
 export const {
   main: mainCloseApp,
   renderer: rendererCloseApp,
-} = IpcChanelFactory.create<{}, undefined>()
+} = IpcChanelFactory.create<{}, undefined>('close-app')
 
 export const {
   main: mainStartBreak,
   renderer: rendererStartBreak,
-} = IpcChanelFactory.create<{}, {}>()
+} = IpcChanelFactory.create<{}, {}>('start-break')
 
 export const {
   main: mainEmitLanguage,
   renderer: rendererEmitLanguage,
-} = IpcChanelFactory.create<{ lang: string }, { lang: string }>(true)
+} = IpcChanelFactory.create<{ lang: string }, { lang: string }>(
+  'emit-language',
+  true
+)
 
 export const {
   main: mainEmitEndBreak,
   renderer: rendererEmitEndBreak,
-} = IpcChanelFactory.create<{}, {}>(true)
+} = IpcChanelFactory.create<{}, {}>('emit-end-break', true)
 
 //? ipc for main
 export const useIpcMain = () => {
-  mainGetBreakData.listen(() => ({
+  mainGetBreakData.listen(async () => ({
     breakIndex: breakIndex.value,
     lastSchedulerJobDate: lastSchedulerJobDate.value,
     lastSchedulerJobLength: lastSchedulerJobLength.value,
@@ -157,29 +156,29 @@ export const useIpcMain = () => {
   mainSetNextBreak.listen(async (options) => {
     try {
       await setNewBreak(options)
-    } catch (error) {
-      console.error(error)
+    } catch (err) {
+      error(err)
     }
     return {}
   })
 
-  mainCloseApp.listen(() => {
+  mainCloseApp.listen(async () => {
     app.quit()
     return undefined
   })
-
+  // TODO FIX ERROR
   mainStartBreak.listen(async () => {
-    const indexKey = 'windowIndex'
-    setBackgroundOf(indexKey)
-    focusOn(indexKey)
     try {
+      const indexKey = 'windowIndex'
+      setBackgroundOf(indexKey)
+      focusOn(indexKey)
       await createWindowIndexChildren()
-    } catch (error) {
-      console.error(error)
+    } catch (err) {
+      error(err)
     }
     return {}
   })
 
-  mainEmitLanguage.listen(({ lang }) => ({ lang }))
-  mainEmitEndBreak.listen(() => ({}))
+  mainEmitLanguage.listen(async ({ lang }) => ({ lang }))
+  mainEmitEndBreak.listen(async () => ({}))
 }

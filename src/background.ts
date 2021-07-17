@@ -1,15 +1,14 @@
 import { app, protocol, BrowserWindow } from 'electron'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
-import { autoUpdater } from "electron-updater"
+import { autoUpdater } from 'electron-updater'
 import { info, verbose } from 'electron-log'
 import path from 'path'
 
 import { useTray } from '@/background/tray'
-import { isProd, isProdBuild, isDevProdTest } from '@/background/env'
+import { isProdBuild } from '@/background/env'
 import { setNewBreak } from '@/background/breaker'
 import { useIpcMain } from '@/background/ipc'
 
-const isDevelopment = process.env.NODE_ENV !== 'production'
 const appFolder = path.dirname(process.execPath)
 const appPath = path.resolve(appFolder, 'save-my-eyes.exe')
 let tray: Electron.Tray | undefined
@@ -22,7 +21,7 @@ app.on('window-all-closed', (e: Event) => e.preventDefault())
 
 app.on('ready', async () => {
   info('app ready event fired')
-  if (isDevelopment) {
+  if (!isProdBuild) {
     try {
       await installExtension(VUEJS_DEVTOOLS)
     } catch (e) {
@@ -41,23 +40,23 @@ app.on('ready', async () => {
     })
     info('app registered to start on login')
   } else {
-    verbose('not: app registered to start on login')
+    if (!isProdBuild) verbose('not: app registered to start on login')
   }
 
   useIpcMain()
-  verbose('app using IPC main module')
+  if (!isProdBuild) verbose('app using IPC main module')
   tray = useTray()
-  verbose('app using Tray module')
+  if (!isProdBuild) verbose('app using Tray module')
   setNewBreak({})
-  verbose('app break set')
-  verbose('app ended init process')
-  if (!isDevelopment) {
+  if (!isProdBuild) verbose('app break set')
+  if (!isProdBuild) verbose('app ended init process')
+  if (isProdBuild) {
     autoUpdater.checkForUpdatesAndNotify()
   }
 })
 
 // Exit cleanly on request from parent process in development mode.
-if (isDevelopment) {
+if (!isProdBuild) {
   if (process.platform === 'win32') {
     process.on('message', (data) => {
       if (data === 'graceful-exit') {

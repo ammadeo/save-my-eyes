@@ -48,12 +48,13 @@ export default mixins(TransparentClickEngine).extend({
     beforeStartBreak() {
       this.showBreakCard = false
     },
-    startBreak() {
+    async startBreak() {
       try {
-        StartBreak.ask({})
-        this.$router.push({ name: 'Index' })
+        await StartBreak.ask({})
       } catch (error) {
         console.error(error)
+      } finally {
+        this.$router.push({ name: 'Index' })
       }
     },
     async skipBreak() {

@@ -1,6 +1,6 @@
 import { scheduleJob, Job } from 'node-schedule'
-import { addSeconds, parseISO } from 'date-fns'
-import { isProd, isProdBuild, isDevProdTest } from './env'
+import { addSeconds } from 'date-fns'
+import { isProdBuild, isDevProdTest } from './env'
 import { createWindowIndex, closeAllWindows } from './windows'
 import {
   breakIndex,
@@ -9,7 +9,6 @@ import {
   lastSchedulerJobLength,
 } from './store'
 import { getUserSettingsStore } from './db'
-// import log from 'electron-log'
 
 let breakSchedule: Job | undefined
 

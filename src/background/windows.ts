@@ -135,7 +135,7 @@ const createWindowIndexChild = async (
   const { height, width, x, y } = bounds
 
   if (rendererWindows.windowIndex) {
-    return await createWindow(`windowChild-${index}`, url, {
+    return createWindow(`windowChild-${index}`, url, {
       width,
       height,
       y,
