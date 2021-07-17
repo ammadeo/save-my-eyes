@@ -17,3 +17,5 @@ jobs:
         run: npm ci
       - name: Build and release
         run: npm run electron:publish
+        env:
+          GH_TOKEN: ${{ secrets.github_token }}
