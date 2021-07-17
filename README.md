@@ -9,7 +9,7 @@
   <li>It's easy to customize Your break time</li> 
   <li>It'll prevent You from using Your computer, when You need a break (Don't worry You can always skip it with one click :wink:)</li> 
   <li>You can accesses all options from tray menu</li>
-  <li>It works on multiple screens setup</li>
+  <li>It works on multiple monitors setup</li>
   <li>It's free! <a href="https://www.buymeacoffee.com/ammadeo">You can buy me a coffee here :coffee:</a></li> 
 </ul>
 <br/>
