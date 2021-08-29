@@ -10,6 +10,7 @@ import {
   focusOn,
   setBackgroundOf,
   rendererWindows,
+  closeAllWindows,
 } from './windows'
 import { setNewBreak, NewBreakOptions } from './breaker'
 import { isProdBuild } from './env'
@@ -128,6 +129,11 @@ export const {
 } = IpcChanelFactory.create<{}, undefined>('close-app')
 
 export const {
+  main: mainCloseAllWindows,
+  renderer: rendererCloseAllWindows,
+} = IpcChanelFactory.create<{}, undefined>('close-all-windows')
+
+export const {
   main: mainStartBreak,
   renderer: rendererStartBreak,
 } = IpcChanelFactory.create<{}, {}>('start-break')
@@ -160,6 +166,11 @@ export const useIpcMain = () => {
       error(err)
     }
     return {}
+  })
+
+  mainCloseAllWindows.listen(async () => {
+    closeAllWindows()
+    return undefined
   })
 
   mainCloseApp.listen(async () => {

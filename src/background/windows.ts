@@ -4,26 +4,28 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { NewBreakOptions, setNewBreak } from './breaker'
 import { appIcon } from './paths'
 import { error } from 'electron-log'
+import { log } from 'console'
 
 export const backgroundDefault = '#121959'
 export const backgroundTransparent = '#00000000'
 export let rendererWindows: {
-  [key: string]: BrowserWindow | undefined
-  windowIndex: undefined | BrowserWindow
-  windowTray: undefined | BrowserWindow
+  [key: string]: BrowserWindow | null
+  windowIndex: null | BrowserWindow
+  windowTray: null | BrowserWindow
 } = {
-  windowIndex: undefined,
-  windowTray: undefined,
+  windowIndex: null,
+  windowTray: null,
 }
 
 export const closeAllWindows = () => {
   console.log('rendererWindows', rendererWindows)
-  rendererWindows.windowIndex?.close()
-  rendererWindows.windowTray?.close()
+
+  const windows = Object.values(rendererWindows)
+  windows.forEach((win) => win?.close())
 
   rendererWindows = {
-    windowIndex: undefined,
-    windowTray: undefined,
+    windowIndex: null,
+    windowTray: null,
   }
 }
 
@@ -106,7 +108,7 @@ const createWindow = async (
     }
 
     newWindow.on('closed', () => {
-      rendererWindows[windowKey] = undefined
+      rendererWindows[windowKey] = null
       if (windowKey === 'windowIndex') {
         // console.warn('warn', 'handling force close of index window, without prior new break set')
         setNewBreak({})
@@ -133,7 +135,7 @@ const createWindowIndexChild = async (
 ) => {
   const url = '/#/Blank'
   const { height, width, x, y } = bounds
-
+  log('bounds', 'x', x, 'y', y)
   if (rendererWindows.windowIndex) {
     return createWindow(`windowChild-${index}`, url, {
       width,
@@ -141,7 +143,6 @@ const createWindowIndexChild = async (
       y,
       x,
       backgroundColor: backgroundDefault,
-      parent: rendererWindows.windowIndex,
       ...baseWindowSettings(),
     })
   }

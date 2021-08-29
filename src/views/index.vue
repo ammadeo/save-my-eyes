@@ -69,6 +69,7 @@ import { remote } from 'electron'
 import {
   rendererSetNextBreak as setNextBreak,
   rendererEmitEndBreak as emitEndBreak,
+rendererCloseAllWindows,
 } from '@/background/ipc'
 import { addSeconds } from 'date-fns'
 import { CheckIsLongBreak, GetBreakTime } from '@/utils/mixins/breaks'
@@ -155,9 +156,8 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
     setForceCloseLock(to: boolean) {
       this.forceCloseLock = to
     },
-    closeWindow() {
-      const window = remote.getCurrentWindow()
-      window.close()
+    async closeWindow() {
+      await rendererCloseAllWindows.ask({})
     },
     hideWindow() {
       const window = remote.getCurrentWindow()
@@ -187,7 +187,7 @@ export default mixins(CheckIsLongBreak, GetBreakTime).extend({
     },
     async close() {
       this.closing = true
-      this.closeWindow()
+      await this.closeWindow()
     },
   },
 })

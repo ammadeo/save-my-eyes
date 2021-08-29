@@ -43,7 +43,10 @@ import ContentStopProtection from '../components/ContentStopProtection.vue'
 import CardCloseable from '../components/CardCloseable.vue'
 import { RunKey } from '@/types/menu'
 import { remote } from 'electron'
-import { rendererSetNextBreak as setNextBreak } from '@/background/ipc'
+import {
+  rendererCloseAllWindows,
+  rendererSetNextBreak as setNextBreak,
+} from '@/background/ipc'
 import { TransparentClickEngine } from '@/utils/mixins/transparentClickEngine'
 import mixins from 'vue-typed-mixins'
 
@@ -76,9 +79,8 @@ export default mixins(TransparentClickEngine).extend({
     async closeWindow() {
       this.openedKey = ''
       if (this.settingsChanged) await this.resetNextBreak()
-      setTimeout(() => {
-        const window = remote.getCurrentWindow()
-        window.close()
+      setTimeout(async () => {
+        await rendererCloseAllWindows.ask({})
       }, 1000)
     },
     async resetNextBreak() {

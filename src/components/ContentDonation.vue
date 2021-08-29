@@ -35,6 +35,7 @@ import Vue from 'vue'
 import ButtonIcon from './ButtonIcon.vue'
 // import mixins from 'vue-typed-mixins'
 import { shell, remote } from 'electron'
+import { rendererCloseAllWindows } from '@/background/ipc'
 export default Vue.extend({
   components: { ButtonIcon },
   props: {
@@ -61,7 +62,7 @@ export default Vue.extend({
   methods: {
     async openCoffee() {
       await shell.openExternal('https://buymeacoffee.com/ammadeo')
-      remote.getCurrentWindow().close()
+      await rendererCloseAllWindows.ask({})
     },
   },
 })

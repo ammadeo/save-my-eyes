@@ -29,6 +29,7 @@ import { remote } from 'electron'
 import {
   rendererSetNextBreak as setNextBreak,
   rendererStartBreak as StartBreak,
+  rendererCloseAllWindows,
 } from '@/background/ipc'
 
 import { TransparentClickEngine } from '@/utils/mixins/transparentClickEngine'
@@ -60,8 +61,7 @@ export default mixins(TransparentClickEngine).extend({
     async skipBreak() {
       try {
         await setNextBreak.ask({})
-        const window = remote.getCurrentWindow()
-        window.close()
+        await rendererCloseAllWindows.ask({})
       } catch (error) {
         console.error(error)
       }
