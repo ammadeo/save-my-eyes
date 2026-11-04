@@ -1,7 +1,9 @@
 //! Break state machine and timer: idle --(timer)--> before --(start)--> active --(end)--> idle.
 //!
 //! Semantics follow `legacy-electron/src/background/breaker.ts`. A break that comes due
-//! during a calendar meeting is held until the meeting ends (`calendar::held_until`). State lives in one
+//! during a calendar meeting is held until the meeting ends (`calendar::held_until`); if a
+//! long break would have come due while it waited, the held break becomes that long break
+//! (`index_after_hold`). State lives in one
 //! `Mutex<Scheduler>`; window work is queued on the main thread *after* the lock is
 //! released (`run_on_main_thread` runs inline on the main thread, so holding the lock
 //! across it could deadlock through window event handlers).
@@ -73,9 +75,19 @@ pub struct Scheduler {
     active_length: u32,
     skip_before_break: bool,
     held_for_meeting: bool,
+    /// The break as it was when a meeting first held it, so `index_after_hold` can be
+    /// re-evaluated each time the hold is extended.
+    held: Option<Hold>,
     /// Bumped on every (re)schedule and on break start; a timer only fires if it still matches.
     generation: u64,
     task: Option<JoinHandle<()>>,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct Hold {
+    index: u32,
+    /// When the break was originally due.
+    since: DateTime<Utc>,
 }
 
 // ---- pure rules (unit tested) ----
@@ -91,6 +103,25 @@ pub fn next_break_index(old: u32, force: Option<ForceType>, long_every: u32) -> 
 
 pub fn is_long(break_index: u32, long_every: u32) -> bool {
     break_index.is_multiple_of(long_every.max(1))
+}
+
+/// The index a break held since `since` (when it was due as break `index`) has when it
+/// fires at `fires_at`: the first long break among the slots that would have come due
+/// every `every` seconds meanwhile, so a long meeting is followed by a long break and not
+/// by the short one it swallowed first. Nothing changes when no long slot passed.
+pub fn index_after_hold(
+    index: u32,
+    since: DateTime<Utc>,
+    fires_at: DateTime<Utc>,
+    every: u32,
+    long_every: u32,
+) -> u32 {
+    let waited = (fires_at - since).num_seconds().max(0) as u64;
+    // One full cycle always holds a long break; no need to look further.
+    let missed = (waited / u64::from(every.max(1))).min(u64::from(long_every.max(1))) as u32;
+    (index..=index.saturating_add(missed))
+        .find(|&i| is_long(i, long_every))
+        .unwrap_or(index)
 }
 
 pub fn break_length(is_long: bool, breaks: &Breaks) -> u32 {
@@ -211,6 +242,7 @@ pub fn set_next_break(app: &AppHandle, opts: NextBreakOptions) -> BreakState {
         sch.started_at = None;
         sch.skip_before_break = opts.skip_before_break;
         sch.held_for_meeting = false;
+        sch.held = None;
         let generation = sch.arm(app, Utc::now() + Duration::from_secs(delay.into()));
         (sch.snapshot(&s), generation)
     });
@@ -233,12 +265,15 @@ enum Fired {
 }
 
 /// Timer expiry: open `before-break`, or go straight to the break when `skipBeforeBreak`.
-/// With `hold`, a break due during a meeting is re-armed for when it ends instead, keeping
-/// its index. No-op when the timer was superseded or the break already fired.
+/// With `hold`, a break due during a meeting is re-armed for when it ends instead; it
+/// becomes a long break if one would have come due meanwhile (`index_after_hold`). No-op
+/// when the timer was superseded or the break already fired.
 fn fire(app: &AppHandle, generation: u64, hold: bool) -> Option<BreakState> {
     let s = settings(app);
+    let now = Utc::now();
+    let every = effective_delay(None, s.breaks.every, dev_override());
     let held_until = hold
-        .then(|| crate::calendar::held_until(app, Utc::now()))
+        .then(|| crate::calendar::held_until(app, now))
         .flatten();
     let (state, fired) = with_scheduler(app, |sch| {
         if sch.generation != generation || sch.phase != Phase::Idle {
@@ -246,9 +281,19 @@ fn fire(app: &AppHandle, generation: u64, hold: bool) -> Option<BreakState> {
         }
         sch.task = None;
         if let Some(at) = held_until {
+            let hold = *sch.held.get_or_insert(Hold {
+                index: sch.break_index,
+                since: sch.scheduled_at.unwrap_or(now),
+            });
+            sch.break_index =
+                index_after_hold(hold.index, hold.since, at, every, s.breaks.long.every);
             sch.held_for_meeting = true;
             sch.arm(app, at);
             return Some((sch.snapshot(&s), Fired::Held));
+        }
+        if let Some(hold) = sch.held.take() {
+            sch.break_index =
+                index_after_hold(hold.index, hold.since, now, every, s.breaks.long.every);
         }
         sch.held_for_meeting = false;
         if sch.skip_before_break {
@@ -260,7 +305,10 @@ fn fire(app: &AppHandle, generation: u64, hold: bool) -> Option<BreakState> {
         }
     })?;
     match fired {
-        Fired::Held => eprintln!("[scheduler] in a meeting, holding the break"),
+        Fired::Held => eprintln!(
+            "[scheduler] in a meeting, holding break {} (long={})",
+            state.break_index, state.is_long
+        ),
         Fired::Break => on_main(app, "open break windows", open_break),
         Fired::Before => on_main(app, "open before-break", windows::open_before_break_window),
     }
@@ -376,6 +424,31 @@ mod tests {
     #[test]
     fn zero_long_every_does_not_panic() {
         assert!(is_long(4, 0));
+    }
+
+    #[test]
+    fn a_held_break_becomes_the_long_break_it_swallowed() {
+        let t0 = Utc::now();
+        let after = |mins: i64| t0 + Duration::from_secs(60 * mins as u64);
+        let held = |index, mins| index_after_hold(index, t0, after(mins), 1200, 3);
+        // Short meeting: nothing missed, the short break stays short.
+        assert_eq!(held(1, 1), 1);
+        assert_eq!(held(1, 19), 1);
+        // The next slot was short too.
+        assert_eq!(held(1, 20), 1);
+        assert_eq!(held(1, 39), 1);
+        // The long break's slot passed: fire as that long break.
+        assert_eq!(held(1, 40), 3);
+        assert_eq!(held(2, 20), 3);
+        // Already long: stays long, whatever passed.
+        assert_eq!(held(3, 0), 3);
+        assert_eq!(held(3, 200), 3);
+        // Past one full cycle the first long slot still wins, never a later one.
+        assert_eq!(held(4, 300), 6);
+        // Clock went backwards: nothing missed.
+        assert_eq!(index_after_hold(1, after(5), t0, 1200, 3), 1);
+        // Degenerate settings do not panic.
+        assert_eq!(index_after_hold(u32::MAX, t0, after(100), 0, 0), u32::MAX);
     }
 
     #[test]

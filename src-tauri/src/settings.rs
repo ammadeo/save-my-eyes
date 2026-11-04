@@ -48,11 +48,13 @@ pub struct Sounds {
     pub voice: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct CalendarSettings {
     /// Hold breaks while the macOS calendar shows a meeting (`calendar.rs`).
     pub enabled: bool,
+    /// Seconds after a meeting ends before a held break fires; 0 means right away.
+    pub grace_secs: u32,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -96,6 +98,15 @@ impl Default for Sounds {
     }
 }
 
+impl Default for CalendarSettings {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            grace_secs: 60,
+        }
+    }
+}
+
 impl Default for Lang {
     fn default() -> Self {
         let locale = sys_locale::get_locale()
@@ -128,6 +139,7 @@ pub const EVERY_RANGE: (u32, u32) = (60, 60 * 60);
 pub const SHORT_LAST_RANGE: (u32, u32) = (1, 60);
 pub const LONG_LAST_RANGE: (u32, u32) = (60, 60 * 60);
 pub const LONG_EVERY_RANGE: (u32, u32) = (1, 30);
+pub const CALENDAR_GRACE_RANGE: (u32, u32) = (0, 15 * 60);
 
 fn clamp(value: &mut u32, (min, max): (u32, u32), code: &'static str, fixes: &mut Vec<Fix>) {
     let to = (*value).clamp(min, max);
@@ -150,6 +162,12 @@ impl Settings {
         clamp(&mut b.short.last, SHORT_LAST_RANGE, "shortLast", &mut fixes);
         clamp(&mut b.long.every, LONG_EVERY_RANGE, "longEvery", &mut fixes);
         clamp(&mut b.long.last, LONG_LAST_RANGE, "longLast", &mut fixes);
+        clamp(
+            &mut self.calendar.grace_secs,
+            CALENDAR_GRACE_RANGE,
+            "calendarGrace",
+            &mut fixes,
+        );
         fixes
     }
 
@@ -208,6 +226,8 @@ mod tests {
         assert_eq!(s.breaks.long.last, 300);
         assert_eq!(s.breaks.long.every, 3);
         assert!(s.sounds.ui && s.sounds.voice);
+        assert!(!s.calendar.enabled);
+        assert_eq!(s.calendar.grace_secs, 60);
     }
 
     #[test]
@@ -261,6 +281,7 @@ mod tests {
         s.breaks.short.last = 61;
         s.breaks.long.every = 31;
         s.breaks.long.last = 3601;
+        s.calendar.grace_secs = 901;
         let fixes = s.validate();
         let codes: Vec<_> = fixes.iter().map(|f| (f.code, f.to)).collect();
         assert_eq!(
@@ -269,7 +290,8 @@ mod tests {
                 ("shortEvery", 3600),
                 ("shortLast", 60),
                 ("longEvery", 30),
-                ("longLast", 3600)
+                ("longLast", 3600),
+                ("calendarGrace", 900)
             ]
         );
         assert!(s.validate().is_empty(), "validate is idempotent");
@@ -282,7 +304,10 @@ mod tests {
         s.breaks.short.last = 60;
         s.breaks.long.every = 30;
         s.breaks.long.last = 3600;
+        s.calendar.grace_secs = 900;
         assert!(s.validate().is_empty());
+        s.calendar.grace_secs = 0;
+        assert!(s.validate().is_empty(), "zero grace means fire at once");
     }
 
     #[test]
@@ -294,7 +319,7 @@ mod tests {
                 "breaks": { "every": 1200, "short": { "last": 20 }, "long": { "last": 300, "every": 3 } },
                 "sounds": { "ui": true, "voice": true },
                 "lang": "en",
-                "calendar": { "enabled": false }
+                "calendar": { "enabled": false, "graceSecs": 60 }
             })
         );
         let fix = serde_json::to_value(Fix {
@@ -318,6 +343,10 @@ mod tests {
         assert_eq!(s.lang, Lang::Pl);
         assert!(s.sounds.voice);
         assert!(!s.calendar.enabled);
+        assert_eq!(s.calendar.grace_secs, 60, "older files have no grace");
+        let s = Settings::from_json(r#"{ "calendar": { "enabled": true, "graceSecs": 0 } }"#);
+        assert!(s.calendar.enabled);
+        assert_eq!(s.calendar.grace_secs, 0);
     }
 
     #[test]

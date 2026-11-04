@@ -9,7 +9,7 @@ import { setLang } from "./i18n";
 export const defaultSettings = (): Settings => ({
   breaks: { every: 20 * 60, short: { last: 20 }, long: { last: 5 * 60, every: 3 } },
   sounds: { ui: true, voice: true },
-  calendar: { enabled: false },
+  calendar: { enabled: false, graceSecs: 60 },
   lang: typeof navigator !== "undefined" && navigator.language.toLowerCase().startsWith("pl") ? "pl" : "en",
 });
 
@@ -19,6 +19,7 @@ export const limits = {
   shortLast: [1, 60],
   longLast: [60, 3600],
   longEvery: [1, 30],
+  calendarGrace: [0, 900],
 } as const;
 
 export const settings = reactive<Settings>(defaultSettings());
@@ -32,6 +33,7 @@ export function applySettings(next: Settings) {
   settings.sounds.voice = next.sounds.voice;
   settings.lang = next.lang;
   settings.calendar.enabled = next.calendar?.enabled ?? false;
+  settings.calendar.graceSecs = next.calendar?.graceSecs ?? 60;
   setLang(next.lang);
 }
 
