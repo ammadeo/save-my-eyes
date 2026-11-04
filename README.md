@@ -36,4 +36,4 @@ deno task tauri build
 - `deno task build` builds only the frontend; `deno task test` runs the Vitest unit tests; `cargo test` inside `src-tauri` runs the Rust tests.
 - `SME_DEV_EVERY_SECS=8 deno task tauri dev` makes the first break fire after 8 seconds instead of the configured interval.
 - Settings are stored in the app config directory as `settings.json` (`settings-dev.json` for debug builds).
-- The migration notes live in [`docs/migration/`](docs/migration/PLAN.md). The previous Electron app is kept under `legacy-electron/` until the port is complete.
+- The migration notes live in [`docs/migration/`](docs/migration/PLAN.md).
