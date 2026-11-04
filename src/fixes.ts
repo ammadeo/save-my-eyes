@@ -120,6 +120,7 @@ export function settingsFromDraft(draft: SettingsDraft, base: Settings): { setti
       },
       sounds: { ...base.sounds, ui: draft.soundsUi },
       lang: draft.lang,
+      calendar: { ...base.calendar },
     },
     fixes,
   };

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { formatDistanceStrict } from "date-fns";
+import { format, formatDistanceStrict } from "date-fns";
 import BaseIcon from "../BaseIcon.vue";
-import { getBreakState, type BreakState } from "@/bridge";
+import { getBreakState, getCalendarStatus, type BreakState, type CalendarStatus } from "@/bridge";
 import { useEvent } from "@/composables/useEvent";
 import { useNow } from "@/composables/useNow";
 import { dateLocale, t, useI18n } from "@/i18n";
@@ -14,6 +14,11 @@ const { t: tl, tg } = useI18n({
   breakNext: t("Next", "Następna"),
   breakIn: t("in", "za"),
   breakIsNow: t("is still going", "trwa"),
+  heldForMeeting: t("Waiting for your meeting to end", "Czeka na koniec spotkania"),
+  meetingUntil: t("until {time}", "do {time}"),
+  meetingUntitled: t("Busy", "Zajęte"),
+  callPaused: t("Breaks paused until the end of your call", "Przerwy wstrzymane do końca rozmowy"),
+  callNext: t("Your next break is scheduled after the meeting", "Następna przerwa zaplanowana jest po spotkaniu"),
   buttonStartLongBreak: t("Start a long break now", "Zacznij długą przerwę teraz"),
   buttonStopProtection: t("Stop protection", "Wstrzymaj ochronę"),
   buttonSettings: t("Settings", "Ustawienia"),
@@ -22,6 +27,7 @@ const { t: tl, tg } = useI18n({
 });
 
 const state = ref<BreakState>();
+const calendar = ref<CalendarStatus>();
 const now = useNow(1000);
 
 onMounted(async () => {
@@ -30,8 +36,23 @@ onMounted(async () => {
   } catch {
     // unknown until a `break-state` event arrives
   }
+  try {
+    calendar.value = await getCalendarStatus();
+  } catch {
+    // no meeting line until a `calendar-status` event arrives
+  }
 });
 useEvent("break-state", (next) => (state.value = next));
+useEvent("calendar-status", (next) => (calendar.value = next));
+
+const meeting = computed(() => {
+  const m = calendar.value?.meeting;
+  if (!m || Date.parse(m.until) <= now.value) return undefined;
+  return {
+    title: m.title.trim() || tl("meetingUntitled"),
+    until: tl("meetingUntil").replace("{time}", format(Date.parse(m.until), "p", { locale: dateLocale.value })),
+  };
+});
 
 const scheduledAt = computed(() => (state.value?.scheduledAt ? Date.parse(state.value.scheduledAt) : undefined));
 const isBreakNow = computed(
@@ -50,9 +71,19 @@ const nextBreakTime = computed(() =>
 
 <template>
   <section class="menu-pane">
-    <div class="mac-group status">
+    <div v-if="meeting && !isBreakNow" class="mac-group status" role="status">
+      <p class="status-label meeting">
+        <span class="meeting-dot" aria-hidden="true" />
+        <span class="meeting-title">{{ meeting.title }}</span>
+        <span class="shrink-0">· {{ meeting.until }}</span>
+      </p>
+      <p class="call-paused">{{ tl("callPaused") }}</p>
+      <p class="status-note">{{ tl("callNext") }}</p>
+    </div>
+    <div v-else class="mac-group status">
       <p class="status-label first-letter:uppercase">{{ label }}</p>
       <p v-if="!isBreakNow" class="status-value">{{ nextBreakTime }}</p>
+      <p v-if="!isBreakNow && state?.heldForMeeting" class="status-note">{{ tl("heldForMeeting") }}</p>
     </div>
 
     <button type="button" class="mac-button is-default is-large start" @click="emit('run', 'start-long-break')">
@@ -107,6 +138,36 @@ const nextBreakTime = computed(() =>
   font-weight: 600;
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
+}
+.status-note {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--mac-label-secondary);
+}
+.meeting {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.meeting-dot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mac-accent);
+}
+.meeting-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.call-paused {
+  margin: 4px 0 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 .start {
   width: 100%;

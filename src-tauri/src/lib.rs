@@ -1,3 +1,4 @@
+mod calendar;
 mod commands;
 mod macos;
 mod scheduler;
@@ -104,6 +105,9 @@ pub fn run() {
             commands::end_break,
             commands::close_window,
             commands::quit_app,
+            commands::get_calendar_status,
+            commands::set_calendar_enabled,
+            commands::open_calendar_privacy,
         ])
         .setup(|app| {
             let handle = app.handle().clone();
@@ -113,12 +117,14 @@ pub fn run() {
             let lang = settings.lang;
             app.manage(Mutex::new(settings));
             app.manage(Mutex::new(Scheduler::default()));
+            app.manage(Mutex::new(calendar::Calendar::default()));
 
             macos::hide_from_dock(&handle);
             tray::build_tray(&handle, lang)?;
             enable_autostart(&handle);
             let state = scheduler::set_next_break(&handle, NextBreakOptions::default());
             scheduler::spawn_watchdog(&handle);
+            calendar::spawn_refresher(&handle);
             notify_started(&handle, lang, state.scheduled_at.as_deref());
             Ok(())
         })
@@ -129,7 +135,10 @@ pub fn run() {
             RunEvent::ExitRequested {
                 api, code: None, ..
             } => api.prevent_exit(),
-            RunEvent::Resumed => scheduler::check_deadline(app),
+            RunEvent::Resumed => {
+                let app = app.clone();
+                tauri::async_runtime::spawn(async move { scheduler::check_deadline(&app).await });
+            }
             _ => {}
         });
 }

@@ -1,6 +1,7 @@
 //! Break state machine and timer: idle --(timer)--> before --(start)--> active --(end)--> idle.
 //!
-//! Semantics follow `legacy-electron/src/background/breaker.ts`. State lives in one
+//! Semantics follow `legacy-electron/src/background/breaker.ts`. A break that comes due
+//! during a calendar meeting is held until the meeting ends (`calendar::held_until`). State lives in one
 //! `Mutex<Scheduler>`; window work is queued on the main thread *after* the lock is
 //! released (`run_on_main_thread` runs inline on the main thread, so holding the lock
 //! across it could deadlock through window event handlers).
@@ -58,6 +59,8 @@ pub struct BreakState {
     pub scheduled_at: Option<String>,
     pub length_secs: u32,
     pub started_at: Option<String>,
+    /// The break came due during a meeting and now waits for it to end.
+    pub held_for_meeting: bool,
 }
 
 #[derive(Default)]
@@ -69,6 +72,7 @@ pub struct Scheduler {
     /// Frozen at `start_break` so a settings change does not alter a running break.
     active_length: u32,
     skip_before_break: bool,
+    held_for_meeting: bool,
     /// Bumped on every (re)schedule and on break start; a timer only fires if it still matches.
     generation: u64,
     task: Option<JoinHandle<()>>,
@@ -128,6 +132,7 @@ impl Scheduler {
             scheduled_at: self.scheduled_at.map(rfc3339),
             length_secs,
             started_at: self.started_at.map(rfc3339),
+            held_for_meeting: self.held_for_meeting,
         }
     }
 
@@ -139,10 +144,29 @@ impl Scheduler {
         self.generation
     }
 
+    /// Schedule `fire` at `at`; zero or past means the caller fires right away.
+    fn arm(&mut self, app: &AppHandle, at: DateTime<Utc>) -> u64 {
+        let generation = self.cancel_timer();
+        self.scheduled_at = Some(at);
+        if let Ok(delay) = (at - Utc::now()).to_std()
+            && !delay.is_zero()
+        {
+            let a = app.clone();
+            self.task = Some(tauri::async_runtime::spawn(async move {
+                tokio::time::sleep(delay).await;
+                // Read the calendar now so a meeting added since the last refresh counts.
+                crate::calendar::refresh(&a).await;
+                fire(&a, generation, true);
+            }));
+        }
+        generation
+    }
+
     fn begin_active(&mut self, s: &Settings) {
         self.cancel_timer();
         self.phase = Phase::Active;
         self.scheduled_at = None;
+        self.held_for_meeting = false;
         self.started_at = Some(Utc::now());
         self.active_length =
             break_length(is_long(self.break_index, s.breaks.long.every), &s.breaks);
@@ -182,19 +206,12 @@ pub fn set_next_break(app: &AppHandle, opts: NextBreakOptions) -> BreakState {
     let s = settings(app);
     let delay = effective_delay(opts.in_secs, s.breaks.every, dev_override());
     let (state, generation) = with_scheduler(app, |sch| {
-        let generation = sch.cancel_timer();
         sch.break_index = next_break_index(sch.break_index, opts.force_type, s.breaks.long.every);
         sch.phase = Phase::Idle;
         sch.started_at = None;
-        sch.scheduled_at = Some(Utc::now() + Duration::from_secs(delay.into()));
         sch.skip_before_break = opts.skip_before_break;
-        if delay > 0 {
-            let a = app.clone();
-            sch.task = Some(tauri::async_runtime::spawn(async move {
-                tokio::time::sleep(Duration::from_secs(delay.into())).await;
-                fire(&a, generation);
-            }));
-        }
+        sch.held_for_meeting = false;
+        let generation = sch.arm(app, Utc::now() + Duration::from_secs(delay.into()));
         (sch.snapshot(&s), generation)
     });
     // State is already idle, so the destroy hooks see no user skip.
@@ -202,33 +219,50 @@ pub fn set_next_break(app: &AppHandle, opts: NextBreakOptions) -> BreakState {
         on_main(app, "close break windows", windows::close_break_windows);
     }
     emit_state(app, &state);
+    // "Now" is the user asking for a break, so a meeting does not hold it.
     if delay == 0 {
-        return fire(app, generation).unwrap_or(state);
+        return fire(app, generation, false).unwrap_or(state);
     }
     state
 }
 
+enum Fired {
+    Held,
+    Before,
+    Break,
+}
+
 /// Timer expiry: open `before-break`, or go straight to the break when `skipBeforeBreak`.
-/// No-op when the timer was superseded or the break already fired.
-fn fire(app: &AppHandle, generation: u64) -> Option<BreakState> {
+/// With `hold`, a break due during a meeting is re-armed for when it ends instead, keeping
+/// its index. No-op when the timer was superseded or the break already fired.
+fn fire(app: &AppHandle, generation: u64, hold: bool) -> Option<BreakState> {
     let s = settings(app);
-    let (state, skip) = with_scheduler(app, |sch| {
+    let held_until = hold
+        .then(|| crate::calendar::held_until(app, Utc::now()))
+        .flatten();
+    let (state, fired) = with_scheduler(app, |sch| {
         if sch.generation != generation || sch.phase != Phase::Idle {
             return None;
         }
         sch.task = None;
-        let skip = sch.skip_before_break;
-        if skip {
+        if let Some(at) = held_until {
+            sch.held_for_meeting = true;
+            sch.arm(app, at);
+            return Some((sch.snapshot(&s), Fired::Held));
+        }
+        sch.held_for_meeting = false;
+        if sch.skip_before_break {
             sch.begin_active(&s);
+            Some((sch.snapshot(&s), Fired::Break))
         } else {
             sch.phase = Phase::Before;
+            Some((sch.snapshot(&s), Fired::Before))
         }
-        Some((sch.snapshot(&s), skip))
     })?;
-    if skip {
-        on_main(app, "open break windows", open_break);
-    } else {
-        on_main(app, "open before-break", windows::open_before_break_window);
+    match fired {
+        Fired::Held => eprintln!("[scheduler] in a meeting, holding the break"),
+        Fired::Break => on_main(app, "open break windows", open_break),
+        Fired::Before => on_main(app, "open before-break", windows::open_before_break_window),
     }
     emit_state(app, &state);
     Some(state)
@@ -240,14 +274,15 @@ fn open_break(app: &AppHandle) -> tauri::Result<()> {
 }
 
 /// Sleep/wake safety: fire if the wall-clock deadline has passed but the timer has not.
-pub fn check_deadline(app: &AppHandle) {
+pub async fn check_deadline(app: &AppHandle) {
     let due = with_scheduler(app, |sch| match (sch.phase, sch.scheduled_at) {
         (Phase::Idle, Some(at)) if at <= Utc::now() => Some(sch.generation),
         _ => None,
     });
     if let Some(generation) = due {
         eprintln!("[scheduler] deadline passed without timer (sleep?), firing now");
-        fire(app, generation);
+        crate::calendar::refresh(app).await;
+        fire(app, generation, true);
     }
 }
 
@@ -257,7 +292,7 @@ pub fn spawn_watchdog(app: &AppHandle) {
         let mut tick = tokio::time::interval(WATCHDOG_EVERY);
         loop {
             tick.tick().await;
-            check_deadline(&app);
+            check_deadline(&app).await;
         }
     });
 }
@@ -411,12 +446,14 @@ mod tests {
             scheduled_at: Some("2026-11-04T10:00:00.000Z".into()),
             length_secs: 20,
             started_at: None,
+            held_for_meeting: false,
         };
         assert_eq!(
             serde_json::to_value(&st).unwrap(),
             serde_json::json!({
                 "breakIndex": 2, "isLong": false, "phase": "before",
-                "scheduledAt": "2026-11-04T10:00:00.000Z", "lengthSecs": 20, "startedAt": null
+                "scheduledAt": "2026-11-04T10:00:00.000Z", "lengthSecs": 20, "startedAt": null,
+                "heldForMeeting": false
             })
         );
         let o: NextBreakOptions =

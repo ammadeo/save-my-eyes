@@ -13,6 +13,7 @@ pub struct Settings {
     pub breaks: Breaks,
     pub sounds: Sounds,
     pub lang: Lang,
+    pub calendar: CalendarSettings,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -45,6 +46,13 @@ pub struct LongBreak {
 pub struct Sounds {
     pub ui: bool,
     pub voice: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(default, rename_all = "camelCase")]
+pub struct CalendarSettings {
+    /// Hold breaks while the macOS calendar shows a meeting (`calendar.rs`).
+    pub enabled: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -285,7 +293,8 @@ mod tests {
             serde_json::json!({
                 "breaks": { "every": 1200, "short": { "last": 20 }, "long": { "last": 300, "every": 3 } },
                 "sounds": { "ui": true, "voice": true },
-                "lang": "en"
+                "lang": "en",
+                "calendar": { "enabled": false }
             })
         );
         let fix = serde_json::to_value(Fix {
@@ -308,6 +317,7 @@ mod tests {
         assert_eq!(s.breaks.long.every, 30);
         assert_eq!(s.lang, Lang::Pl);
         assert!(s.sounds.voice);
+        assert!(!s.calendar.enabled);
     }
 
     #[test]
