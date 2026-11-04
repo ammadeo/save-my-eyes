@@ -25,7 +25,7 @@ A menu-bar agent that enforces breaks gently: the break is a full-screen cover y
 - Runs as a menu-bar-only agent (no Dock icon), started at login.
 - Four window kinds, all created from Rust at runtime: `menu` (tray popover with countdown, long-break shortcut, stop protection, settings, quit), `before-break` (a small card top-right of the primary display: Wait / Start / Skip, auto-starts in 5 s), `break` (full-screen cover on the primary display: countdown, idea card, skip/finish, inline settings and stop protection), and `cover-N` (blank cover on every other display).
 - Short breaks auto-close when the clock ends; long breaks wait for the user. Short and long sound cues play at start and end when sounds are on.
-- Settings (cadence, lengths, sounds, language) persist in a JSON file and are clamped by the Rust side.
+- Settings (cadence, lengths, sounds, language, meeting hold and its pause after a call) persist in a JSON file and are clamped by the Rust side.
 
 ## Capabilities and Constraints
 

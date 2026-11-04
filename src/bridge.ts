@@ -21,10 +21,11 @@ export interface Settings {
   };
   sounds: { ui: boolean; voice: boolean };
   lang: Lang;
-  calendar: { enabled: boolean };
+  /** `graceSecs`: how long a break held for a meeting waits after it ends (seconds). */
+  calendar: { enabled: boolean; graceSecs: number };
 }
 
-export type FixCode = "shortEvery" | "shortLast" | "longEvery" | "longLast";
+export type FixCode = "shortEvery" | "shortLast" | "longEvery" | "longLast" | "calendarGrace";
 
 export interface Fix {
   code: FixCode;

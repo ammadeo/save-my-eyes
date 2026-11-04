@@ -68,7 +68,7 @@ onUnmounted(() => clearTimeout(timer));
       </div>
     </div>
 
-    <MenuCalendar />
+    <MenuCalendar v-model="draft.calendarGrace" />
 
     <div class="glass-group">
       <label class="glass-row">

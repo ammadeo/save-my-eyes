@@ -14,7 +14,7 @@ const { t: tl, tg } = useI18n({
   breakNext: t("Next", "Następna"),
   breakIn: t("in", "za"),
   breakIsNow: t("is still going", "trwa"),
-  heldForMeeting: t("Waiting for your meeting to end", "Czeka na koniec spotkania"),
+  heldForMeeting: t("Moved to after your meeting", "Przesunięta na czas po spotkaniu"),
   meetingUntil: t("until {time}", "do {time}"),
   meetingUntitled: t("Busy", "Zajęte"),
   callPaused: t("Breaks paused until the end of your call", "Przerwy wstrzymane do końca rozmowy"),

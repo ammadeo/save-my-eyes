@@ -1,17 +1,25 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import MacSliderRow from "./MacSliderRow.vue";
 import { getCalendarStatus, openCalendarPrivacy, setCalendarEnabled, type CalendarStatus } from "@/bridge";
 import { t, useI18n } from "@/i18n";
 import { useEvent } from "@/composables/useEvent";
+import { uiRanges } from "@/fixes";
 import { log } from "@/log";
 import { settings } from "@/settings";
 
-const { t: tl } = useI18n({
+/** `modelValue`: the draft's pause after a call, in seconds (saved with "Save changes"). */
+defineProps<{ modelValue: number }>();
+const emit = defineEmits<{ "update:modelValue": [value: number] }>();
+
+const { t: tl, tg } = useI18n({
   title: t("Meetings", "Spotkania"),
   toggle: t("Don't break during meetings", "Bez przerw w trakcie spotkań"),
+  grace: t("Pause breaks after a call ends", "Wstrzymaj przerwy po zakończeniu rozmowy"),
+  graceZero: t("Immediately", "Od razu"),
   hint: t(
-    "A break that falls during an event from the Calendar app starts a minute after it ends. For Google Calendar, add your Google account in System Settings › Internet Accounts.",
-    "Przerwa wypadająca w trakcie wydarzenia z aplikacji Kalendarz zacznie się minutę po jego końcu. Aby użyć Kalendarza Google, dodaj konto Google w Ustawieniach systemowych › Konta internetowe.",
+    "A break that falls during an event from the Calendar app waits until the event ends. For Google Calendar, add your Google account in System Settings › Internet Accounts.",
+    "Przerwa wypadająca w trakcie wydarzenia z aplikacji Kalendarz poczeka do jego końca. Aby użyć Kalendarza Google, dodaj konto Google w Ustawieniach systemowych › Konta internetowe.",
   ),
   denied: t("Save My Eyes has no access to your calendar.", "Save My Eyes nie ma dostępu do kalendarza."),
   openSettings: t("Open Privacy Settings…", "Otwórz ustawienia prywatności…"),
@@ -80,6 +88,16 @@ async function openPrivacy() {
           @change="toggle"
         />
       </label>
+      <MacSliderRow
+        :model-value="modelValue"
+        :label="tl('grace')"
+        :min="uiRanges.calendarGraceMin[0]"
+        :max="uiRanges.calendarGraceMin[1]"
+        :scale="60"
+        :suffix="tg('minutesSuffix')"
+        :zero-label="tl('graceZero')"
+        @update:model-value="emit('update:modelValue', $event)"
+      />
       <div v-if="notAsked" class="glass-row warning" role="status">
         <span class="grow">{{ tl("notAsked") }}</span>
         <button type="button" class="glass-button" :disabled="busy" @click="apply(true)">{{ tl("allow") }}</button>

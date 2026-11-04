@@ -18,9 +18,11 @@ pub const EVT_CALENDAR_STATUS: &str = "calendar-status";
 pub const REFRESH_EVERY: Duration = Duration::from_secs(60);
 /// A cache older than this is ignored (refresh loop stalled, Mac asleep).
 const STALE_AFTER: TimeDelta = TimeDelta::minutes(30);
-/// A held break fires this long after the meeting ends. Meetings that start within this
-/// gap count as one block.
-pub const GRACE: TimeDelta = TimeDelta::minutes(1);
+/// Default for `calendar.graceSecs`: a held break fires this long after the meeting ends.
+/// Meetings that start within the grace count as one block. Unit tests only; the runtime
+/// reads the user's value.
+#[cfg(test)]
+const GRACE: TimeDelta = TimeDelta::minutes(1);
 const LOOK_BACK: TimeDelta = TimeDelta::hours(12);
 const LOOK_AHEAD: TimeDelta = TimeDelta::hours(12);
 
@@ -109,8 +111,9 @@ pub fn busy_events(events: impl IntoIterator<Item = EventInfo>) -> Vec<Busy> {
 }
 
 /// The earliest-started meeting covering `now`, with the end of its busy block: meetings
-/// that start within `GRACE` of the previous one ending are merged. `None` when free.
-pub fn current_meeting(busy: &[Busy], now: DateTime<Utc>) -> Option<Meeting> {
+/// that start within `grace` of the previous one ending are merged, since a break that
+/// would fire in that gap would only be held again. `None` when free.
+pub fn current_meeting(busy: &[Busy], now: DateTime<Utc>, grace: TimeDelta) -> Option<Meeting> {
     let mut upcoming: Vec<_> = busy.iter().filter(|b| b.interval.end > now).collect();
     upcoming.sort_by_key(|b| b.interval.start);
     let mut meeting: Option<Meeting> = None;
@@ -123,7 +126,7 @@ pub fn current_meeting(busy: &[Busy], now: DateTime<Utc>) -> Option<Meeting> {
                     until: i.end,
                 })
             }
-            Some(m) if i.start <= m.until + GRACE => m.until = m.until.max(i.end),
+            Some(m) if i.start <= m.until + grace => m.until = m.until.max(i.end),
             _ => break,
         }
     }
@@ -147,14 +150,21 @@ fn enabled(app: &AppHandle) -> bool {
     crate::scheduler::settings(app).calendar.enabled
 }
 
+/// How long after a meeting ends a held break fires (`calendar.graceSecs`, clamped by
+/// `settings::validate`).
+fn grace(app: &AppHandle) -> TimeDelta {
+    TimeDelta::seconds(crate::scheduler::settings(app).calendar.grace_secs.into())
+}
+
 /// The meeting going on at `now` per a fresh cache, if the feature is on.
 fn meeting_now(app: &AppHandle, now: DateTime<Utc>) -> Option<Meeting> {
     if !enabled(app) {
         return None;
     }
+    let grace = grace(app);
     let cal = lock(app);
     match cal.fetched_at {
-        Some(at) if now - at <= STALE_AFTER => current_meeting(&cal.busy, now),
+        Some(at) if now - at <= STALE_AFTER => current_meeting(&cal.busy, now, grace),
         _ => None,
     }
 }
@@ -162,8 +172,13 @@ fn meeting_now(app: &AppHandle, now: DateTime<Utc>) -> Option<Meeting> {
 /// When a break due at `now` should fire instead, or `None` to fire now.
 pub fn held_until(app: &AppHandle, now: DateTime<Utc>) -> Option<DateTime<Utc>> {
     let meeting = meeting_now(app, now)?;
-    eprintln!("[calendar] in a meeting until {}", rfc3339(meeting.until));
-    Some(meeting.until + GRACE)
+    let grace = grace(app);
+    eprintln!(
+        "[calendar] in a meeting until {}, holding the break for {}s after",
+        rfc3339(meeting.until),
+        grace.num_seconds()
+    );
+    Some(meeting.until + grace)
 }
 
 pub fn status(app: &AppHandle) -> CalendarStatus {
@@ -417,7 +432,7 @@ mod tests {
     }
 
     fn until(day: &[Busy], now: i64) -> Option<DateTime<Utc>> {
-        current_meeting(day, at(now)).map(|m| m.until)
+        current_meeting(day, at(now), GRACE).map(|m| m.until)
     }
 
     #[test]
@@ -431,7 +446,7 @@ mod tests {
     #[test]
     fn inside_a_meeting() {
         assert_eq!(
-            current_meeting(&[busy(-10, 20, "Standup")], at(0)),
+            current_meeting(&[busy(-10, 20, "Standup")], at(0), GRACE),
             Some(Meeting {
                 title: "Standup".into(),
                 until: at(20)
@@ -448,13 +463,34 @@ mod tests {
             busy(31, 45, "d"),
             busy(70, 90, "e"),
         ];
-        let m = current_meeting(&day, at(0)).unwrap();
+        let m = current_meeting(&day, at(0), GRACE).unwrap();
         assert_eq!((m.title.as_str(), m.until), ("a", at(60)));
     }
 
     #[test]
+    fn the_grace_decides_what_counts_as_back_to_back() {
+        let day = [busy(-10, 20, "a"), busy(25, 60, "b")];
+        // Five minutes apart: one block with a long grace, two blocks with a short one.
+        let block = |grace| current_meeting(&day, at(0), grace).map(|m| m.until);
+        assert_eq!(block(TimeDelta::minutes(15)), Some(at(60)));
+        assert_eq!(block(TimeDelta::minutes(5)), Some(at(60)));
+        assert_eq!(block(TimeDelta::minutes(4)), Some(at(20)));
+        assert_eq!(block(TimeDelta::zero()), Some(at(20)));
+        // Zero grace still merges a meeting that starts exactly when the last one ends.
+        assert_eq!(
+            current_meeting(
+                &[busy(-10, 20, "a"), busy(20, 40, "b")],
+                at(0),
+                TimeDelta::zero()
+            )
+            .map(|m| m.until),
+            Some(at(40))
+        );
+    }
+
+    #[test]
     fn overlapping_meetings_take_the_latest_end() {
-        let m = current_meeting(&[busy(-5, 20, "b"), busy(-10, 50, "a")], at(0)).unwrap();
+        let m = current_meeting(&[busy(-5, 20, "b"), busy(-10, 50, "a")], at(0), GRACE).unwrap();
         assert_eq!((m.title.as_str(), m.until), ("a", at(50)));
     }
 

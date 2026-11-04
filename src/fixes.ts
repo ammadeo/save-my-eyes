@@ -39,6 +39,7 @@ const names: Record<FixCode, Translation> = {
   shortLast: t("short break length", "długość krótkiej przerwy"),
   longEvery: t("long break every", "czas między długimi przerwami"),
   longLast: t("long break length", "długość długiej przerwy"),
+  calendarGrace: t("pause after a call", "wstrzymanie po rozmowie"),
 };
 
 function formatSeconds(value: number, lang: Lang) {
@@ -63,6 +64,8 @@ export interface SettingsDraft {
   longLast: number;
   soundsUi: boolean;
   lang: Lang;
+  /** Pause after a meeting ends before a held break fires, in seconds. */
+  calendarGrace: number;
 }
 
 /** UI ranges (legacy ContentSettings), tighter than the Rust clamps. */
@@ -71,6 +74,7 @@ export const uiRanges = {
   shortLastSec: [5, 60],
   longEveryMaxMin: 120,
   longLastMin: [1, 60],
+  calendarGraceMin: [0, 15],
 } as const;
 
 export const draftFromSettings = (s: Settings): SettingsDraft => ({
@@ -80,6 +84,7 @@ export const draftFromSettings = (s: Settings): SettingsDraft => ({
   longLast: s.breaks.long.last,
   soundsUi: s.sounds.ui,
   lang: s.lang,
+  calendarGrace: s.calendar.graceSecs,
 });
 
 /** Snaps the long-break interval to a multiple of the short-break interval. */
@@ -110,6 +115,15 @@ export function settingsFromDraft(draft: SettingsDraft, base: Settings): { setti
       .max(uiRanges.longLastMin[1] * 60)
       .val(),
   );
+  const graceSecs = track(
+    "calendarGrace",
+    new FixNumber(draft.calendarGrace)
+      .round()
+      .toClosest(60)
+      .min(uiRanges.calendarGraceMin[0] * 60)
+      .max(uiRanges.calendarGraceMin[1] * 60)
+      .val(),
+  );
 
   return {
     settings: {
@@ -120,7 +134,8 @@ export function settingsFromDraft(draft: SettingsDraft, base: Settings): { setti
       },
       sounds: { ...base.sounds, ui: draft.soundsUi },
       lang: draft.lang,
-      calendar: { ...base.calendar },
+      // `enabled` applies instantly outside the draft (MenuCalendar's toggle).
+      calendar: { enabled: base.calendar.enabled, graceSecs },
     },
     fixes,
   };

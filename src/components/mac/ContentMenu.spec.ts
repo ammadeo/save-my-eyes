@@ -50,7 +50,7 @@ describe("components/mac/ContentMenu.vue", () => {
   test("says when a break waits for a meeting", async () => {
     vi.mocked(getBreakState).mockResolvedValue(state({ heldForMeeting: true }));
     const { findByText } = render(Component);
-    expect(await findByText("Waiting for your meeting to end")).toBeVisible();
+    expect(await findByText("Moved to after your meeting")).toBeVisible();
   });
 
   test("replaces the countdown with the call going on", async () => {
@@ -67,7 +67,7 @@ describe("components/mac/ContentMenu.vue", () => {
     expect(await findByText("Breaks paused until the end of your call")).toBeVisible();
     expect(await findByText("Your next break is scheduled after the meeting")).toBeVisible();
     expect(queryByText("Next short break in")).toBeNull();
-    expect(queryByText("Waiting for your meeting to end")).toBeNull();
+    expect(queryByText("Moved to after your meeting")).toBeNull();
   });
 
   test("has start a long break now button", async () => {
