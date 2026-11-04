@@ -25,7 +25,7 @@ const longIdeas: Idea[] = [
     title: t("Do some exercises", "Poćwicz chwilę"),
     img: { src: workoutImg, alt: t("Woman dancing", "Tańcząca kobieta") },
     content: t(
-      "Few minutes of workout will help you relax from sitting position",
+      "A few minutes of workout will help you relax from sitting position",
       "Kilka minut ćwiczeń pomoże ci się zrelaksować",
     ),
   },
@@ -70,7 +70,7 @@ const shortIdeas: Idea[] = [
   {
     title: t("Blink your eyes", "Pomrugaj oczami"),
     img: { src: blinkImg, alt: t("Man looks at the darkness", "Mężczyzna patrzy w ciemność") },
-    content: t("Blink few times to clean your eyes", "Mrugnij kilka razy, aby oczyścić oczy"),
+    content: t("Blink a few times to clean your eyes", "Mrugnij kilka razy, aby oczyścić oczy"),
   },
 ];
 

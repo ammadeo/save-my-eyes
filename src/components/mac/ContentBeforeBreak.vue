@@ -12,12 +12,13 @@ const props = withDefaults(defineProps<{ long?: boolean; autoStartMs?: number }>
 const emit = defineEmits<{ break: []; skip: []; wait: [] }>();
 
 const { t: tl, tg } = useI18n({
-  contentStart: t("start a break now", "rozpocznij przerwę teraz"),
-  contentWait: t("wait", "zaczekaj chwilę"),
-  contentSkip: t("skip a break", "pomiń przerwę"),
+  // Polish is kept short: both buttons must fit the 360px card side by side.
+  contentStart: t("start a break now", "zacznij przerwę"),
+  contentWait: t("wait", "zaczekaj"),
+  contentSkip: t("skip a break", "pomiń"),
   contentBase: t("will start", "zacznie się"),
   statusWaiting: t("when you're ready", "kiedy zechcesz"),
-  statusStarting: t("in 5 seconds", "za 5 sekund"),
+  statusIn: t("in", "za"),
   waitingPrefix: t("You're waiting for", "Czekasz już"),
 });
 
@@ -32,8 +33,18 @@ const countdown = useCountdown(start, start + props.autoStartMs, () => {
 });
 const percent = computed(() => (countdown.elapsed.value / countdown.total.value) * 100);
 
+/** "5 seconds" / "5 sekund", "2 sekundy", "1 sekunda": counts down with the bar. */
+const secondsLeft = computed(() => {
+  const n = Math.max(1, Math.ceil(countdown.remaining.value / 1000));
+  if (lang.value !== "pl") return `${n} ${n === 1 ? "second" : "seconds"}`;
+  const few = n % 10 >= 2 && n % 10 <= 4 && !(n % 100 >= 12 && n % 100 <= 14);
+  return `${n} ${n === 1 ? "sekunda" : few ? "sekundy" : "sekund"}`;
+});
 const status = computed(
-  () => `${props.long ? tg("breakLong") : tg("breakShort")} ${tl("contentBase")} ${waiting.value ? tl("statusWaiting") : tl("statusStarting")}`,
+  () =>
+    `${props.long ? tg("breakLong") : tg("breakShort")} ${tl("contentBase")} ${
+      waiting.value ? tl("statusWaiting") : `${tl("statusIn")} ${secondsLeft.value}`
+    }`,
 );
 
 function updateWaitingInfo() {
@@ -88,12 +99,11 @@ onUnmounted(() => clearInterval(waitingTimer));
 </template>
 
 <style scoped>
-/* No background: the native glass paints the card (18px native corners). */
+/* No background: the native glass paints the card (18px native corners). The window is sized to this article. */
 .banner {
   box-sizing: border-box;
   display: flex;
   gap: 12px;
-  height: 100vh;
   padding: 14px;
   border-radius: var(--radius-panel);
   color: var(--label);
@@ -124,7 +134,7 @@ onUnmounted(() => clearInterval(waitingTimer));
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: auto;
+  margin-top: 12px;
 }
 .banner-progress {
   flex: 1;
@@ -138,7 +148,7 @@ onUnmounted(() => clearInterval(waitingTimer));
 
 /* After a minute of waiting the card breathes a faint sage tint over the glass. */
 .is-waiting {
-  animation: banner-pulse 1s ease-in 60s infinite alternate;
+  animation: banner-pulse 2.5s ease-in-out 60s infinite alternate;
 }
 @keyframes banner-pulse {
   to {

@@ -2,8 +2,8 @@
 import { ref } from "vue";
 import BaseButton from "./BaseButton.vue";
 import ButtonIcon from "./ButtonIcon.vue";
-import ButtonRoundable from "./ButtonRoundable.vue";
 import CardCloseable from "./CardCloseable.vue";
+import BaseIcon from "../BaseIcon.vue";
 import { useStopProtection } from "@/composables/useStopProtection";
 import { t, useI18n } from "@/i18n";
 
@@ -25,9 +25,18 @@ const pause = (hours: number) => stop.pause(hours);
 
 <template>
   <div class="relative w-full">
-    <div class="flex items-center justify-end gap-2" :class="{ invisible: open && !disabled }">
-      <p class="text-footnote" :class="disabled ? 'text-label-tertiary' : 'text-label-secondary'">{{ tl("title") }}</p>
-      <ButtonRoundable icon="pause" :label="tl('title')" data-testid="pause-button" :disabled="disabled" @click="setOpen(true)" />
+    <div class="flex justify-end" :class="{ invisible: open && !disabled }">
+      <button
+        type="button"
+        class="glass-button is-plain"
+        :aria-label="tl('title')"
+        data-testid="pause-button"
+        :disabled="disabled"
+        @click="setOpen(true)"
+      >
+        {{ tl("title") }}
+        <BaseIcon icon="pause" class="h-3 text-label-secondary" />
+      </button>
     </div>
     <Transition name="slide">
       <CardCloseable

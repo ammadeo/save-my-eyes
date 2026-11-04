@@ -37,14 +37,6 @@
   --spacing-cover: clamp(32px, 5vw, 64px);
 }
 
-/* hocus = hover or focus. `group-hocus:` comes for free. */
-@custom-variant hocus {
-  &:hover,
-  &:focus {
-    @slot;
-  }
-}
-
 @utility grid-cols-base {
   grid-template-columns: minmax(320px, 1fr) minmax(32px, 64px) minmax(min-content, 320px);
 }

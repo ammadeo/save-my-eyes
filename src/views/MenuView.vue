@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import ContentMenu from "@/components/mac/ContentMenu.vue";
 import type { RunKey } from "@/components/mac/types";
 import ContentStopProtection from "@/components/mac/ContentStopProtection.vue";
 import MenuSettings from "@/components/mac/MenuSettings.vue";
-import { closeWindow, openUrl, quitApp, setNextBreak, setWindowHeight } from "@/bridge";
+import { closeWindow, openUrl, quitApp, setNextBreak } from "@/bridge";
+import { useWindowFit } from "@/composables/useWindowFit";
 import { t, useI18n } from "@/i18n";
 import { log } from "@/log";
 
 type Pane = "menu" | "settings" | "stop-protection";
+
+const TOOLBAR_HEIGHT = 52;
+const CONTENT_PADDING_BOTTOM = 16;
 
 const { t: tl, tg } = useI18n({
   settings: t("Settings", "Ustawienia"),
@@ -24,14 +28,14 @@ const title = computed(() =>
   pane.value === "settings" ? tl("settings") : pane.value === "stop-protection" ? tl("stopProtection") : tg("title"),
 );
 
-/** The window grows and shrinks with its pane so no pane floats in empty glass. */
-const paneHeight: Record<Pane, number> = { menu: 352, settings: 500, "stop-protection": 300 };
+/** The window is as tall as its pane (toolbar + pane + bottom padding), so no pane floats in empty glass. */
+const content = ref<HTMLElement>();
+const { track: fitWindow } = useWindowFit(TOOLBAR_HEIGHT + CONTENT_PADDING_BOTTOM);
 
 function open(next: Pane) {
   direction.value = next === "menu" ? "pane-back" : "pane-forward";
   pane.value = next;
 }
-watch(pane, (p) => setWindowHeight(paneHeight[p]), { immediate: true });
 
 async function run(key: RunKey) {
   try {
@@ -56,7 +60,10 @@ async function run(key: RunKey) {
 function onKey(event: KeyboardEvent) {
   if (event.key === "Escape") closeWindow();
 }
-onMounted(() => window.addEventListener("keydown", onKey));
+onMounted(() => {
+  window.addEventListener("keydown", onKey);
+  fitWindow(content.value?.firstElementChild);
+});
 onUnmounted(() => window.removeEventListener("keydown", onKey));
 </script>
 
@@ -77,8 +84,8 @@ onUnmounted(() => window.removeEventListener("keydown", onKey));
       </button>
       <h1 class="toolbar-title text-headline" data-tauri-drag-region>{{ title }}</h1>
     </header>
-    <main class="content">
-      <Transition :name="direction" mode="out-in">
+    <main ref="content" class="content">
+      <Transition :name="direction" mode="out-in" @before-enter="fitWindow">
         <ContentMenu v-if="pane === 'menu'" key="menu" @run="run" />
         <MenuSettings v-else-if="pane === 'settings'" key="settings" />
         <ContentStopProtection v-else key="stop-protection" @close="closeWindow()" />

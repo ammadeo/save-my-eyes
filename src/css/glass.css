@@ -11,9 +11,11 @@
   --font-system: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
   /* Sage, the single accent. */
-  --accent: oklch(58% 0.07 150);
-  --accent-pressed: oklch(52% 0.07 150);
+  --accent: oklch(52% 0.07 150);
+  --accent-pressed: oklch(46% 0.07 150);
   --on-accent: oklch(99% 0.005 150);
+  /* Neutral tint for native sliders: only one sage control per screen. */
+  --control-neutral: oklch(55% 0.01 150);
 
   /* Labels: one hue, three alphas. */
   --label: oklch(22% 0.02 150 / 0.9);
@@ -24,12 +26,13 @@
   --surface: oklch(100% 0 0 / 0.45);
   --surface-raised: oklch(100% 0 0 / 0.6);
   --fill: oklch(22% 0.02 150 / 0.06);
+  --fill-pressed: oklch(22% 0.02 150 / 0.1);
   --separator: oklch(22% 0.02 150 / 0.1);
 
   --warning: oklch(60% 0.12 75);
-  --destructive: oklch(55% 0.16 25);
-  --focus-ring: oklch(58% 0.07 150 / 0.5);
-  --selection: oklch(58% 0.07 150 / 0.3);
+  --destructive: oklch(50% 0.16 25);
+  --focus-ring: oklch(52% 0.07 150 / 0.5);
+  --selection: oklch(52% 0.07 150 / 0.3);
 
   --radius-control: 8px;
   --radius-group: 14px;
@@ -41,12 +44,14 @@
     --accent: oklch(76% 0.08 150);
     --accent-pressed: oklch(70% 0.08 150);
     --on-accent: oklch(20% 0.03 150);
+    --control-neutral: oklch(80% 0.01 150);
     --label: oklch(97% 0.01 150 / 0.9);
     --label-secondary: oklch(97% 0.01 150 / 0.55);
     --label-tertiary: oklch(97% 0.01 150 / 0.3);
     --surface: oklch(100% 0 0 / 0.07);
     --surface-raised: oklch(100% 0 0 / 0.12);
     --fill: oklch(97% 0.01 150 / 0.09);
+    --fill-pressed: oklch(97% 0.01 150 / 0.16);
     --separator: oklch(97% 0.01 150 / 0.1);
     --warning: oklch(78% 0.12 80);
     --destructive: oklch(72% 0.15 25);
@@ -68,6 +73,7 @@
   background: var(--surface-raised);
 }
 .glass-row {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -81,11 +87,35 @@
   font: inherit;
   text-align: left;
 }
-.glass-row + .glass-row {
-  box-shadow: inset 0 0.5px 0 var(--separator);
+/* Hairline between rows, inset to the text start (System Settings style). */
+.glass-row + .glass-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12px;
+  right: 0;
+  height: 0.5px;
+  background: var(--separator);
+}
+.glass-row:has(> .glass-row-icon) + .glass-row::before {
+  left: 40px;
 }
 button.glass-row:active {
-  background: var(--fill);
+  background: var(--fill-pressed);
+}
+/* Rows are clipped by their group, so the focus ring sits inside the row. */
+.glass-row:focus-visible {
+  outline-offset: -3px;
+  border-radius: 0;
+}
+.glass-group > .glass-row:first-child:focus-visible {
+  border-radius: var(--radius-group) var(--radius-group) 0 0;
+}
+.glass-group > .glass-row:last-child:focus-visible {
+  border-radius: 0 0 var(--radius-group) var(--radius-group);
+}
+.glass-group > .glass-row:only-child:focus-visible {
+  border-radius: var(--radius-group);
 }
 .glass-row-icon {
   display: inline-flex;
@@ -128,7 +158,7 @@ button.glass-row:active {
   white-space: nowrap;
   transition: background-color 120ms ease-out;
   &:active:not(:disabled) {
-    background: var(--fill);
+    background: var(--fill-pressed);
   }
   &:disabled {
     opacity: 0.45;
@@ -159,7 +189,7 @@ button.glass-row:active {
     border-color: transparent;
     color: var(--label-secondary);
     &:active:not(:disabled) {
-      background: var(--fill);
+      background: var(--fill-pressed);
       color: var(--label);
     }
   }
@@ -169,7 +199,7 @@ button.glass-row:active {
 .glass-slider {
   -webkit-appearance: auto;
   appearance: auto;
-  accent-color: var(--accent);
+  accent-color: var(--control-neutral);
   margin: 0;
   width: 100%;
 }
@@ -199,11 +229,10 @@ button.glass-row:active {
   background: var(--accent);
 }
 
-/* Browser surfaces that still carry the design. */
+/* Browser surfaces that still carry the design. Outlines follow each element's own radius. */
 :focus-visible {
   outline: 3px solid var(--focus-ring);
   outline-offset: 1px;
-  border-radius: var(--radius-control);
 }
 ::selection {
   background: var(--selection);
