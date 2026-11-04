@@ -19,7 +19,8 @@
 
   /* Labels: one hue, three alphas. */
   --label: oklch(22% 0.02 150 / 0.9);
-  --label-secondary: oklch(22% 0.02 150 / 0.55);
+  /* Secondary is the floor for readable text: 0.65 keeps 11px footnotes at 4.5:1 on light glass. */
+  --label-secondary: oklch(22% 0.02 150 / 0.65);
   --label-tertiary: oklch(22% 0.02 150 / 0.3);
 
   /* Three levels of translucency on the glass. */
@@ -29,9 +30,10 @@
   --fill-pressed: oklch(22% 0.02 150 / 0.1);
   --separator: oklch(22% 0.02 150 / 0.1);
 
-  --warning: oklch(60% 0.12 75);
+  --warning: oklch(50% 0.11 75);
   --destructive: oklch(50% 0.16 25);
-  --focus-ring: oklch(52% 0.07 150 / 0.5);
+  /* Opaque sage: a translucent ring fell under 3:1 against light glass. */
+  --focus-ring: var(--accent);
   --selection: oklch(52% 0.07 150 / 0.3);
 
   --radius-control: 8px;
@@ -46,7 +48,7 @@
     --on-accent: oklch(20% 0.03 150);
     --control-neutral: oklch(80% 0.01 150);
     --label: oklch(97% 0.01 150 / 0.9);
-    --label-secondary: oklch(97% 0.01 150 / 0.55);
+    --label-secondary: oklch(97% 0.01 150 / 0.65);
     --label-tertiary: oklch(97% 0.01 150 / 0.3);
     --surface: oklch(100% 0 0 / 0.07);
     --surface-raised: oklch(100% 0 0 / 0.12);
@@ -54,9 +56,35 @@
     --fill-pressed: oklch(97% 0.01 150 / 0.16);
     --separator: oklch(97% 0.01 150 / 0.1);
     --warning: oklch(78% 0.12 80);
-    --destructive: oklch(72% 0.15 25);
-    --focus-ring: oklch(76% 0.08 150 / 0.6);
+    --destructive: oklch(76% 0.13 25);
+    --focus-ring: var(--accent);
     --selection: oklch(76% 0.08 150 / 0.35);
+  }
+}
+
+/* System Settings › Accessibility › Increase contrast: firmer labels, hairlines and surfaces. */
+@media (prefers-contrast: more) {
+  :root {
+    --label: oklch(15% 0.02 150);
+    --label-secondary: oklch(22% 0.02 150 / 0.82);
+    --label-tertiary: oklch(22% 0.02 150 / 0.6);
+    --surface: oklch(100% 0 0 / 0.7);
+    --surface-raised: oklch(100% 0 0 / 0.85);
+    --separator: oklch(22% 0.02 150 / 0.35);
+    --accent: oklch(44% 0.07 150);
+    --accent-pressed: oklch(38% 0.07 150);
+  }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root {
+    --label: oklch(100% 0 0);
+    --label-secondary: oklch(97% 0.01 150 / 0.82);
+    --label-tertiary: oklch(97% 0.01 150 / 0.6);
+    --surface: oklch(0% 0 0 / 0.35);
+    --surface-raised: oklch(0% 0 0 / 0.5);
+    --separator: oklch(97% 0.01 150 / 0.35);
+    --accent: oklch(82% 0.08 150);
+    --accent-pressed: oklch(76% 0.08 150);
   }
 }
 
@@ -233,6 +261,10 @@ button.glass-row:active {
 :focus-visible {
   outline: 3px solid var(--focus-ring);
   outline-offset: 1px;
+}
+/* Headings take focus only so VoiceOver reads them after a pane change; they are not controls. */
+[tabindex="-1"]:focus {
+  outline: none;
 }
 ::selection {
   background: var(--selection);

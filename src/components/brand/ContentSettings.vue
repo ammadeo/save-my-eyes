@@ -21,8 +21,6 @@ defineExpose({ save: form.save, changed: form.changed });
 
 <template>
   <form class="flex grow flex-col gap-3.5" @submit.prevent="emit('save')">
-    <h3 class="sr-only">{{ t("settings") }}</h3>
-
     <div class="glass-group">
       <MacSliderRow
         v-model="draft.every"

@@ -10,8 +10,8 @@ colors:
   on-accent-dark: "oklch(20% 0.03 150)"
   label: "oklch(22% 0.02 150 / 0.9)"
   label-dark: "oklch(97% 0.01 150 / 0.9)"
-  label-secondary: "oklch(22% 0.02 150 / 0.55)"
-  label-secondary-dark: "oklch(97% 0.01 150 / 0.55)"
+  label-secondary: "oklch(22% 0.02 150 / 0.65)"
+  label-secondary-dark: "oklch(97% 0.01 150 / 0.65)"
   label-tertiary: "oklch(22% 0.02 150 / 0.3)"
   label-tertiary-dark: "oklch(97% 0.01 150 / 0.3)"
   surface: "oklch(100% 0 0 / 0.45)"
@@ -24,9 +24,9 @@ colors:
   control-neutral-dark: "oklch(80% 0.01 150)"
   separator: "oklch(22% 0.02 150 / 0.1)"
   separator-dark: "oklch(97% 0.01 150 / 0.1)"
-  warning: "oklch(60% 0.12 75)"
+  warning: "oklch(50% 0.11 75)"
   destructive: "oklch(50% 0.16 25)"
-  destructive-dark: "oklch(72% 0.15 25)"
+  destructive-dark: "oklch(76% 0.13 25)"
   glass-tint: "oklch(70% 0.06 150 / 0.14)"
 typography:
   display:
@@ -137,16 +137,19 @@ Sage on glass: a single muted green against translucent white and alpha-black la
 
 ### Neutral
 - **Label** (`oklch(22% 0.02 150 / 0.9)` light, `oklch(97% 0.01 150 / 0.9)` dark): all primary text and icons.
-- **Label secondary** (alpha 0.55): captions, section titles, footnotes, status lines.
-- **Label tertiary** (alpha 0.3): chevrons, shortcuts, disabled text.
+- **Label secondary** (alpha 0.65): captions, section titles, footnotes, status lines. This is the lowest alpha allowed for readable text: 0.65 keeps 11px footnotes at 4.5:1 on light glass (0.55 measured ~3.6:1).
+- **Label tertiary** (alpha 0.3): chevrons, shortcuts, disabled text. Decoration only, never the sole carrier of information.
 - **Surface** (`oklch(100% 0 0 / 0.45)` light, `oklch(100% 0 0 / 0.07)` dark): grouped lists, cards, quiet buttons.
 - **Fill** (`oklch(22% 0.02 150 / 0.06)` / `oklch(97% 0.01 150 / 0.09)`): progress tracks, notices. **Fill pressed** (alpha 0.1 / 0.16): rows and quiet buttons while pressed.
 - **Control neutral** (`oklch(55% 0.01 150)` / `oklch(80% 0.01 150)`): the tint of native sliders, so a form of four sliders stays monochrome.
 - **Separator** (alpha 0.1 of the label hue): hairlines between rows.
 
 ### Tertiary
-- **Warning** (`oklch(60% 0.12 75)`): the "fixing settings" notice only.
-- **Destructive** (`oklch(50% 0.16 25)` / `oklch(72% 0.15 25)`): text of "Turn off for this session" and "Quit".
+- **Warning** (`oklch(50% 0.11 75)` light, `oklch(78% 0.12 80)` dark): the "fixing settings" notice only.
+- **Destructive** (`oklch(50% 0.16 25)` / `oklch(76% 0.13 25)`): text of "Turn off for this session" and "Quit".
+
+### Increase Contrast
+When macOS Increase contrast is on (`prefers-contrast: more`), labels go opaque or 0.82 alpha, tertiary 0.6, separators 0.35, surfaces firmer, and sage darkens (light) or lightens (dark) one step. Same hues, no new colours.
 
 ### Named Rules
 **The One Sage Rule.** At most one sage-filled control per screen, plus the progress fill and the on-state of switches. Sliders are neutral. If a second control wants colour, it becomes quiet. A floating card on the cover (settings, stop protection) counts as its own screen while open: its Save may be sage.
@@ -195,7 +198,7 @@ Continuous, concentric rounding. Controls 8px, groups and cards 14px, the before
 - **Quiet:** surface background, label text, 0.5px separator border. Pressed: fill pressed.
 - **Destructive:** quiet with destructive text.
 - **Disabled:** opacity 0.45.
-- **Hover / Focus:** no hover colour on buttons (macOS convention); focus-visible ring is 3px sage at 0.5 alpha, 1px outside the element and following its own radius. Inside a group the ring sits 3px inside the row.
+- **Hover / Focus:** no hover colour on buttons (macOS convention); focus-visible ring is 3px opaque sage (a translucent ring fell under 3:1 on light glass), 1px outside the element and following its own radius. Inside a group the ring sits 3px inside the row.
 
 ### Cards / Containers
 - **Corner Style:** 14px.
@@ -238,6 +241,8 @@ The seven unDraw illustrations (`src/assets/images/*.svg`) are recoloured into t
 - **Do** keep every window to one sage control; sliders stay neutral.
 - **Do** size a window to its content (`useWindowFit`) instead of hard-coding a height.
 - **Do** use the system font at 13px body, 11px footnote, Apple's macOS scale above.
+- **Do** move focus with what opens: into a floating card (its close button) or a menu pane (its title), and back to the control that opened it on close. Floating cards are `role="dialog"` and close on Escape.
+- **Do** keep live regions (`role="status"`) mounted and change only their text; never put a ticking countdown inside one.
 
 ### Don't:
 - **Don't** add tinted icon chips, gradients, pills, stacked shadows or uppercase labels; those belong to the rejected look.

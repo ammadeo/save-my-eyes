@@ -9,7 +9,11 @@ const props = withDefaults(defineProps<{ startDate: Date; endDate: Date; autoFin
 });
 const emit = defineEmits<{ finished: [] }>();
 
-const { t: tl } = useI18n({ autoFinish: t("Ends by itself", "Zakończy się sama") });
+const { t: tl, tg } = useI18n({
+  autoFinish: t("Ends by itself", "Zakończy się sama"),
+  progress: t("Break progress", "Postęp przerwy"),
+  left: t("left", "zostało"),
+});
 
 const { remaining, elapsed, total } = useCountdown(
   () => props.startDate.getTime(),
@@ -23,6 +27,11 @@ const timeLeftInfo = computed(() => {
   const secs = Math.ceil(remaining.value / 1000);
   return `${pad(Math.floor(secs / 60))} : ${pad(secs % 60)}`;
 });
+/** What VoiceOver reads for the timer: "4 min. 59 sec. left". */
+const timeLeftSpoken = computed(() => {
+  const secs = Math.max(0, Math.ceil(remaining.value / 1000));
+  return `${Math.floor(secs / 60)} ${tg("minutesSuffix")} ${secs % 60} ${tg("secondsSuffix")} ${tl("left")}`;
+});
 const percentage = computed(() => (total.value ? (elapsed.value / total.value) * 100 : 100));
 </script>
 
@@ -31,9 +40,9 @@ const percentage = computed(() => (total.value ? (elapsed.value / total.value) *
     class="flex w-full max-w-[680px] flex-col gap-6 self-start transition-opacity duration-1000 ease-out"
     :class="remaining <= 0 ? ['opacity-25'] : []"
   >
-    <p class="text-display whitespace-nowrap text-label" role="timer">{{ timeLeftInfo }}</p>
+    <p class="text-display whitespace-nowrap text-label" role="timer" :aria-label="timeLeftSpoken">{{ timeLeftInfo }}</p>
     <div class="flex flex-col gap-2">
-      <BaseProgressbar :min="0" :max="100" :value="percentage" />
+      <BaseProgressbar :min="0" :max="100" :value="percentage" :label="tl('progress')" />
       <!-- Short breaks close themselves when the time is up; say so instead of a lone glyph. -->
       <p v-if="autoFinish" class="text-footnote text-label-secondary">{{ tl("autoFinish") }}</p>
     </div>

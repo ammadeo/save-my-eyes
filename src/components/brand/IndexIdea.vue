@@ -101,7 +101,7 @@ const showDonation = computed(() => props.long && props.finished);
             data-testid="idea-img"
           />
           <div class="flex max-w-[48ch] flex-col gap-1">
-            <h3 class="text-title-2 text-label" data-testid="idea-title">{{ pick(card.title) }}</h3>
+            <h2 class="text-title-2 text-label" data-testid="idea-title">{{ pick(card.title) }}</h2>
             <p class="text-body text-label-secondary" data-testid="idea-content">{{ pick(card.content) }}</p>
           </div>
         </div>

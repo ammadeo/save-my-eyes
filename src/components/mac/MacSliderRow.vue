@@ -18,7 +18,17 @@ const onInput = (event: Event) => emit("update:modelValue", Number((event.target
       <label :for="id">{{ label }}</label>
       <output :for="id" class="slider-value">{{ display }}&nbsp;{{ suffix }}</output>
     </div>
-    <input :id="id" type="range" class="glass-slider" :min="min" :max="max" :step="step" :value="display" @input="onInput" />
+    <input
+      :id="id"
+      type="range"
+      class="glass-slider"
+      :min="min"
+      :max="max"
+      :step="step"
+      :value="display"
+      :aria-valuetext="`${display} ${suffix}`.trim()"
+      @input="onInput"
+    />
   </div>
 </template>
 

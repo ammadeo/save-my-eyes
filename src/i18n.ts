@@ -2,7 +2,7 @@
  * Two languages, ~100 strings, no plurals: a ref and a lookup are enough (no vue-i18n).
  * The language comes from settings (`lang`), see settings.ts.
  */
-import { computed, ref } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import { pl as plLocale, enGB } from "date-fns/locale";
 import type { Lang } from "./bridge";
 
@@ -16,6 +16,9 @@ export const t = (en = "", pl = ""): Translation => ({ en, pl });
 export const translate = t;
 
 export const lang = ref<Lang>("en");
+
+// VoiceOver picks its voice from `<html lang>`: Polish read by the English voice is unintelligible.
+watchEffect(() => (document.documentElement.lang = lang.value));
 
 /** `pl`, `pl-PL`, `PL_pl` → 'pl'; anything else → 'en' (fixes the legacy `pl-PL` → en bug). */
 export function setLang(code: string | null | undefined) {

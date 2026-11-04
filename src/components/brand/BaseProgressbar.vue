@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-const props = defineProps<{ min: number; max: number; value: number }>();
+const props = defineProps<{ min: number; max: number; value: number; label: string }>();
 const progress = computed(() => ((props.max - props.value - props.min) / props.max) * 100);
 </script>
 
@@ -9,6 +9,7 @@ const progress = computed(() => ((props.max - props.value - props.min) / props.m
   <div
     class="glass-progress is-wide w-full"
     role="progressbar"
+    :aria-label="label"
     :aria-valuenow="Math.round(value)"
     :aria-valuemin="min"
     :aria-valuemax="max"
