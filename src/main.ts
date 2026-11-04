@@ -1,17 +1,13 @@
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
+import { createApp } from "vue";
+import App from "./App.vue";
+import { router } from "./router";
+import { initSettings } from "./settings";
+import "./css/main.css";
 
-import { Lang } from '@/utils/mixins/i18n'
-Vue.mixin(Lang)
+// Paint the right window surface before anything mounts (no brand flash in the menu).
+document.documentElement.dataset.surface = /^#\/(menu|before-break)\b/.test(location.hash) ? "mac" : "brand";
 
-require('@/assets/css/main.css')
+// Settings first (inventory risk #5): views read them synchronously.
+await initSettings();
 
-Vue.config.productionTip = false
-
-new Vue({
-  router,
-  store,
-  render: (h) => h(App),
-}).$mount('#app')
+createApp(App).use(router).mount("#app");

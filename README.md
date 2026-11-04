@@ -13,6 +13,27 @@
   <li>It's free! <a href="https://www.buymeacoffee.com/ammadeo">You can buy me a coffee here :coffee:</a></li> 
 </ul>
 <br/>
-<p><a href="https://github.com/ammadeo/save-my-eyes/releases/download/v0.2.2/save-my-eyes-Setup-0.2.2.exe">Download for windows</a></p>
+<p><a href="https://github.com/ammadeo/save-my-eyes/releases/download/v0.2.2/save-my-eyes-Setup-0.2.2.exe">Download for Windows (v0.2.2, Electron)</a>. A native macOS build on Tauri is in progress on the <code>tauri-migration</code> branch.</p>
 <br/>
 </p>
+
+## Development (Tauri 2 + Vue 3 + Deno)
+
+Prerequisites: [Deno](https://deno.com) 2.9 (pinned in `.tool-versions`), a Rust toolchain via [rustup](https://rustup.rs), and on macOS the Xcode Command Line Tools.
+
+```bash
+deno install
+```
+
+```bash
+deno task tauri dev
+```
+
+```bash
+deno task tauri build
+```
+
+- `deno task build` builds only the frontend; `deno task test` runs the Vitest unit tests; `cargo test` inside `src-tauri` runs the Rust tests.
+- `SME_DEV_EVERY_SECS=8 deno task tauri dev` makes the first break fire after 8 seconds instead of the configured interval.
+- Settings are stored in the app config directory as `settings.json` (`settings-dev.json` for debug builds).
+- The migration notes live in [`docs/migration/`](docs/migration/PLAN.md).
