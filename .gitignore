@@ -29,3 +29,6 @@ dist-ssr
 # Legacy Electron app kept for reference during the Tauri migration
 legacy-electron/node_modules
 legacy-electron/dist_electron
+
+# Claude Code worktrees
+.claude/worktrees/

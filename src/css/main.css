@@ -1,0 +1,217 @@
+@import "tailwindcss";
+@import "./fonts.css";
+@import "./transitions.css";
+@import "./mac.css";
+
+/* Brand palette from legacy-electron/tailwind.config.js, copied by hex. */
+@theme {
+  --color-*: initial;
+  --color-black: #000;
+  --color-white: #fff;
+  --color-warn-400: #f6ad55;
+
+  --color-secondary-50: #e8eaf6;
+  --color-secondary-100: #c5cae9;
+  --color-secondary-200: #9fa8da;
+  --color-secondary-300: #7986cb;
+  --color-secondary-400: #5c6bc0;
+  --color-secondary-500: #3f51b5;
+  --color-secondary-600: #3949ab;
+  --color-secondary-700: #303f9f;
+  --color-secondary-800: #283593;
+  --color-secondary-900: #1a237e;
+  --color-secondary-1000: #121959;
+  --color-secondary-1050: #10164f;
+  --color-secondary-1075: #0f154a;
+  --color-secondary-1100: #030943;
+  --color-secondary-1200: #020630;
+
+  --color-primary-50: #e3f2fd;
+  --color-primary-100: #bbdefb;
+  --color-primary-200: #90caf9;
+  --color-primary-300: #64b5f6;
+  --color-primary-400: #42a5f5;
+  --color-primary-500: #2196f3;
+  --color-primary-600: #1e88e5;
+  --color-primary-700: #1976d2;
+  --color-primary-800: #1565c0;
+  --color-primary-900: #0d47a1;
+
+  --font-display: Comfortaa, roboto, sans-serif;
+  --font-body: "Source Sans Pro", roboto, sans-serif;
+  --font-system: -apple-system, BlinkMacSystemFont, "SF Pro", system-ui, sans-serif;
+
+  --shadow-revers: 0 -1px 3px 0 rgb(0 0 0 / 0.1), 0 -1px 2px 0 rgb(0 0 0 / 0.06);
+  --shadow-lg-revers: 0 -10px 15px -3px rgb(0 0 0 / 0.1), 0 -4px 6px -2px rgb(0 0 0 / 0.05);
+  --shadow-xl-revers: 0 -20px 25px -5px rgb(0 0 0 / 0.1), 0 -10px 10px -5px rgb(0 0 0 / 0.04);
+  --inset-shadow-1: inset 0 -1px 0.25rem 0 rgb(0 0 0 / 0.2);
+  --inset-shadow-2-top-2: inset 0 0.5rem 0.5rem 0 rgb(0 0 0 / 0.17);
+}
+
+/* tailwindcss-interaction-variants: hocus = hover or focus. `group-hocus:` comes for free. */
+@custom-variant hocus {
+  &:hover,
+  &:focus {
+    @slot;
+  }
+}
+
+@utility grid-cols-base {
+  grid-template-columns: minmax(20rem, 1fr) minmax(2rem, 4rem) minmax(min-content, 20rem);
+}
+
+@utility grid-rows-base {
+  grid-template-rows: auto auto 1fr auto;
+}
+
+@utility font-preset-info {
+  color: var(--color-secondary-200);
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  line-height: var(--text-2xl--line-height);
+}
+
+@utility font-preset-card-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  @variant md {
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+  }
+  @variant lg {
+    font-size: var(--text-lg);
+    line-height: var(--text-lg--line-height);
+  }
+  @variant xl {
+    font-size: var(--text-xl);
+    line-height: var(--text-xl--line-height);
+  }
+}
+
+@utility bg-gradient-card {
+  background-image: radial-gradient(
+    circle farthest-side at top left,
+    var(--color-secondary-900),
+    var(--color-secondary-1050)
+  );
+}
+
+@utility scroll-sm {
+  &::-webkit-scrollbar {
+    width: 0.25rem;
+    border-radius: 9999px;
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-primary-800);
+    border-radius: 9999px;
+    outline: 1px solid var(--color-primary-900);
+  }
+}
+
+@utility selection-darker {
+  &::selection,
+  & *::selection {
+    background: var(--color-primary-900);
+  }
+}
+
+@layer base {
+  html,
+  body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+  }
+
+  /* Each window paints its own surface; the attribute is set by the router. */
+  html[data-surface="brand"] {
+    background: var(--color-secondary-1000);
+    color: var(--color-secondary-100);
+    font-family: var(--font-body);
+  }
+  html[data-surface="brand"] ::selection {
+    background: var(--color-primary-700);
+  }
+
+  html[data-surface="mac"] {
+    background: var(--mac-window);
+    color: var(--mac-label);
+    font-family: var(--font-system);
+    font-size: 13px;
+    line-height: 1.35;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+  }
+
+  button {
+    cursor: default;
+  }
+}
+
+/* Brand range slider (break-screen settings). */
+.brand-range {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  &:focus {
+    outline: none;
+  }
+  &::-webkit-slider-runnable-track {
+    height: 0.5rem;
+    width: 100%;
+    border-radius: 9999px;
+    background: var(--color-secondary-400);
+    box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.06);
+    cursor: pointer;
+  }
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 1.5rem;
+    width: 1.5rem;
+    margin-top: -0.5rem;
+    border-radius: 9999px;
+    background: var(--color-primary-600);
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    cursor: pointer;
+  }
+  &:hover::-webkit-slider-thumb,
+  &:focus::-webkit-slider-thumb {
+    background: var(--color-primary-700);
+  }
+}
+
+/* BaseLink hint (was `.after:link` + `hocus:after:lang-*`). */
+.link-hint {
+  position: relative;
+  &::after {
+    content: attr(data-hint);
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    padding: 0.5rem;
+    border-radius: 0.125rem;
+    background: var(--color-warn-400);
+    color: var(--color-black);
+    font-size: var(--text-base);
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 100ms;
+  }
+  &:hover::after,
+  &:focus-within::after {
+    opacity: 1;
+  }
+}

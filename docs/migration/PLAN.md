@@ -1,6 +1,6 @@
 # Tauri migration plan
 
-Status 2026-11-04: scaffold done (Tauri 2.12.5, Vue 3.5, Vite 8, Deno 2.9.8), both sides compile, draft PR #21 open. Nothing from the old app is ported yet.
+Status 2026-11-04 (evening): Phase 0 passed, Phase 1 landed (PR #22 Rust core, PR #23 renderer), Phase 2 integration branch runs the full break loop end to end on macOS 27.2 (`docs/migration/phase2-integration/`). `legacy-electron/` removed; the Vue 2 sources live in git history before commit 55f661f. Remaining unverified: real tray clicks and the startup notification (no synthetic input on the dev Mac), multi-monitor covers (one display), long-break and settings panes in real windows, autostart (release builds only).
 
 Companion docs: [renderer-inventory.md](renderer-inventory.md) (what the Vue 2 app does, component by component) and [tauri-macos-capability-map.md](tauri-macos-capability-map.md) (verified Tauri 2 APIs for every Electron feature).
 
@@ -76,6 +76,8 @@ Prove on this Mac (macOS 27.2) that a Tauri window with the AppKit level/collect
 - **CI/release**: deferred (owner decision, see bottom).
 
 ### Phase 2: integration (lead)
+**Result:** `tauri-migration-integration` merges both Phase 1 branches; fixes: `core:window:allow-start-dragging`, the banner closes an open `menu` window, `.claude/worktrees/` ignored. `SME_DEV_EVERY_SECS=8 deno task tauri dev` ran idle → banner → auto-start → break (sound at start and end) → idle → banner twice with no input.
+
 Wire both sides in `tauri dev`, walk the full flow (tray → menu → settings → before-break → break → covers → end → reschedule, long break, stop protection, quit), fix contract drift, delete `legacy-electron/`, mark the PR ready.
 
 ### Out of scope for this PR
