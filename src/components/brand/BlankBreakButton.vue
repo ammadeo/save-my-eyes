@@ -17,7 +17,7 @@ const { t: tl } = useI18n({
     :content="finished ? tl('finish') : tl('skip')"
     :primary="finished"
     absolute
-    class="right-0 bottom-0 m-8 origin-bottom-right scale-75 font-light tracking-wider lg:m-12 xl:m-16"
+    class="is-large right-cover bottom-cover"
     @click="emit('click')"
   />
 </template>

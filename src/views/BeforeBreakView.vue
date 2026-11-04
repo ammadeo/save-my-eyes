@@ -2,12 +2,16 @@
 import { onMounted, ref } from "vue";
 import ContentBeforeBreak from "@/components/mac/ContentBeforeBreak.vue";
 import { closeWindow, getBreakState, startBreak } from "@/bridge";
+import { useWindowFit } from "@/composables/useWindowFit";
 import { log } from "@/log";
 
 const long = ref(false);
 let started = false;
+const card = ref<InstanceType<typeof ContentBeforeBreak>>();
+const { track: fitWindow } = useWindowFit();
 
 onMounted(async () => {
+  fitWindow(card.value?.$el);
   try {
     long.value = (await getBreakState()).isLong;
   } catch {
@@ -31,5 +35,5 @@ const skip = () => closeWindow();
 </script>
 
 <template>
-  <ContentBeforeBreak :long="long" @break="start" @skip="skip" />
+  <ContentBeforeBreak ref="card" :long="long" @break="start" @skip="skip" />
 </template>

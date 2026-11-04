@@ -7,7 +7,7 @@
  */
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 import { openUrl as tauriOpenUrl } from "@tauri-apps/plugin-opener";
 import { log } from "./log";
 
@@ -107,6 +107,19 @@ export async function closeWindow(): Promise<void> {
     await call<void>("close_window");
   } catch {
     if (isTauri()) await getCurrentWindow().close().catch(() => {});
+  }
+}
+
+/** Resizes the calling window to `height` logical px, keeping its width (no-op outside Tauri). */
+export async function setWindowHeight(height: number): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    const w = getCurrentWindow();
+    const scale = await w.scaleFactor();
+    const { width } = (await w.innerSize()).toLogical(scale);
+    await w.setSize(new LogicalSize(width, height));
+  } catch (error) {
+    log.warn("bridge: setWindowHeight failed", error);
   }
 }
 

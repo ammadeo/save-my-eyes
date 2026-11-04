@@ -2,29 +2,23 @@
 import BaseCard from "./BaseCard.vue";
 import ButtonRoundable from "./ButtonRoundable.vue";
 
-withDefaults(defineProps<{ absolute?: boolean; title?: string; content?: string; closeLabel?: string }>(), {
+import { t, useI18n } from "@/i18n";
+
+const { t: tl } = useI18n({ close: t("Close", "Zamknij") });
+withDefaults(defineProps<{ absolute?: boolean; title?: string; closeLabel?: string }>(), {
   absolute: false,
   title: "save my eyes",
-  content: "",
-  closeLabel: "Close",
+  closeLabel: "",
 });
 const emit = defineEmits<{ close: [] }>();
 </script>
 
 <template>
   <BaseCard :absolute="absolute">
-    <div class="flex flex-col p-4">
-      <div class="flex justify-between">
-        <p v-show="!content" class="text-xl text-secondary-100 uppercase">{{ title }}</p>
-        <ButtonRoundable
-          primary
-          :class="content ? ['w-full'] : []"
-          :content="content"
-          :label="closeLabel"
-          @click="emit('close')"
-        />
-      </div>
-      <slot />
+    <div class="mb-4 flex items-center justify-between gap-2">
+      <p class="text-headline text-label first-letter:uppercase">{{ title }}</p>
+      <ButtonRoundable :label="closeLabel || tl('close')" @click="emit('close')" />
     </div>
+    <slot />
   </BaseCard>
 </template>

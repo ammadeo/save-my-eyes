@@ -15,14 +15,24 @@ const round = computed(() => !props.content);
 <template>
   <BaseButton
     :primary="primary"
-    :center="round"
+    center
     :disabled="disabled"
-    class="align-baseline"
-    :class="round ? ['h-8', 'w-8'] : ['min-h-8']"
+    :class="round ? 'is-round' : ''"
     :aria-label="round ? label || undefined : undefined"
     @click="emit('click')"
   >
-    <p v-show="!round" class="my-1 mr-2 ml-4 font-display text-lg">{{ content }}</p>
-    <BaseIcon :icon="icon" class="m-1 h-3 text-secondary-100" :class="round ? [] : ['pr-4']" />
+    <span v-if="!round" class="first-letter:uppercase">{{ content }}</span>
+    <BaseIcon v-else :icon="icon" class="h-2.5 text-label-secondary" />
   </BaseButton>
 </template>
+
+<style scoped>
+/* 28px quiet circle for icon-only buttons (close, pause). */
+.glass-button.is-round {
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  border-radius: 999px;
+}
+</style>

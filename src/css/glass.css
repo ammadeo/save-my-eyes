@@ -1,0 +1,261 @@
+/*
+ * Design tokens and shared classes for every window (see DESIGN.md).
+ *
+ * The window itself is painted by the native material (Liquid Glass on macOS 26+,
+ * an NSVisualEffectView material before), applied from Rust. The webview is
+ * transparent; everything here is translucent and follows the system appearance.
+ */
+:root {
+  color-scheme: light dark;
+
+  --font-system: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  /* Sage, the single accent. */
+  --accent: oklch(52% 0.07 150);
+  --accent-pressed: oklch(46% 0.07 150);
+  --on-accent: oklch(99% 0.005 150);
+  /* Neutral tint for native sliders: only one sage control per screen. */
+  --control-neutral: oklch(55% 0.01 150);
+
+  /* Labels: one hue, three alphas. */
+  --label: oklch(22% 0.02 150 / 0.9);
+  --label-secondary: oklch(22% 0.02 150 / 0.55);
+  --label-tertiary: oklch(22% 0.02 150 / 0.3);
+
+  /* Three levels of translucency on the glass. */
+  --surface: oklch(100% 0 0 / 0.45);
+  --surface-raised: oklch(100% 0 0 / 0.6);
+  --fill: oklch(22% 0.02 150 / 0.06);
+  --fill-pressed: oklch(22% 0.02 150 / 0.1);
+  --separator: oklch(22% 0.02 150 / 0.1);
+
+  --warning: oklch(60% 0.12 75);
+  --destructive: oklch(50% 0.16 25);
+  --focus-ring: oklch(52% 0.07 150 / 0.5);
+  --selection: oklch(52% 0.07 150 / 0.3);
+
+  --radius-control: 8px;
+  --radius-group: 14px;
+  --radius-panel: 18px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: oklch(76% 0.08 150);
+    --accent-pressed: oklch(70% 0.08 150);
+    --on-accent: oklch(20% 0.03 150);
+    --control-neutral: oklch(80% 0.01 150);
+    --label: oklch(97% 0.01 150 / 0.9);
+    --label-secondary: oklch(97% 0.01 150 / 0.55);
+    --label-tertiary: oklch(97% 0.01 150 / 0.3);
+    --surface: oklch(100% 0 0 / 0.07);
+    --surface-raised: oklch(100% 0 0 / 0.12);
+    --fill: oklch(97% 0.01 150 / 0.09);
+    --fill-pressed: oklch(97% 0.01 150 / 0.16);
+    --separator: oklch(97% 0.01 150 / 0.1);
+    --warning: oklch(78% 0.12 80);
+    --destructive: oklch(72% 0.15 25);
+    --focus-ring: oklch(76% 0.08 150 / 0.6);
+    --selection: oklch(76% 0.08 150 / 0.35);
+  }
+}
+
+/* Shared classes live in the components layer so Tailwind utilities can override them. */
+@layer components {
+/* Grouped list (System Settings style) on glass. */
+.glass-group {
+  background: var(--surface);
+  border: 0.5px solid var(--separator);
+  border-radius: var(--radius-group);
+  overflow: hidden;
+}
+.glass-group.is-raised {
+  background: var(--surface-raised);
+}
+.glass-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--label);
+  font: inherit;
+  text-align: left;
+}
+/* Hairline between rows, inset to the text start (System Settings style). */
+.glass-row + .glass-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12px;
+  right: 0;
+  height: 0.5px;
+  background: var(--separator);
+}
+.glass-row:has(> .glass-row-icon) + .glass-row::before {
+  left: 40px;
+}
+button.glass-row:active {
+  background: var(--fill-pressed);
+}
+/* Rows are clipped by their group, so the focus ring sits inside the row. */
+.glass-row:focus-visible {
+  outline-offset: -3px;
+  border-radius: 0;
+}
+.glass-group > .glass-row:first-child:focus-visible {
+  border-radius: var(--radius-group) var(--radius-group) 0 0;
+}
+.glass-group > .glass-row:last-child:focus-visible {
+  border-radius: 0 0 var(--radius-group) var(--radius-group);
+}
+.glass-group > .glass-row:only-child:focus-visible {
+  border-radius: var(--radius-group);
+}
+.glass-row-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--label-secondary);
+}
+.glass-section-title {
+  margin: 0 0 6px 12px;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 500;
+  color: var(--label-secondary);
+}
+.glass-footnote {
+  margin: 6px 12px 0;
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--label-secondary);
+}
+
+/* Push buttons. Primary is the one sage control on a screen. */
+.glass-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 4px 14px;
+  border-radius: var(--radius-control);
+  border: 0.5px solid var(--separator);
+  background: var(--surface);
+  color: var(--label);
+  font: inherit;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 120ms ease-out;
+  &:active:not(:disabled) {
+    background: var(--fill-pressed);
+  }
+  &:disabled {
+    opacity: 0.45;
+  }
+  &.is-primary {
+    background: var(--accent);
+    border-color: transparent;
+    color: var(--on-accent);
+    &:active:not(:disabled) {
+      background: var(--accent-pressed);
+    }
+  }
+  &.is-large {
+    min-height: 28px;
+    padding: 5px 16px;
+  }
+  &.is-xl {
+    min-height: 40px;
+    padding: 8px 20px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+  &.is-destructive {
+    color: var(--destructive);
+  }
+  &.is-plain {
+    background: transparent;
+    border-color: transparent;
+    color: var(--label-secondary);
+    &:active:not(:disabled) {
+      background: var(--fill-pressed);
+      color: var(--label);
+    }
+  }
+}
+
+/* Native WebKit controls tinted sage. */
+.glass-slider {
+  -webkit-appearance: auto;
+  appearance: auto;
+  accent-color: var(--control-neutral);
+  margin: 0;
+  width: 100%;
+}
+.glass-switch {
+  accent-color: var(--accent);
+  margin: 0;
+}
+.glass-select {
+  font: inherit;
+  color: var(--label);
+}
+
+/* Progress: fill track, sage bar. */
+.glass-progress {
+  position: relative;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--fill);
+  overflow: hidden;
+}
+.glass-progress.is-wide {
+  height: 8px;
+}
+.glass-progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+/* Browser surfaces that still carry the design. Outlines follow each element's own radius. */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+::selection {
+  background: var(--selection);
+}
+a {
+  color: var(--label);
+  text-decoration: underline;
+  text-decoration-color: var(--label-tertiary);
+  text-underline-offset: 2px;
+}
+a:hover {
+  text-decoration-color: var(--label-secondary);
+}
+kbd {
+  font: inherit;
+  color: var(--label-tertiary);
+}
+::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--label-tertiary);
+  border-radius: 999px;
+}
+}

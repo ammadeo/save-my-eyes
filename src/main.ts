@@ -4,8 +4,8 @@ import { router } from "./router";
 import { initSettings } from "./settings";
 import "./css/main.css";
 
-// Paint the right window surface before anything mounts (no brand flash in the menu).
-document.documentElement.dataset.surface = /^#\/(menu|before-break)\b/.test(location.hash) ? "mac" : "brand";
+// Density hint for the window kind, set before anything mounts.
+document.documentElement.dataset.surface = /^#\/(menu|before-break)\b/.test(location.hash) ? "window" : "cover";
 
 // Settings first (inventory risk #5): views read them synchronously.
 await initSettings();

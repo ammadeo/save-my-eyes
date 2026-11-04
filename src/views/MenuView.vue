@@ -5,10 +5,14 @@ import type { RunKey } from "@/components/mac/types";
 import ContentStopProtection from "@/components/mac/ContentStopProtection.vue";
 import MenuSettings from "@/components/mac/MenuSettings.vue";
 import { closeWindow, openUrl, quitApp, setNextBreak } from "@/bridge";
+import { useWindowFit } from "@/composables/useWindowFit";
 import { t, useI18n } from "@/i18n";
 import { log } from "@/log";
 
 type Pane = "menu" | "settings" | "stop-protection";
+
+const TOOLBAR_HEIGHT = 52;
+const CONTENT_PADDING_BOTTOM = 16;
 
 const { t: tl, tg } = useI18n({
   settings: t("Settings", "Ustawienia"),
@@ -16,11 +20,17 @@ const { t: tl, tg } = useI18n({
   back: t("Back", "Wstecz"),
 });
 
-const pane = ref<Pane>("menu");
+// Dev aid: `#/menu?pane=settings` opens straight at a pane (see SME_DEV_OPEN_MENU).
+const initialPane = new URLSearchParams(location.hash.split("?")[1] ?? "").get("pane");
+const pane = ref<Pane>(initialPane === "settings" || initialPane === "stop-protection" ? initialPane : "menu");
 const direction = ref<"pane-forward" | "pane-back">("pane-forward");
 const title = computed(() =>
   pane.value === "settings" ? tl("settings") : pane.value === "stop-protection" ? tl("stopProtection") : tg("title"),
 );
+
+/** The window is as tall as its pane (toolbar + pane + bottom padding), so no pane floats in empty glass. */
+const content = ref<HTMLElement>();
+const { track: fitWindow } = useWindowFit(TOOLBAR_HEIGHT + CONTENT_PADDING_BOTTOM);
 
 function open(next: Pane) {
   direction.value = next === "menu" ? "pane-back" : "pane-forward";
@@ -50,7 +60,10 @@ async function run(key: RunKey) {
 function onKey(event: KeyboardEvent) {
   if (event.key === "Escape") closeWindow();
 }
-onMounted(() => window.addEventListener("keydown", onKey));
+onMounted(() => {
+  window.addEventListener("keydown", onKey);
+  fitWindow(content.value?.firstElementChild);
+});
 onUnmounted(() => window.removeEventListener("keydown", onKey));
 </script>
 
@@ -58,15 +71,21 @@ onUnmounted(() => window.removeEventListener("keydown", onKey));
   <div class="menu-window">
     <!-- Overlay title bar: native traffic lights sit at the top-left of this strip. -->
     <header class="toolbar" data-tauri-drag-region>
-      <button v-if="pane !== 'menu'" type="button" class="back" :aria-label="tl('back')" @click="open('menu')">
-        <svg viewBox="0 0 10 16" width="9" height="14" aria-hidden="true">
+      <button
+        v-if="pane !== 'menu'"
+        type="button"
+        class="glass-button is-plain back"
+        :aria-label="tl('back')"
+        @click="open('menu')"
+      >
+        <svg viewBox="0 0 10 16" width="8" height="13" aria-hidden="true">
           <path d="M8.5 1.5 2 8l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
-      <h1 class="toolbar-title" data-tauri-drag-region>{{ title }}</h1>
+      <h1 class="toolbar-title text-headline" data-tauri-drag-region>{{ title }}</h1>
     </header>
-    <main class="content">
-      <Transition :name="direction" mode="out-in">
+    <main ref="content" class="content">
+      <Transition :name="direction" mode="out-in" @before-enter="fitWindow">
         <ContentMenu v-if="pane === 'menu'" key="menu" @run="run" />
         <MenuSettings v-else-if="pane === 'settings'" key="settings" />
         <ContentStopProtection v-else key="stop-protection" @close="closeWindow()" />
@@ -76,11 +95,11 @@ onUnmounted(() => window.removeEventListener("keydown", onKey));
 </template>
 
 <style scoped>
+/* No background: the native glass paints the window. */
 .menu-window {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: var(--mac-window);
 }
 .toolbar {
   position: relative;
@@ -97,33 +116,16 @@ onUnmounted(() => window.removeEventListener("keydown", onKey));
 .toolbar-title {
   position: absolute;
   top: 4px;
-  line-height: 24px;
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--mac-label);
+  line-height: 24px;
+  color: var(--label);
   white-space: nowrap;
 }
 .back {
-  -webkit-appearance: none;
-  appearance: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 28px;
-  height: 24px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--mac-label-secondary);
-  &:hover {
-    background: var(--mac-hover);
-  }
-  &:active {
-    background: var(--mac-fill);
-  }
+  padding: 0;
 }
 .content {
   flex: 1;

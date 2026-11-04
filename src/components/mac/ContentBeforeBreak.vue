@@ -12,12 +12,13 @@ const props = withDefaults(defineProps<{ long?: boolean; autoStartMs?: number }>
 const emit = defineEmits<{ break: []; skip: []; wait: [] }>();
 
 const { t: tl, tg } = useI18n({
-  contentStart: t("start a break now", "rozpocznij przerwę teraz"),
-  contentWait: t("wait", "zaczekaj chwilę"),
-  contentSkip: t("skip a break", "pomiń przerwę"),
+  // Polish is kept short: both buttons must fit the 360px card side by side.
+  contentStart: t("start a break now", "zacznij przerwę"),
+  contentWait: t("wait", "zaczekaj"),
+  contentSkip: t("skip a break", "pomiń"),
   contentBase: t("will start", "zacznie się"),
   statusWaiting: t("when you're ready", "kiedy zechcesz"),
-  statusStarting: t("in 5 seconds", "za 5 sekund"),
+  statusIn: t("in", "za"),
   waitingPrefix: t("You're waiting for", "Czekasz już"),
 });
 
@@ -32,8 +33,18 @@ const countdown = useCountdown(start, start + props.autoStartMs, () => {
 });
 const percent = computed(() => (countdown.elapsed.value / countdown.total.value) * 100);
 
+/** "5 seconds" / "5 sekund", "2 sekundy", "1 sekunda": counts down with the bar. */
+const secondsLeft = computed(() => {
+  const n = Math.max(1, Math.ceil(countdown.remaining.value / 1000));
+  if (lang.value !== "pl") return `${n} ${n === 1 ? "second" : "seconds"}`;
+  const few = n % 10 >= 2 && n % 10 <= 4 && !(n % 100 >= 12 && n % 100 <= 14);
+  return `${n} ${n === 1 ? "sekunda" : few ? "sekundy" : "sekund"}`;
+});
 const status = computed(
-  () => `${props.long ? tg("breakLong") : tg("breakShort")} ${tl("contentBase")} ${waiting.value ? tl("statusWaiting") : tl("statusStarting")}`,
+  () =>
+    `${props.long ? tg("breakLong") : tg("breakShort")} ${tl("contentBase")} ${
+      waiting.value ? tl("statusWaiting") : `${tl("statusIn")} ${secondsLeft.value}`
+    }`,
 );
 
 function updateWaitingInfo() {
@@ -60,28 +71,26 @@ onUnmounted(() => clearInterval(waitingTimer));
   <article class="banner" :class="{ 'is-waiting': waiting }" aria-live="polite">
     <img class="banner-icon" :src="appIcon" alt="" />
     <div class="banner-body">
-      <header class="banner-head">
-        <h1 class="banner-title">{{ tg("title") }}</h1>
-      </header>
+      <h1 class="banner-title text-headline">{{ tg("title") }}</h1>
       <p class="banner-text first-letter:uppercase">{{ status }}</p>
       <p v-show="waitingInfo" class="banner-sub">
-        {{ tl("waitingPrefix") }} <span class="font-semibold">{{ waitingInfo }}</span>
+        {{ tl("waitingPrefix") }} <span class="font-medium">{{ waitingInfo }}</span>
       </p>
       <div class="banner-actions">
         <div
           v-show="!waiting"
-          class="banner-progress"
+          class="glass-progress banner-progress"
           role="progressbar"
           :aria-valuenow="Math.round(percent)"
           aria-valuemin="0"
           aria-valuemax="100"
         >
-          <div class="banner-progress-fill" :style="{ width: `${percent}%` }" />
+          <div class="glass-progress-bar" :style="{ width: `${percent}%` }" />
         </div>
-        <button v-show="waiting" type="button" class="mac-button" @click="emit('skip')">
+        <button v-show="waiting" type="button" class="glass-button" @click="emit('skip')">
           <span class="cap">{{ tl("contentSkip") }}</span>
         </button>
-        <button type="button" class="mac-button" :class="{ 'is-default': waiting }" @click="onPrimary">
+        <button type="button" class="glass-button" :class="{ 'is-primary': waiting }" @click="onPrimary">
           <span class="cap">{{ waiting ? tl("contentStart") : tl("contentWait") }}</span>
         </button>
       </div>
@@ -90,18 +99,18 @@ onUnmounted(() => clearInterval(waitingTimer));
 </template>
 
 <style scoped>
+/* No background: the native glass paints the card (18px native corners). The window is sized to this article. */
 .banner {
   box-sizing: border-box;
   display: flex;
   gap: 12px;
-  height: 100vh;
-  padding: 14px 14px 12px;
-  background: var(--mac-banner);
-  color: var(--mac-label);
+  padding: 14px;
+  border-radius: var(--radius-panel);
+  color: var(--label);
 }
 .banner-icon {
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
 }
 .banner-body {
@@ -112,34 +121,23 @@ onUnmounted(() => clearInterval(waitingTimer));
 }
 .banner-title {
   margin: 0;
-  font-size: 13px;
-  font-weight: 600;
 }
 .banner-text {
   margin: 2px 0 0;
 }
 .banner-sub {
   margin: 2px 0 0;
-  color: var(--mac-label-secondary);
+  color: var(--label-secondary);
 }
 .banner-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: auto;
+  margin-top: 12px;
 }
 .banner-progress {
   flex: 1;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--mac-fill);
-  overflow: hidden;
-}
-.banner-progress-fill {
-  height: 100%;
-  background: var(--mac-accent);
-  border-radius: 2px;
 }
 .cap {
   display: inline-block;
@@ -148,13 +146,13 @@ onUnmounted(() => clearInterval(waitingTimer));
   text-transform: uppercase;
 }
 
-/* After a minute of waiting the banner gently pulses (legacy animejs scale pulse). */
+/* After a minute of waiting the card breathes a faint sage tint over the glass. */
 .is-waiting {
-  animation: banner-pulse 1s ease-in 60s infinite alternate;
+  animation: banner-pulse 2.5s ease-in-out 60s infinite alternate;
 }
 @keyframes banner-pulse {
   to {
-    background: color-mix(in srgb, var(--mac-accent) 16%, var(--mac-banner));
+    background: color-mix(in oklch, var(--accent) 14%, transparent);
   }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -66,9 +66,9 @@ async function openPrivacy() {
 
 <template>
   <div v-if="status?.access !== 'unsupported'">
-    <h2 class="mac-section-title">{{ tl("title") }}</h2>
-    <div class="mac-group">
-      <label class="mac-row">
+    <h2 class="glass-section-title">{{ tl("title") }}</h2>
+    <div class="glass-group">
+      <label class="glass-row">
         <span class="grow">{{ tl("toggle") }}</span>
         <input
           :checked="enabled"
@@ -76,27 +76,25 @@ async function openPrivacy() {
           v-bind="{ switch: '' }"
           type="checkbox"
           role="switch"
-          class="mac-switch"
+          class="glass-switch"
           @change="toggle"
         />
       </label>
-      <div v-if="notAsked" class="mac-row warning" role="status">
+      <div v-if="notAsked" class="glass-row warning" role="status">
         <span class="grow">{{ tl("notAsked") }}</span>
-        <button type="button" class="mac-button" :disabled="busy" @click="apply(true)">{{ tl("allow") }}</button>
+        <button type="button" class="glass-button" :disabled="busy" @click="apply(true)">{{ tl("allow") }}</button>
       </div>
-      <div v-if="blocked" class="mac-row warning" role="status">
+      <div v-if="blocked" class="glass-row warning" role="status">
         <span class="grow">{{ tl("denied") }}</span>
-        <button type="button" class="mac-button" @click="openPrivacy">{{ tl("openSettings") }}</button>
+        <button type="button" class="glass-button" @click="openPrivacy">{{ tl("openSettings") }}</button>
       </div>
     </div>
-    <p class="mac-footnote">{{ tl("hint") }}</p>
+    <p class="glass-footnote">{{ tl("hint") }}</p>
   </div>
 </template>
 
 <style scoped>
 .warning {
-  background: var(--mac-warning-bg);
-  color: var(--mac-warning-label);
-  font-size: 12px;
+  color: var(--label-secondary);
 }
 </style>

@@ -25,7 +25,7 @@ const longIdeas: Idea[] = [
     title: t("Do some exercises", "Poćwicz chwilę"),
     img: { src: workoutImg, alt: t("Woman dancing", "Tańcząca kobieta") },
     content: t(
-      "Few minutes of workout will help you relax from sitting position",
+      "A few minutes of workout will help you relax from sitting position",
       "Kilka minut ćwiczeń pomoże ci się zrelaksować",
     ),
   },
@@ -70,7 +70,7 @@ const shortIdeas: Idea[] = [
   {
     title: t("Blink your eyes", "Pomrugaj oczami"),
     img: { src: blinkImg, alt: t("Man looks at the darkness", "Mężczyzna patrzy w ciemność") },
-    content: t("Blink few times to clean your eyes", "Mrugnij kilka razy, aby oczyścić oczy"),
+    content: t("Blink a few times to clean your eyes", "Mrugnij kilka razy, aby oczyścić oczy"),
   },
 ];
 
@@ -85,33 +85,36 @@ const showDonation = computed(() => props.long && props.finished);
 <template>
   <div>
     <Transition name="fade" appear>
-      <p
-        v-show="!showDonation"
-        class="selection-darker mb-4 font-display text-lg text-secondary-200 duration-300"
-        :class="finished ? [] : ['delay-500']"
-      >
-        {{ tl("title") }}
-      </p>
+      <p v-show="!showDonation" class="mb-2 ml-4 text-footnote text-label-secondary">{{ tl("title") }}</p>
     </Transition>
 
     <Transition name="slide" appear mode="out-in">
-      <BaseCard
-        v-if="showDonation"
-        key="donation-card"
-        class="slide-leave-left max-w-3xl delay-300 duration-500"
-        data-testid="donation-card"
-      >
+      <BaseCard v-if="showDonation" key="donation-card" class="idea-card slide-leave-left max-w-[680px]" data-testid="donation-card">
         <ContentDonation :force-close-lock="forceCloseLock" />
       </BaseCard>
-      <BaseCard v-else key="inspiration-card" class="slide-leave-left max-w-3xl delay-100 duration-500">
-        <div class="m-4 flex">
-          <img class="mr-4 h-32 md:h-40 lg:h-48" :src="card.img.src" :alt="pick(card.img.alt)" data-testid="idea-img" />
-          <div class="flex flex-col">
-            <h3 class="font-preset-card-title mb-2 text-secondary-50" data-testid="idea-title">{{ pick(card.title) }}</h3>
-            <p class="mb-4 text-lg text-secondary-100" data-testid="idea-content">{{ pick(card.content) }}</p>
+      <BaseCard v-else key="inspiration-card" class="idea-card slide-leave-left max-w-[680px]">
+        <div class="flex items-center gap-5">
+          <img
+            class="h-32 w-auto shrink-0 lg:h-40"
+            :src="card.img.src"
+            :alt="pick(card.img.alt)"
+            data-testid="idea-img"
+          />
+          <div class="flex max-w-[48ch] flex-col gap-1">
+            <h3 class="text-title-2 text-label" data-testid="idea-title">{{ pick(card.title) }}</h3>
+            <p class="text-body text-label-secondary" data-testid="idea-content">{{ pick(card.content) }}</p>
           </div>
         </div>
       </BaseCard>
     </Transition>
   </div>
 </template>
+
+<style scoped>
+/* A calm, decelerating entrance (transitions.css owns the property; this only retimes it). */
+.idea-card.slide-enter-active {
+  transition-duration: 600ms;
+  transition-delay: 150ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+</style>

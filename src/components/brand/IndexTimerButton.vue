@@ -28,7 +28,7 @@ const content = computed(() =>
     :icon="finished ? 'finish' : 'skip'"
     :content="content"
     :disabled="disabled"
-    class="min-h-12 self-start"
+    class="is-xl self-start justify-self-end"
     @click="emit('click')"
   />
 </template>

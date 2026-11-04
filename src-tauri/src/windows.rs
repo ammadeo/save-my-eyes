@@ -3,7 +3,8 @@
 //! Every `open_*`/`close_*` function touches AppKit and must run on the main thread
 //! (`setup`, tray handlers, or via [`on_main`]).
 
-use tauri::window::Color;
+use tauri::utils::config::WindowEffectsConfig;
+use tauri::window::{Color, Effect};
 use tauri::{
     AppHandle, LogicalSize, Manager, Monitor, PhysicalPosition, WebviewUrl, WebviewWindow,
     WebviewWindowBuilder, WindowEvent,
@@ -16,12 +17,32 @@ pub const BEFORE_BREAK: &str = "before-break";
 pub const BREAK: &str = "break";
 pub const COVER_PREFIX: &str = "cover-";
 
-const COVER_BG: Color = Color(0x12, 0x19, 0x59, 0xff);
-const BEFORE_BREAK_BG: Color = Color(0x1b, 0x23, 0x70, 0xff);
-const MENU_SIZE: LogicalSize<f64> = LogicalSize::new(420.0, 560.0);
-const BEFORE_BREAK_SIZE: LogicalSize<f64> = LogicalSize::new(360.0, 140.0);
+/// Initial size; the page resizes the window per pane (`MenuView.vue`, `paneHeight`).
+const MENU_SIZE: LogicalSize<f64> = LogicalSize::new(400.0, 352.0);
+/// Initial size; the page resizes the card to its content (`BeforeBreakView.vue`).
+const BEFORE_BREAK_SIZE: LogicalSize<f64> = LogicalSize::new(360.0, 100.0);
 /// Logical-pixel gap between a card window and the work-area edges.
 const MARGIN: f64 = 12.0;
+/// Corner radius of the `before-break` card; `macos::style_panel` clips to the same value.
+pub const PANEL_RADIUS: f64 = 18.0;
+/// Sage glass tint (~0.14 alpha), DESIGN.md `glass-tint`.
+const GLASS_TINT: Color = Color(122, 158, 134, 36);
+
+/// The native material painted behind every (transparent) window.
+///
+/// macOS 26+: Liquid Glass (`NSGlassEffectView`, regular style) tinted sage, with `radius`
+/// as the glass corner radius. macOS 15 and below: the `fallback` `NSVisualEffectView`
+/// material instead (the tint is glass-only; `radius` still rounds it).
+/// Requires `.transparent(true)` on the builder so the webview does not paint over it.
+fn material(fallback: Effect, radius: Option<f64>) -> WindowEffectsConfig {
+    WindowEffectsConfig {
+        effects: vec![Effect::LiquidGlassRegular, fallback],
+        state: None,
+        radius,
+        color: Some(GLASS_TINT),
+        interactive: false,
+    }
+}
 
 fn route(r: &str) -> WebviewUrl {
     WebviewUrl::App(format!("index.html#/{r}").into())
@@ -94,7 +115,8 @@ fn build_cover(
         .always_on_top(true)
         .visible_on_all_workspaces(true)
         .shadow(false)
-        .background_color(COVER_BG)
+        .transparent(true)
+        .effects(material(Effect::FullScreenUI, None))
         .visible(false)
         .build()?;
     w.set_position(*monitor.position())?;
@@ -144,7 +166,8 @@ pub fn open_before_break_window(app: &AppHandle) -> tauri::Result<()> {
         .minimizable(false)
         .maximizable(false)
         .focused(false)
-        .background_color(BEFORE_BREAK_BG)
+        .transparent(true)
+        .effects(material(Effect::Popover, Some(PANEL_RADIUS)))
         .visible(false);
     if let Some(m) = app.primary_monitor()? {
         // Builder positions are logical.
@@ -162,18 +185,29 @@ pub fn open_before_break_window(app: &AppHandle) -> tauri::Result<()> {
 /// Card-sized window with native chrome (traffic lights over the page, hidden title),
 /// top-right of the primary work area under the tray icon; closes on blur, close button, Cmd+W.
 pub fn open_menu_window(app: &AppHandle) -> tauri::Result<()> {
+    open_menu_window_at(app, None)
+}
+
+/// `pane` (dev aid): `settings` or `stop-protection` opens the menu on that pane.
+pub fn open_menu_window_at(app: &AppHandle, pane: Option<&str>) -> tauri::Result<()> {
     macos::activate_app();
     if let Some(w) = app.get_webview_window(MENU) {
         w.show()?;
         return w.set_focus();
     }
-    let b = WebviewWindowBuilder::new(app, MENU, route("menu"))
+    let r = match pane {
+        Some(p) if p == "settings" || p == "stop-protection" => format!("menu?pane={p}"),
+        _ => "menu".to_string(),
+    };
+    let b = WebviewWindowBuilder::new(app, MENU, route(&r))
         .title("Save My Eyes")
         .decorations(true)
         .resizable(false)
         .minimizable(false)
         .always_on_top(true)
         .inner_size(MENU_SIZE.width, MENU_SIZE.height)
+        .transparent(true)
+        .effects(material(Effect::Popover, None))
         .visible(false);
     #[cfg(target_os = "macos")]
     let b = b

@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import ProgressbarIcon from "./ProgressbarIcon.vue";
+import BaseProgressbar from "./BaseProgressbar.vue";
 import { useCountdown } from "@/composables/useCountdown";
+import { t, useI18n } from "@/i18n";
 
 const props = withDefaults(defineProps<{ startDate: Date; endDate: Date; autoFinish?: boolean }>(), {
   autoFinish: false,
 });
 const emit = defineEmits<{ finished: [] }>();
+
+const { t: tl } = useI18n({ autoFinish: t("Ends by itself", "Zakończy się sama") });
 
 const { remaining, elapsed, total } = useCountdown(
   () => props.startDate.getTime(),
@@ -25,17 +28,14 @@ const percentage = computed(() => (total.value ? (elapsed.value / total.value) *
 
 <template>
   <div
-    class="relative flex w-full min-w-full items-center self-start transition-opacity duration-1000 ease-in"
+    class="flex w-full max-w-[680px] flex-col gap-6 self-start transition-opacity duration-1000 ease-out"
     :class="remaining <= 0 ? ['opacity-25'] : []"
   >
-    <p
-      class="shrink-0 grow-0 pr-6 font-body text-3xl leading-none font-semibold text-secondary-100 tabular-nums"
-      role="timer"
-    >
-      {{ timeLeftInfo }}
-    </p>
-    <div class="h-12 w-full">
-      <ProgressbarIcon :min="0" :max="100" :value="percentage" :icon="autoFinish ? 'finish' : ''" />
+    <p class="text-display whitespace-nowrap text-label" role="timer">{{ timeLeftInfo }}</p>
+    <div class="flex flex-col gap-2">
+      <BaseProgressbar :min="0" :max="100" :value="percentage" />
+      <!-- Short breaks close themselves when the time is up; say so instead of a lone glyph. -->
+      <p v-if="autoFinish" class="text-footnote text-label-secondary">{{ tl("autoFinish") }}</p>
     </div>
   </div>
 </template>

@@ -80,7 +80,7 @@ async function onClockFinished() {
 <template>
   <main
     v-show="!closing"
-    class="grid h-screen grow grid-cols-base grid-rows-base overflow-hidden bg-secondary-1000 p-8 font-body lg:p-12 xl:p-16"
+    class="grid h-screen grow grid-cols-base grid-rows-base overflow-hidden p-cover"
   >
     <HeaderTitle class="col-start-1 col-end-3 row-start-1" />
     <IndexStopProtection
@@ -88,9 +88,9 @@ async function onClockFinished() {
       :disabled="forceCloseLock"
       @change-auto-finish-lock="setLocks($event)"
     />
-    <p v-if="!ready" class="font-preset-info mb-8">{{ tl("loading") }}</p>
+    <p v-if="!ready" class="col-start-1 row-start-2 mt-16 max-w-[40ch] text-large-title text-label-secondary">{{ tl("loading") }}</p>
     <template v-else>
-      <TimerInfo class="col-start-1 row-start-2" :long="long" :start-date="startDate" :end-date="endDate" :finished="finished" />
+      <TimerInfo class="col-start-1 row-start-2 mt-16 mb-4" :long="long" :start-date="startDate" :end-date="endDate" :finished="finished" />
       <TimerClock
         class="col-start-1 row-start-3"
         :auto-finish="!long && !autoFinishLock"
@@ -106,7 +106,7 @@ async function onClockFinished() {
         @click="close"
       />
     </template>
-    <IndexIdea class="col-start-1 row-start-4" :long="long" :finished="finished" :force-close-lock="forceCloseLock" />
+    <IndexIdea class="col-start-1 row-start-4 self-end" :long="long" :finished="finished" :force-close-lock="forceCloseLock" />
     <IndexSettings
       class="col-start-3 row-start-4"
       @change-auto-finish-lock="setLocks($event)"

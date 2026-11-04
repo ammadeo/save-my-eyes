@@ -126,6 +126,16 @@ pub fn run() {
             scheduler::spawn_watchdog(&handle);
             calendar::spawn_refresher(&handle);
             notify_started(&handle, lang, state.scheduled_at.as_deref());
+            // Dev aid: open the menu window at startup (no synthetic tray clicks on macOS).
+            // `SME_DEV_OPEN_MENU=settings` / `=stop-protection` opens straight at that pane.
+            if let Some(pane) = std::env::var("SME_DEV_OPEN_MENU")
+                .ok()
+                .filter(|_| cfg!(debug_assertions))
+            {
+                windows::on_main(&handle, "open menu (SME_DEV_OPEN_MENU)", move |app| {
+                    windows::open_menu_window_at(app, Some(&pane))
+                });
+            }
             Ok(())
         })
         .build(tauri::generate_context!())
