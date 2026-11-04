@@ -7,7 +7,7 @@ import { t, useI18n } from "@/i18n";
 
 const emit = defineEmits<{ changeAutoFinishLock: [locked: boolean]; changed: [] }>();
 
-const { t: tl, tg } = useI18n({
+const { t: tl } = useI18n({
   open: t("Show settings", "Ustawienia"),
   title: t("Settings", "Ustawienia"),
   fixing: t("Fixing settings", "Poprawiam ustawienia"),
@@ -15,7 +15,6 @@ const { t: tl, tg } = useI18n({
 });
 
 const show = ref(false);
-const changed = ref(false);
 const hovering = ref(false);
 const fixLog = ref<string[]>([]);
 const failed = ref(false);
@@ -29,13 +28,12 @@ function setShow(to: boolean) {
   failed.value = false;
   emit("changeAutoFinishLock", to);
   show.value = to;
-  if (!to) changed.value = false;
   hovering.value = false;
 }
 
-/** The close button saves first when something changed (explicit save, no save-on-unmount). */
+/** Closing saves first when something changed (explicit save, no save-on-unmount); Save changes closes too. */
 async function close() {
-  const result = changed.value && form.value ? await form.value.save() : undefined;
+  const result = form.value?.changed ? await form.value.save() : undefined;
   setShow(false);
   if (result && (result.messages.length || !result.ok)) {
     fixLog.value = result.messages;
@@ -53,23 +51,17 @@ function clearLater(ms: number) {
   }, ms);
 }
 onUnmounted(() => clearTimeout(timer));
-
-function onChanged() {
-  changed.value = true;
-  emit("changed");
-}
 </script>
 
 <template>
-  <div class="relative w-full self-end">
-    <ButtonIcon class="is-large w-full" :class="{ invisible: show || hasFixLog }" icon="settings" :content="tl('open')" @click="setShow(true)" />
+  <div class="relative flex w-full justify-end self-end">
+    <ButtonIcon class="is-large" :class="{ invisible: show || hasFixLog }" icon="settings" :content="tl('open')" @click="setShow(true)" />
     <Transition name="slide">
       <CardCloseable
         v-if="show || hasFixLog"
-        :content="changed ? tg('settingsSave') : ''"
         :title="tl('title')"
         absolute
-        class="slide-leave-bottom right-0 bottom-0 z-40 max-h-[calc(100vh-2*var(--spacing-cover))]"
+        class="slide-leave-bottom right-0 bottom-0 z-40 max-h-[calc(100vh-2*var(--spacing-cover))] w-[360px]! max-w-[calc(100vw-2*var(--spacing-cover))]"
         @close="hasFixLog && !show ? setShow(false) : close()"
         @mouseenter="hovering = true"
         @mouseleave="hovering = false"
@@ -80,7 +72,7 @@ function onChanged() {
           </p>
           <p v-for="line in fixLog" :key="line" class="mt-1 text-footnote text-label-secondary">{{ line }}</p>
         </div>
-        <ContentSettings v-else ref="form" @changed="onChanged" />
+        <ContentSettings v-else ref="form" @changed="emit('changed')" @save="close" />
       </CardCloseable>
     </Transition>
   </div>

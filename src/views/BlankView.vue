@@ -20,7 +20,7 @@ const end = () => endBreak().catch((error) => log.warn("end_break failed", error
 
 <template>
   <main class="relative flex h-screen items-center justify-center p-cover">
-    <div class="flex flex-col items-center gap-3 text-center opacity-60">
+    <div class="flex flex-col items-center gap-3 text-center">
       <HeaderTitle />
       <p class="text-large-title text-label" aria-live="polite">{{ finished ? tl("contentFinished") : tl("content") }}</p>
     </div>

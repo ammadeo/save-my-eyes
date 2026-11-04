@@ -19,7 +19,8 @@ pub const COVER_PREFIX: &str = "cover-";
 
 /// Initial size; the page resizes the window per pane (`MenuView.vue`, `paneHeight`).
 const MENU_SIZE: LogicalSize<f64> = LogicalSize::new(400.0, 352.0);
-const BEFORE_BREAK_SIZE: LogicalSize<f64> = LogicalSize::new(360.0, 140.0);
+/// Initial size; the page resizes the card to its content (`BeforeBreakView.vue`).
+const BEFORE_BREAK_SIZE: LogicalSize<f64> = LogicalSize::new(360.0, 100.0);
 /// Logical-pixel gap between a card window and the work-area edges.
 const MARGIN: f64 = 12.0;
 /// Corner radius of the `before-break` card; `macos::style_panel` clips to the same value.

@@ -31,7 +31,7 @@ async function openCoffee() {
       <h3 class="text-title-2 text-label" data-testid="idea-title">{{ tl("title") }}</h3>
       <p class="text-body text-label-secondary" data-testid="idea-content">{{ tl("description") }}</p>
       <ButtonIcon class="is-large mt-3" :disabled="forceCloseLock" icon="coffee" :content="tl('link')" @click="openCoffee" />
-      <p class="mt-1 text-footnote text-label-tertiary">{{ tl("note") }}</p>
+      <p class="mt-1 text-footnote text-label-secondary">{{ tl("note") }}</p>
     </div>
   </div>
 </template>

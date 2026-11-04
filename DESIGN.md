@@ -2,9 +2,9 @@
 name: Save My Eyes
 description: Sage-tinted Liquid Glass windows that follow macOS, with only what has to be there.
 colors:
-  accent: "oklch(58% 0.07 150)"
+  accent: "oklch(52% 0.07 150)"
   accent-dark: "oklch(76% 0.08 150)"
-  accent-pressed: "oklch(52% 0.07 150)"
+  accent-pressed: "oklch(46% 0.07 150)"
   accent-pressed-dark: "oklch(70% 0.08 150)"
   on-accent: "oklch(99% 0.005 150)"
   on-accent-dark: "oklch(20% 0.03 150)"
@@ -18,10 +18,14 @@ colors:
   surface-dark: "oklch(100% 0 0 / 0.07)"
   fill: "oklch(22% 0.02 150 / 0.06)"
   fill-dark: "oklch(97% 0.01 150 / 0.09)"
+  fill-pressed: "oklch(22% 0.02 150 / 0.1)"
+  fill-pressed-dark: "oklch(97% 0.01 150 / 0.16)"
+  control-neutral: "oklch(55% 0.01 150)"
+  control-neutral-dark: "oklch(80% 0.01 150)"
   separator: "oklch(22% 0.02 150 / 0.1)"
   separator-dark: "oklch(97% 0.01 150 / 0.1)"
   warning: "oklch(60% 0.12 75)"
-  destructive: "oklch(55% 0.16 25)"
+  destructive: "oklch(50% 0.16 25)"
   destructive-dark: "oklch(72% 0.15 25)"
   glass-tint: "oklch(70% 0.06 150 / 0.14)"
 typography:
@@ -90,7 +94,7 @@ components:
     rounded: "{rounded.control}"
     padding: "4px 14px"
   button-quiet-active:
-    backgroundColor: "{colors.fill}"
+    backgroundColor: "{colors.fill-pressed}"
   group:
     backgroundColor: "{colors.surface}"
     rounded: "{rounded.group}"
@@ -127,8 +131,8 @@ The old look (deep navy, Comfortaa and Source Sans Pro, pill buttons with stacke
 Sage on glass: a single muted green against translucent white and alpha-black labels.
 
 ### Primary
-- **Sage** (`oklch(58% 0.07 150)` light, `oklch(76% 0.08 150)` dark): background of the single prominent button on a screen, the progress fill, the slider knob and switch on-state. Never used for text.
-- **Sage pressed** (`oklch(52% 0.07 150)` / `oklch(70% 0.08 150)`): the prominent button while pressed.
+- **Sage** (`oklch(52% 0.07 150)` light, `oklch(76% 0.08 150)` dark): background of the single prominent button on a screen, the progress fill and the on-state of a switch (a state indicator, not a control). Never used for text. Light sage is dark enough for 13px white text at 4.5:1.
+- **Sage pressed** (`oklch(46% 0.07 150)` / `oklch(70% 0.08 150)`): the prominent button while pressed.
 - **Glass tint** (`oklch(70% 0.06 150 / 0.14)`): passed to the native material as its tint colour so the whole window reads faintly sage.
 
 ### Neutral
@@ -136,15 +140,16 @@ Sage on glass: a single muted green against translucent white and alpha-black la
 - **Label secondary** (alpha 0.55): captions, section titles, footnotes, status lines.
 - **Label tertiary** (alpha 0.3): chevrons, shortcuts, disabled text.
 - **Surface** (`oklch(100% 0 0 / 0.45)` light, `oklch(100% 0 0 / 0.07)` dark): grouped lists, cards, quiet buttons.
-- **Fill** (`oklch(22% 0.02 150 / 0.06)` / `oklch(97% 0.01 150 / 0.09)`): pressed rows, progress tracks, slider tracks.
+- **Fill** (`oklch(22% 0.02 150 / 0.06)` / `oklch(97% 0.01 150 / 0.09)`): progress tracks, notices. **Fill pressed** (alpha 0.1 / 0.16): rows and quiet buttons while pressed.
+- **Control neutral** (`oklch(55% 0.01 150)` / `oklch(80% 0.01 150)`): the tint of native sliders, so a form of four sliders stays monochrome.
 - **Separator** (alpha 0.1 of the label hue): hairlines between rows.
 
 ### Tertiary
 - **Warning** (`oklch(60% 0.12 75)`): the "fixing settings" notice only.
-- **Destructive** (`oklch(55% 0.16 25)` / `oklch(72% 0.15 25)`): text of "Turn off protection" and "Quit".
+- **Destructive** (`oklch(50% 0.16 25)` / `oklch(72% 0.15 25)`): text of "Turn off for this session" and "Quit".
 
 ### Named Rules
-**The One Sage Rule.** At most one sage-filled control per screen, plus the progress fill. If a second control wants colour, it becomes quiet.
+**The One Sage Rule.** At most one sage-filled control per screen, plus the progress fill and the on-state of switches. Sliders are neutral. If a second control wants colour, it becomes quiet. A floating card on the cover (settings, stop protection) counts as its own screen while open: its Save may be sage.
 **The No-Paint Rule.** No element paints an opaque background. Surfaces are alpha white or alpha label; the glass must show through everywhere.
 
 ## Typography
@@ -159,7 +164,7 @@ Sage on glass: a single muted green against translucent white and alpha-black la
 - **Large Title** (400, 26/32): the break info line ("take a short break for 20 seconds").
 - **Title 2** (500, 17/22): the idea card title, the menu countdown value is 26/32 at 500.
 - **Headline** (600, 13/16): window titles, the before-break card title.
-- **Body** (400, 13/16): every control and row.
+- **Body** (400, 13/16): every row and field. Push-button labels are the same size at weight 500.
 - **Footnote** (400, 11/14): section titles (secondary label), credits, hints.
 - **Control XL** (500, 15/20): the label of the cover's 40px exit button only.
 
@@ -169,7 +174,7 @@ Sage on glass: a single muted green against translucent white and alpha-black la
 
 ## Layout
 
-Four windows. The menu window is 400px wide and resizes to its pane (352px for the menu, 500px for settings, 300px for stop protection) so no pane floats in empty glass; it is a single column with 16px side gutters and 14px between groups. The before-break card is icon + text column with actions bottom-right, 14px padding. The break cover keeps a three-column grid (content, gutter, actions) with `clamp(32px, 5vw, 64px)` page padding: title row, info, countdown, idea card bottom-left, exit button top-right of the actions column, settings bottom-right. Blank covers centre a single caption with the exit button bottom-right. Rows are at least 40px tall; hit targets are never under 24px.
+Four windows. The menu window is 400px wide and is sized to its pane (52px toolbar + pane + 16px), re-measured when the pane grows, so no pane floats in empty glass; it is a single column with 16px side gutters and 14px between groups. The before-break card is 360px wide and sized to its content: icon + text column, actions 12px below the text, 14px padding. The break cover keeps a three-column grid (content, gutter, actions) with `clamp(32px, 5vw, 64px)` page padding: title row, info, countdown, idea card bottom-left, exit button top-right of the actions column, settings bottom-right. Blank covers centre a single caption with the exit button bottom-right. Rows are at least 40px tall; hit targets are never under 24px.
 
 ## Elevation & Depth
 
@@ -187,10 +192,10 @@ Continuous, concentric rounding. Controls 8px, groups and cards 14px, the before
 ### Buttons
 - **Shape:** 8px radius, 24px min height (28px large), 4px 14px padding. The cover's exit button is the one XL control: 40px tall, 12px radius, 15px label.
 - **Primary:** sage background, on-accent text, no border. Pressed: sage pressed.
-- **Quiet:** surface background, label text, 0.5px separator border. Pressed: fill.
+- **Quiet:** surface background, label text, 0.5px separator border. Pressed: fill pressed.
 - **Destructive:** quiet with destructive text.
 - **Disabled:** opacity 0.45.
-- **Hover / Focus:** no hover colour on buttons (macOS convention); focus-visible ring is 3px sage at 0.5 alpha, 1px offset.
+- **Hover / Focus:** no hover colour on buttons (macOS convention); focus-visible ring is 3px sage at 0.5 alpha, 1px outside the element and following its own radius. Inside a group the ring sits 3px inside the row.
 
 ### Cards / Containers
 - **Corner Style:** 14px.
@@ -200,12 +205,12 @@ Continuous, concentric rounding. Controls 8px, groups and cards 14px, the before
 - **Internal Padding:** 12–14px.
 
 ### Inputs / Fields
-- **Sliders and switches:** native WebKit controls with `accent-color: sage`.
+- **Sliders:** native WebKit range tinted control-neutral. **Switches:** native, sage when on.
 - **Select:** native popup.
 - **Focus:** the shared focus ring.
 
 ### Rows (grouped list)
-- 40px min height, 8px gap, 12px side padding, hairline inset separator between rows, fill on press, no hover colour on glass.
+- 40px min height, 8px gap, 12px side padding, hairline separator between rows inset to the text start (12px, 40px after an icon), fill pressed on press, no hover colour on glass.
 - Leading icon: monochrome label-secondary SVG, 11–13px, no tinted chip. Trailing chevron is a drawn 7×12 stroke in label-tertiary.
 - The Quit row is the only destructive row (destructive label). "Buy me a coffee" is a footnote link in the settings credits, not a row.
 
@@ -215,12 +220,23 @@ Continuous, concentric rounding. Controls 8px, groups and cards 14px, the before
 ### Countdown (signature)
 The break cover's clock: display-size light numerals, tabular, a wide sage progress bar beneath, fading to 0.25 opacity once the time is up.
 
+## Imagery
+
+The seven unDraw illustrations (`src/assets/images/*.svg`) are recoloured into the system and are the only polychrome objects on the cover. They are plain SVG files loaded with `<img>`, so their colours are literal:
+
+- **sage-700** `#4F6E5A` main garments and far trees; **sage-500** `#6B8F77` the main object (balls, leaves, mug, sky); **sage-300** `#A9C4B0` light garments and backdrops.
+- **clay-500** `#B8A58B` and **clay-300** `#D9CBB8` the quiet second hue (tops, birds, sprouts) where unDraw used pink or yellow.
+- **ink** `#2E3A33` and **ink-2** `#45554B` outlines, hair, furniture, instead of unDraw's navy.
+- Skin tones and plain greys are unDraw's own; brick texture in `window.svg` is `#8fa394` so it reads softly on both appearances.
+- No blue, purple, pink or yellow may return. Keep each picture at 128–160px tall inside its card.
+
 ## Do's and Don'ts
 
 ### Do:
 - **Do** let the native material paint the window; the HTML root is `background: transparent`.
 - **Do** use alpha label colours for text and icons so they stay legible in both appearances and under Reduce Transparency.
-- **Do** keep every window to one sage control.
+- **Do** keep every window to one sage control; sliders stay neutral.
+- **Do** size a window to its content (`useWindowFit`) instead of hard-coding a height.
 - **Do** use the system font at 13px body, 11px footnote, Apple's macOS scale above.
 
 ### Don't:

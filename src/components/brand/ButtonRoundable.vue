@@ -28,8 +28,7 @@ const round = computed(() => !props.content);
 
 <style scoped>
 /* 28px quiet circle for icon-only buttons (close, pause). */
-.glass-button.is-round,
-.glass-button.is-round:focus-visible {
+.glass-button.is-round {
   width: 28px;
   height: 28px;
   min-height: 28px;

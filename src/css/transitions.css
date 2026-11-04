@@ -1,7 +1,9 @@
 /* Legacy transitions renamed for Vue 3 (`-enter` -> `-enter-from`). */
-.slide-enter-active,
+.slide-enter-active {
+  transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 .slide-leave-active {
-  transition: transform 300ms ease-in-out;
+  transition: transform 240ms cubic-bezier(0.4, 0, 1, 1);
 }
 .slide-enter-from {
   transform: translateY(150%);

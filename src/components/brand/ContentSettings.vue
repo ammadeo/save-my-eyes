@@ -1,62 +1,56 @@
 <script setup lang="ts">
 import { watch } from "vue";
-import BaseInputRange from "./BaseInputRange.vue";
-import BaseIcon from "../BaseIcon.vue";
 import BaseLink from "./BaseLink.vue";
-import ButtonToggleLabeled from "./ButtonToggleLabeled.vue";
+import MacSliderRow from "@/components/mac/MacSliderRow.vue";
 import { useSettingsForm } from "@/composables/useSettingsForm";
 import { uiRanges } from "@/fixes";
 import { settingsDict } from "@/settingsDict";
 import { useI18n } from "@/i18n";
 
-withDefaults(defineProps<{ forceLarge?: boolean }>(), { forceLarge: false });
-const emit = defineEmits<{ changed: [] }>();
+/** `save` asks the card to save and close, so the fix log shows in one place (IndexSettings). */
+const emit = defineEmits<{ changed: []; save: [] }>();
 
 const { t, tg } = useI18n(settingsDict);
 const form = useSettingsForm();
-const { draft } = form;
+const { draft, changed, saving, reset } = form;
 
-watch(form.changed, (to) => to && emit("changed"));
+watch(changed, (to) => to && emit("changed"));
 
 defineExpose({ save: form.save, changed: form.changed });
 </script>
 
 <template>
-  <section class="grow">
+  <form class="flex grow flex-col gap-3.5" @submit.prevent="emit('save')">
     <h3 class="sr-only">{{ t("settings") }}</h3>
 
-    <div class="flex flex-col gap-4">
-      <BaseInputRange
+    <div class="glass-group">
+      <MacSliderRow
         v-model="draft.every"
-        :name="t('inputShortEvery')"
-        :force-large="forceLarge"
+        :label="t('inputShortEvery')"
         :min="uiRanges.everyMin[0]"
         :max="uiRanges.everyMin[1]"
         :scale="60"
         :suffix="tg('minutesSuffix')"
       />
-      <BaseInputRange
+      <MacSliderRow
         v-model="draft.shortLast"
-        :name="t('inputShortLast')"
-        :force-large="forceLarge"
+        :label="t('inputShortLast')"
         :min="uiRanges.shortLastSec[0]"
         :max="uiRanges.shortLastSec[1]"
         :suffix="tg('secondsSuffix')"
       />
-      <BaseInputRange
+      <MacSliderRow
         v-model="draft.longEvery"
-        :name="t('inputLongEvery')"
-        :force-large="forceLarge"
+        :label="t('inputLongEvery')"
         :min="draft.every / 60"
         :max="uiRanges.longEveryMaxMin"
-        :scale="60"
         :step="draft.every / 60"
+        :scale="60"
         :suffix="tg('minutesSuffix')"
       />
-      <BaseInputRange
+      <MacSliderRow
         v-model="draft.longLast"
-        :name="t('inputLongLast')"
-        :force-large="forceLarge"
+        :label="t('inputLongLast')"
         :min="uiRanges.longLastMin[0]"
         :max="uiRanges.longLastMin[1]"
         :scale="60"
@@ -64,34 +58,35 @@ defineExpose({ save: form.save, changed: form.changed });
       />
     </div>
 
-    <h4 class="mt-6 mb-2 text-footnote text-label-secondary">{{ t("sound") }}</h4>
-    <ButtonToggleLabeled
-      :on="draft.soundsUi"
-      :state-on="t('soundUiOn')"
-      :state-off="t('soundUiOff')"
-      @toggle="draft.soundsUi = $event"
-    >
-      <template #iconOn><BaseIcon class="h-3.5" icon="sound" /></template>
-      <template #iconOff><BaseIcon class="h-3.5" icon="mute" /></template>
-    </ButtonToggleLabeled>
+    <div class="glass-group">
+      <label class="glass-row">
+        <span class="grow">{{ t("soundUi") }}</span>
+        <input v-model="draft.soundsUi" v-bind="{ switch: '' }" type="checkbox" role="switch" class="glass-switch" />
+      </label>
+      <label class="glass-row">
+        <span class="grow">{{ t("language") }}</span>
+        <select v-model="draft.lang" class="glass-select">
+          <option value="en">English</option>
+          <option value="pl">Polski</option>
+        </select>
+      </label>
+    </div>
 
-    <h4 class="mt-4 mb-2 text-footnote text-label-secondary">{{ t("language") }}</h4>
-    <ButtonToggleLabeled
-      :on="draft.lang === 'en'"
-      :state-on="t('languageOn')"
-      :state-off="t('languageOff')"
-      @toggle="draft.lang = $event ? 'en' : 'pl'"
-    />
+    <div class="flex justify-end gap-2">
+      <button type="button" class="glass-button" :disabled="!changed || saving" @click="reset">{{ t("revert") }}</button>
+      <button type="submit" class="glass-button is-primary" :disabled="!changed || saving">{{ tg("settingsSave") }}</button>
+    </div>
 
-    <h4 class="mt-6 mb-2 text-footnote text-label-secondary">{{ t("credentials") }}</h4>
-    <p class="text-body text-label-secondary">
-      {{ t("createdBy") }}
-      <BaseLink href="https://ammadeo.dev">{{ t("author") }}</BaseLink>
-    </p>
-    <p class="mt-1 text-body text-label-secondary">
-      {{ t("thanksTo") }}
-      <BaseLink href="https://undraw.co/">Katerina Limpitsouni</BaseLink>
-      {{ t("thanksFor") }}
-    </p>
-  </section>
+    <div class="mx-3 text-footnote text-label-secondary">
+      <p>
+        {{ t("createdBy") }}
+        <BaseLink href="https://ammadeo.dev">{{ t("author") }}</BaseLink>
+      </p>
+      <p>
+        {{ t("thanksTo") }}
+        <BaseLink href="https://undraw.co/">Katerina Limpitsouni</BaseLink>
+        {{ t("thanksFor") }}
+      </p>
+    </div>
+  </form>
 </template>
