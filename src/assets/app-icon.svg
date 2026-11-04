@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Save My Eyes app icon (master, flattened).
+  An eyeball whose pupil is a plus, in the DESIGN.md sage palette: three flat
+  layers, no gradients, no baked shadows. Drawn on the macOS icon grid
+  (1024 canvas, 824 tile with a 100px margin). The same shapes, on a
+  full-bleed 1024 canvas, are the layers of src-tauri/icons/AppIcon.icon,
+  the Liquid Glass source for macOS 26+.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- tile: sage-500 -->
+  <rect id="tile" x="100" y="100" width="824" height="824" rx="185" ry="185" fill="#6B8F77"/>
+  <g transform="translate(100 100) scale(0.8046875)">
+    <!-- eyeball: pale sage -->
+    <circle id="disc" cx="512" cy="512" r="300" fill="#E7EFE9"/>
+    <!-- pupil: a plus, sage-700 -->
+    <path id="plus" d="M512 362v300M362 512h300" fill="none" stroke="#4F6E5A" stroke-width="88" stroke-linecap="round"/>
+  </g>
+</svg>

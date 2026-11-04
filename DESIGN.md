@@ -230,6 +230,8 @@ The seven unDraw illustrations (`src/assets/images/*.svg`) are recoloured into t
 - Skin tones and plain greys are unDraw's own; brick texture in `window.svg` is `#8fa394` so it reads softly on both appearances.
 - No blue, purple, pink or yellow may return. Keep each picture at 128–160px tall inside its card.
 
+The app icon is the same world: a sage-500 tile, a pale sage eyeball and a sage-700 plus for its pupil, three flat layers and nothing else. `src/assets/app-icon.svg` is the flattened master on the macOS icon grid; `src-tauri/icons/AppIcon.icon` holds the same shapes as Icon Composer layers, so macOS 26+ renders it as Liquid Glass (specular, shadow, dark and clear variants come from the system). The menu-bar tray icon stays a monochrome template.
+
 ## Do's and Don'ts
 
 ### Do:
