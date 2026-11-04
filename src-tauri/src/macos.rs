@@ -25,7 +25,8 @@ pub fn elevate_cover_window(w: &WebviewWindow) -> tauri::Result<()> {
     Ok(())
 }
 
-/// Notification-banner look for the `before-break` card: rounded corners, system shadow,
+/// Notification-banner look for the `before-break` card: rounded corners (concentric with
+/// its glass), system shadow,
 /// shown on every Space including other apps' fullscreen Spaces (floating level comes from
 /// `always_on_top`).
 pub fn style_panel(w: &WebviewWindow) -> tauri::Result<()> {
@@ -47,7 +48,7 @@ pub fn style_panel(w: &WebviewWindow) -> tauri::Result<()> {
             unsafe {
                 let layer: *mut AnyObject = msg_send![&*view, layer];
                 if let Some(layer) = layer.as_ref() {
-                    let _: () = msg_send![layer, setCornerRadius: 12.0f64];
+                    let _: () = msg_send![layer, setCornerRadius: crate::windows::PANEL_RADIUS];
                     let _: () = msg_send![layer, setMasksToBounds: true];
                 }
             }

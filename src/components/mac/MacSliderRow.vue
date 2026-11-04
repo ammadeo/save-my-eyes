@@ -13,12 +13,12 @@ const onInput = (event: Event) => emit("update:modelValue", Number((event.target
 </script>
 
 <template>
-  <div class="mac-row slider-row">
+  <div class="glass-row slider-row">
     <div class="slider-top">
       <label :for="id">{{ label }}</label>
       <output :for="id" class="slider-value">{{ display }}&nbsp;{{ suffix }}</output>
     </div>
-    <input :id="id" type="range" class="mac-slider" :min="min" :max="max" :step="step" :value="display" @input="onInput" />
+    <input :id="id" type="range" class="glass-slider" :min="min" :max="max" :step="step" :value="display" @input="onInput" />
   </div>
 </template>
 
@@ -26,9 +26,9 @@ const onInput = (event: Event) => emit("update:modelValue", Number((event.target
 .slider-row {
   flex-direction: column;
   align-items: stretch;
-  gap: 2px;
-  padding-top: 8px;
-  padding-bottom: 6px;
+  gap: 4px;
+  padding-top: 9px;
+  padding-bottom: 7px;
 }
 .slider-top {
   display: flex;
@@ -36,7 +36,8 @@ const onInput = (event: Event) => emit("update:modelValue", Number((event.target
   gap: 8px;
 }
 .slider-value {
-  color: var(--mac-label-secondary);
+  flex-shrink: 0;
+  color: var(--label-secondary);
   font-variant-numeric: tabular-nums;
 }
 </style>

@@ -10,9 +10,13 @@ const open = () => openUrl(props.href);
 </script>
 
 <template>
-  <span class="link-hint" :data-hint="tl('hint')">
-    <a :href="href" class="font-semibold underline" rel="noopener noreferrer" @click.prevent="open" @auxclick.prevent="open">
-      <slot /> </a
-    ><sup class="no-underline">↗</sup>
-  </span>
+  <a
+    :href="href"
+    :title="tl('hint')"
+    class="font-medium"
+    rel="noopener noreferrer"
+    @click.prevent="open"
+    @auxclick.prevent="open"
+    ><slot
+  /></a>
 </template>

@@ -25,13 +25,8 @@ const pause = (hours: number) => stop.pause(hours);
 
 <template>
   <div class="relative w-full">
-    <div class="flex items-center justify-end">
-      <p
-        class="selection-darker mr-2 font-display text-sm tracking-wide uppercase"
-        :class="disabled ? ['cursor-not-allowed', 'text-secondary-500'] : ['text-secondary-400']"
-      >
-        {{ tl("title") }}
-      </p>
+    <div class="flex items-center justify-end gap-2" :class="{ invisible: open && !disabled }">
+      <p class="text-footnote" :class="disabled ? 'text-label-tertiary' : 'text-label-secondary'">{{ tl("title") }}</p>
       <ButtonRoundable icon="pause" :label="tl('title')" data-testid="pause-button" :disabled="disabled" @click="setOpen(true)" />
     </div>
     <Transition name="slide">
@@ -39,21 +34,35 @@ const pause = (hours: number) => stop.pause(hours);
         v-show="open && !disabled"
         absolute
         :title="tl('title')"
-        class="slide-enter-right top-0 right-0 z-30 max-h-[calc(100vh-4rem)] lg:max-h-[calc(100vh-6rem)] xl:max-h-[calc(100vh-8rem)]"
+        class="slide-enter-right top-0 right-0 z-30 max-h-[calc(100vh-2*var(--spacing-cover))]"
         @close="setOpen(false)"
       >
         <div class="grow">
-          <p class="mb-2 text-lg text-secondary-100">{{ stop.t("stopFor") }}</p>
-          <div class="mb-4 flex w-full gap-2">
-            <BaseButton v-for="option in stop.options.value" :key="option.hours" center class="flex-1" @click="pause(option.hours)">
-              <p class="px-1 py-2">{{ option.label }}</p>
+          <p class="mb-2 text-body text-label-secondary">{{ stop.t("stopFor") }}</p>
+          <div class="flex w-full gap-2">
+            <BaseButton
+              v-for="option in stop.options.value"
+              :key="option.hours"
+              center
+              class="hour-button is-large flex-1"
+              @click="pause(option.hours)"
+            >
+              {{ option.label }}
             </BaseButton>
           </div>
-          <p class="mb-2 text-lg text-secondary-100">{{ stop.t("turnOffTitle") }}</p>
-          <ButtonIcon primary class="mb-2 w-full" icon="stop" :content="stop.t('turnOffContent')" @click="stop.quit()" />
-          <p class="text-center text-secondary-200">{{ stop.t("turnOffInfo") }}</p>
+          <p class="mt-6 mb-2 text-body text-label-secondary">{{ stop.t("turnOffTitle") }}</p>
+          <ButtonIcon class="is-large is-destructive w-full" icon="stop" :content="stop.t('turnOffContent')" @click="stop.quit()" />
+          <p class="mt-2 text-center text-footnote text-label-secondary">{{ stop.t("turnOffInfo") }}</p>
         </div>
       </CardCloseable>
     </Transition>
   </div>
 </template>
+
+<style scoped>
+/* Three hour buttons share the card width; let them shrink below the default side padding. */
+.glass-button.hour-button {
+  min-width: 0;
+  padding-inline: 6px;
+}
+</style>

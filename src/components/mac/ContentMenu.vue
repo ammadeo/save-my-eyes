@@ -17,7 +17,6 @@ const { t: tl, tg } = useI18n({
   buttonStartLongBreak: t("Start a long break now", "Zacznij długą przerwę teraz"),
   buttonStopProtection: t("Stop protection", "Wstrzymaj ochronę"),
   buttonSettings: t("Settings", "Ustawienia"),
-  buttonCoffee: t("Buy me a coffee", "Zamów mi kawę"),
   buttonQuit: t("Quit Save My Eyes", "Zakończ Save My Eyes"),
 });
 
@@ -50,39 +49,38 @@ const nextBreakTime = computed(() =>
 
 <template>
   <section class="menu-pane">
-    <div class="mac-group status">
+    <div class="glass-group status">
       <p class="status-label first-letter:uppercase">{{ label }}</p>
       <p v-if="!isBreakNow" class="status-value">{{ nextBreakTime }}</p>
     </div>
 
-    <button type="button" class="mac-button is-default is-large start" @click="emit('run', 'start-long-break')">
-      <BaseIcon icon="start" class="h-3" />
+    <button type="button" class="glass-button is-primary is-large w-full" @click="emit('run', 'start-long-break')">
+      <BaseIcon icon="start" class="h-[11px]" />
       <span>{{ tl("buttonStartLongBreak") }}</span>
     </button>
 
-    <div class="mac-group">
-      <button type="button" class="mac-row" @click="emit('run', 'open-stop-protection')">
-        <span class="row-icon tint-orange"><BaseIcon icon="pause" class="h-2.5" /></span>
+    <div class="glass-group">
+      <button type="button" class="glass-row" @click="emit('run', 'open-stop-protection')">
+        <span class="glass-row-icon"><BaseIcon icon="pause" class="h-[12px]" /></span>
         <span class="grow">{{ tl("buttonStopProtection") }}</span>
-        <span class="chevron" aria-hidden="true">›</span>
+        <svg class="chevron" viewBox="0 0 7 12" width="7" height="12" aria-hidden="true">
+          <path d="m1 1 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
       </button>
-      <button type="button" class="mac-row" @click="emit('run', 'open-settings')">
-        <span class="row-icon tint-gray"><BaseIcon icon="settings" class="h-3" /></span>
+      <button type="button" class="glass-row" @click="emit('run', 'open-settings')">
+        <span class="glass-row-icon"><BaseIcon icon="settings" class="h-[13px]" /></span>
         <span class="grow">{{ tl("buttonSettings") }}</span>
-        <span class="chevron" aria-hidden="true">›</span>
+        <svg class="chevron" viewBox="0 0 7 12" width="7" height="12" aria-hidden="true">
+          <path d="m1 1 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
       </button>
     </div>
 
-    <div class="mac-group">
-      <button type="button" class="mac-row" @click="emit('run', 'coffee')">
-        <span class="row-icon tint-brown"><BaseIcon icon="coffee" class="h-3" /></span>
-        <span class="grow">{{ tl("buttonCoffee") }}</span>
-        <span class="chevron" aria-hidden="true">↗</span>
-      </button>
-      <button type="button" class="mac-row" @click="emit('run', 'quit')">
-        <span class="row-icon tint-red"><BaseIcon icon="stop" class="h-2.5" /></span>
-        <span class="grow">{{ tl("buttonQuit") }}</span>
-        <kbd class="shortcut">⌘Q</kbd>
+    <div class="glass-group">
+      <button type="button" class="glass-row" @click="emit('run', 'quit')">
+        <span class="glass-row-icon"><BaseIcon icon="stop" class="h-[11px]" /></span>
+        <span class="grow text-destructive">{{ tl("buttonQuit") }}</span>
+        <kbd aria-hidden="true">⌘Q</kbd>
       </button>
     </div>
   </section>
@@ -95,50 +93,21 @@ const nextBreakTime = computed(() =>
   gap: 14px;
 }
 .status {
-  padding: 14px 14px 16px;
+  padding: 12px 14px 14px;
 }
 .status-label {
   margin: 0;
-  color: var(--mac-label-secondary);
+  color: var(--label-secondary);
 }
 .status-value {
   margin: 2px 0 0;
   font-size: 26px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  line-height: 32px;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
-.start {
-  width: 100%;
-}
-.row-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
-  color: #fff;
-}
-.tint-orange {
-  background: #ff9500;
-}
-.tint-gray {
-  background: #8e8e93;
-}
-.tint-brown {
-  background: #a2845e;
-}
-.tint-red {
-  background: #ff3b30;
-}
-.chevron,
-.shortcut {
-  color: var(--mac-label-tertiary);
-  font-size: 15px;
-  font-family: inherit;
-}
-.shortcut {
-  font-size: 12px;
+.chevron {
+  flex-shrink: 0;
+  color: var(--label-tertiary);
 }
 </style>

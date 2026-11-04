@@ -20,6 +20,7 @@ export const settingsDict = {
   author: t("Ammadeo", "Amadeusza Chomiaka"),
   thanksTo: t("Thanks to", "Dzięki"),
   thanksFor: t("for awesome drawings", "za świetne rysunki"),
+  coffee: t("Buy me a coffee", "Zamów mi kawę"),
   fixing: t("Fixing settings", "Poprawiam ustawienia"),
   saved: t("Settings saved", "Zapisano ustawienia"),
   saveFailed: t("Could not save settings", "Nie udało się zapisać ustawień"),

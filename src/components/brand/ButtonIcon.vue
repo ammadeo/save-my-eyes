@@ -11,8 +11,15 @@ const emit = defineEmits<{ click: [] }>();
 </script>
 
 <template>
-  <BaseButton :primary="primary" :absolute="absolute" :disabled="disabled" class="flex min-h-12" @click="emit('click')">
-    <p class="px-4 py-2 font-display text-lg first-letter:uppercase">{{ content }}</p>
-    <BaseIcon :icon="icon" class="h-4 pr-4 text-secondary-100" />
+  <BaseButton :primary="primary" :absolute="absolute" :disabled="disabled" center @click="emit('click')">
+    <span class="first-letter:uppercase">{{ content }}</span>
+    <BaseIcon v-if="icon" :icon="icon" class="button-icon" />
   </BaseButton>
 </template>
+
+<style scoped>
+.button-icon {
+  height: 0.85em;
+  opacity: 0.7;
+}
+</style>

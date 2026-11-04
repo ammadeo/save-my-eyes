@@ -3,15 +3,18 @@ withDefaults(defineProps<{ absolute?: boolean }>(), { absolute: false });
 </script>
 
 <template>
-  <div
-    class="flex max-h-full w-full flex-col items-stretch rounded-lg shadow-xl-revers"
-    :class="absolute ? 'absolute' : 'relative'"
-  >
-    <div class="absolute inset-0 max-h-full rounded-lg bg-secondary-1075 inset-shadow-1" />
-    <div
-      class="scroll-sm relative flex max-h-full flex-1 -translate-y-2 flex-col overflow-auto scroll-smooth rounded-lg bg-gradient-card"
-    >
+  <!-- Raised glass group; the inner box scrolls (glass-group clips its overflow). Callers cap the height. -->
+  <div class="glass-group is-raised flex w-full flex-col" :class="absolute ? ['absolute', 'is-floating'] : ['relative']">
+    <div class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain p-4">
       <slot />
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Floating cards overlap other controls on the cover: blur what is under them so it never reads through. */
+.glass-group.is-floating {
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  backdrop-filter: blur(24px) saturate(1.2);
+}
+</style>
