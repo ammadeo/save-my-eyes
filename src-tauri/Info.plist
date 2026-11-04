@@ -4,5 +4,9 @@
 <dict>
   <key>LSUIElement</key>
   <true/>
+  <key>NSCalendarsFullAccessUsageDescription</key>
+  <string>Save My Eyes checks your calendar so it does not start a break during a meeting. Events never leave your Mac.</string>
+  <key>NSCalendarsUsageDescription</key>
+  <string>Save My Eyes checks your calendar so it does not start a break during a meeting. Events never leave your Mac.</string>
 </dict>
 </plist>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onUnmounted, ref } from "vue";
 import MacSliderRow from "./MacSliderRow.vue";
+import MenuCalendar from "./MenuCalendar.vue";
 import { openUrl } from "@/bridge";
 import { useSettingsForm } from "@/composables/useSettingsForm";
 import { uiRanges } from "@/fixes";
@@ -66,6 +67,8 @@ onUnmounted(() => clearTimeout(timer));
         />
       </div>
     </div>
+
+    <MenuCalendar />
 
     <div class="glass-group">
       <label class="glass-row">

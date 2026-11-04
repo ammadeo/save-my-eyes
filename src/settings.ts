@@ -9,6 +9,7 @@ import { setLang } from "./i18n";
 export const defaultSettings = (): Settings => ({
   breaks: { every: 20 * 60, short: { last: 20 }, long: { last: 5 * 60, every: 3 } },
   sounds: { ui: true, voice: true },
+  calendar: { enabled: false },
   lang: typeof navigator !== "undefined" && navigator.language.toLowerCase().startsWith("pl") ? "pl" : "en",
 });
 
@@ -30,6 +31,7 @@ export function applySettings(next: Settings) {
   settings.sounds.ui = next.sounds.ui;
   settings.sounds.voice = next.sounds.voice;
   settings.lang = next.lang;
+  settings.calendar.enabled = next.calendar?.enabled ?? false;
   setLang(next.lang);
 }
 

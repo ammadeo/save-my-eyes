@@ -5,6 +5,7 @@ use std::sync::Mutex;
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, WebviewWindow};
 
+use crate::calendar::{self, CalendarStatus};
 use crate::scheduler::{self, BreakState, NextBreakOptions};
 use crate::settings::{self, Fix, Settings};
 use crate::{tray, windows};
@@ -31,26 +32,56 @@ pub async fn set_settings(
     mut settings: Settings,
 ) -> Result<SetSettingsResult, String> {
     let fixes = settings.validate();
+    store_settings(&app, &settings)?;
+    Ok(SetSettingsResult { settings, fixes })
+}
+
+/// Replace, persist and broadcast already validated settings.
+fn store_settings(app: &AppHandle, settings: &Settings) -> Result<(), String> {
     let old_lang = {
         let state = app.state::<Mutex<Settings>>();
         let mut current = state.lock().unwrap_or_else(|e| e.into_inner());
         std::mem::replace(&mut *current, settings.clone()).lang
     };
-    let path = settings::settings_path(&app).map_err(|e| e.to_string())?;
+    let path = settings::settings_path(app).map_err(|e| e.to_string())?;
     settings
         .save_to(&path)
         .map_err(|e| format!("saving {}: {e}", path.display()))?;
     if old_lang != settings.lang {
         let (a, lang) = (app.clone(), settings.lang);
-        windows::on_main(&app, "relabel tray menu", move |_| {
+        windows::on_main(app, "relabel tray menu", move |_| {
             tray::set_language(&a, lang);
             Ok(())
         });
     }
-    if let Err(e) = app.emit(EVT_SETTINGS_CHANGED, &settings) {
+    if let Err(e) = app.emit(EVT_SETTINGS_CHANGED, settings) {
         eprintln!("[commands] emit {EVT_SETTINGS_CHANGED}: {e}");
     }
-    Ok(SetSettingsResult { settings, fixes })
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn get_calendar_status(app: AppHandle) -> CalendarStatus {
+    calendar::status(&app)
+}
+
+/// Turn meeting-aware breaks on or off. Turning on asks macOS for calendar access the
+/// first time (resolves once the user answers the prompt).
+#[tauri::command]
+pub async fn set_calendar_enabled(app: AppHandle, enabled: bool) -> Result<CalendarStatus, String> {
+    if enabled {
+        calendar::request_access().await;
+    }
+    let mut settings = scheduler::settings(&app);
+    settings.calendar.enabled = enabled;
+    store_settings(&app, &settings)?;
+    calendar::refresh(&app).await;
+    Ok(calendar::status(&app))
+}
+
+#[tauri::command]
+pub async fn open_calendar_privacy() {
+    calendar::open_privacy_settings()
 }
 
 #[tauri::command]

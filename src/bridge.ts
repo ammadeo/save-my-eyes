@@ -21,6 +21,7 @@ export interface Settings {
   };
   sounds: { ui: boolean; voice: boolean };
   lang: Lang;
+  calendar: { enabled: boolean };
 }
 
 export type FixCode = "shortEvery" | "shortLast" | "longEvery" | "longLast";
@@ -40,6 +41,18 @@ export interface BreakState {
   scheduledAt: string | null;
   lengthSecs: number;
   startedAt: string | null;
+  /** The break came due during a calendar meeting and waits for it to end. */
+  heldForMeeting: boolean;
+}
+
+export type CalendarAccess = "notDetermined" | "granted" | "denied" | "restricted" | "unsupported";
+
+export interface CalendarStatus {
+  enabled: boolean;
+  access: CalendarAccess;
+  /** The meeting going on now (when the feature is on) and when its busy block ends. */
+  meeting: { title: string; until: string } | null;
+  syncedAt: string | null;
 }
 
 export interface NextBreakOptions {
@@ -53,6 +66,7 @@ export interface Events {
   "settings-changed": Settings;
   "break-state": BreakState;
   "break-ended": Record<string, never>;
+  "calendar-status": CalendarStatus;
 }
 
 const isTauri = () => typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -82,6 +96,10 @@ export const startBreak = () => call<BreakState>("start_break");
 export const notifyBreakEnded = () => call<void>("notify_break_ended");
 export const endBreak = () => call<BreakState>("end_break");
 export const quitApp = () => call<void>("quit_app");
+export const getCalendarStatus = () => call<CalendarStatus>("get_calendar_status");
+/** Turning on shows the macOS calendar permission prompt the first time. */
+export const setCalendarEnabled = (enabled: boolean) => call<CalendarStatus>("set_calendar_enabled", { enabled });
+export const openCalendarPrivacy = () => call<void>("open_calendar_privacy");
 
 /** Closes the calling window via Rust; falls back to the window API if the command is missing. */
 export async function closeWindow(): Promise<void> {

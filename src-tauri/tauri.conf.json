@@ -30,7 +30,7 @@
       "icons/icon.ico"
     ],
     "copyright": "Copyright \u00a9 2020-2026 Ammadeo",
-    "category": "Healthcare",
+    "category": "public.app-category.healthcare-fitness",
     "macOS": {
       "minimumSystemVersion": "12.0"
     }
