@@ -4,9 +4,9 @@
 
 ## Platform
 
-web
+macOS (native)
 
-(The web UI runs inside WKWebView windows of a Tauri 2 macOS menu-bar app. There is no browser build; every surface is a native window.)
+(Swift, SwiftUI and AppKit. A menu-bar agent with a status-item popover and native panels and windows; no web view. Rewritten from Tauri 2 + Vue 3 on 2026-11-04.)
 
 ## Users
 
@@ -18,21 +18,21 @@ Save My Eyes schedules eye breaks: every 20 minutes (configurable) it asks for a
 
 ## Positioning
 
-A menu-bar agent that enforces breaks gently: the break is a full-screen cover you can always skip, not a nag. It is free and open source (GPL-3.0), bilingual (English, Polish), and native on macOS (Tauri + Rust core).
+A menu-bar agent that enforces breaks gently: the break is a full-screen cover you can always skip, not a nag. It is free and open source (GPL-3.0), bilingual (English, Polish), and native on macOS (Swift).
 
 ## Operating Context
 
 - Runs as a menu-bar-only agent (no Dock icon), started at login.
-- Four window kinds, all created from Rust at runtime: `menu` (tray popover with countdown, long-break shortcut, stop protection, settings, quit), `before-break` (a small card top-right of the primary display: Wait / Start / Skip, auto-starts in 5 s), `break` (full-screen cover on the primary display: countdown, idea card, skip/finish, inline settings and stop protection), and `cover-N` (blank cover on every other display).
+- Four surfaces, all created from `WindowManager` at runtime: the menu (an `NSPopover` under the status item with countdown, long-break shortcut, stop protection, settings, quit), the before-break card (a non-activating panel top-right of the primary display: Wait / Start / Skip, auto-starts in 5 s), the break cover (full-screen window on the primary display: countdown, idea card, skip/finish, inline settings and stop protection), and a blank cover on every other display.
 - Short breaks auto-close when the clock ends; long breaks wait for the user. Short and long sound cues play at start and end when sounds are on.
-- Settings (cadence, lengths, sounds, language, meeting hold and its pause after a call) persist in a JSON file and are clamped by the Rust side.
+- Settings (cadence, lengths, sounds, language, meeting hold and its pause after a call) persist in a JSON file and are clamped by `Settings.validate()`.
 
 ## Capabilities and Constraints
 
-- Tauri 2.12 + Vue 3.5 + Tailwind 4 + Vite 8 frontend, Deno task runner, Vitest specs for behaviour; Rust core with `cargo test`.
-- macOS 12+ is the bundle minimum, the development Mac runs macOS 27.2. The native window materials (Liquid Glass on macOS 26+, NSVisualEffectView materials before) are applied from Rust.
-- Window labels, IPC commands and events are a fixed contract (`src/bridge.ts`, `src-tauri/src/commands.rs`).
-- Behaviour specs in `src/**/*.spec.ts` must keep passing; they test copy and roles, not styling.
+- Swift 5 language mode, SwiftUI views hosted in AppKit windows, xcodegen project (`SaveMyEyes/project.yml`), XCTest unit tests (`make test`).
+- macOS 14 is the minimum, the development Mac runs macOS 27.2. The native window materials (Liquid Glass on macOS 26+, NSVisualEffectView materials before) are painted by `Sources/Windows/GlassBacking.swift`; SwiftUI views paint no background.
+- `AppModel` is the one object views talk to; `WindowCoordinating` and `CalendarServicing` (`Sources/Core/Contracts.swift`) are the fixed seams between core, windows and calendar.
+- Unit tests in `SaveMyEyes/Tests` must keep passing; they cover settings clamping and persistence, the break rules and scheduler, calendar rules and the settings form.
 - Terminology: "short break", "long break", "stop protection" (pause for 1–3 h), "turn off protection" (quit for this session).
 
 ## Brand Commitments
