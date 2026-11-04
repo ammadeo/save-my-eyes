@@ -131,6 +131,8 @@ pub fn open_before_break_window(app: &AppHandle) -> tauri::Result<()> {
     if app.get_webview_window(BEFORE_BREAK).is_some() {
         return Ok(());
     }
+    // Both windows live top-right; the banner takes precedence over an open menu.
+    destroy_where(app, |l| l == MENU)?;
     let mut b = WebviewWindowBuilder::new(app, BEFORE_BREAK, route("before-break"))
         .title("Save My Eyes")
         .inner_size(BEFORE_BREAK_SIZE.width, BEFORE_BREAK_SIZE.height)
