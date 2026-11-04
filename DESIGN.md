@@ -113,7 +113,7 @@ Reference captures of the shipped windows on real Liquid Glass (dark appearance)
 
 **Creative North Star: "A pane of sage glass over your desk"**
 
-The app has no surface of its own. Every window is a sheet of Liquid Glass that the system renders behind a transparent webview, so a break is not a navy screen slammed over your work, it is your work receding behind frosted glass, tinted faintly green. Light and dark are never chosen by the app: the glass takes its luminance from whatever is behind it and from the user's macOS appearance, and the labels follow with semantic alpha colours.
+The app has no surface of its own. Every window is a sheet of Liquid Glass that the system renders behind the SwiftUI content (the views paint no background), so a break is not a navy screen slammed over your work, it is your work receding behind frosted glass, tinted faintly green. Light and dark are never chosen by the app: the glass takes its luminance from whatever is behind it and from the user's macOS appearance, and the labels follow with semantic alpha colours.
 
 Everything on the glass is monochrome except two things: the one action that matters right now (start a long break, finish the break) and the progress of time. Those are sage. Nothing else is coloured. Text is the system font at Apple's macOS sizes; there is no display face, no uppercase tracking, no brand lockup. The break cover keeps the old layout's bones (title, countdown, idea card, exit button, settings) but each is reduced to its minimum, with generous air between them.
 
@@ -208,7 +208,7 @@ Continuous, concentric rounding. Controls 8px, groups and cards 14px, the before
 - **Internal Padding:** 12–14px.
 
 ### Inputs / Fields
-- **Sliders:** native WebKit range tinted control-neutral. **Switches:** native, sage when on.
+- **Sliders:** native `Slider` tinted control-neutral. **Switches:** native, sage when on.
 - **Select:** native popup.
 - **Focus:** the shared focus ring.
 
@@ -225,7 +225,7 @@ The break cover's clock: display-size light numerals, tabular, a wide sage progr
 
 ## Imagery
 
-The seven unDraw illustrations (`src/assets/images/*.svg`) are recoloured into the system and are the only polychrome objects on the cover. They are plain SVG files loaded with `<img>`, so their colours are literal:
+The seven unDraw illustrations (`SaveMyEyes/Resources/Images/*.svg`) are recoloured into the system and are the only polychrome objects on the cover. They are plain SVG files loaded as `NSImage`, so their colours are literal:
 
 - **sage-700** `#4F6E5A` main garments and far trees; **sage-500** `#6B8F77` the main object (balls, leaves, mug, sky); **sage-300** `#A9C4B0` light garments and backdrops.
 - **clay-500** `#B8A58B` and **clay-300** `#D9CBB8` the quiet second hue (tops, birds, sprouts) where unDraw used pink or yellow.
@@ -233,15 +233,15 @@ The seven unDraw illustrations (`src/assets/images/*.svg`) are recoloured into t
 - Skin tones and plain greys are unDraw's own; brick texture in `window.svg` is `#8fa394` so it reads softly on both appearances.
 - No blue, purple, pink or yellow may return. Keep each picture at 128–160px tall inside its card.
 
-The app icon is the same world: a sage-500 tile, a pale sage eyeball and a sage-700 plus for its pupil, three flat layers and nothing else. `src/assets/app-icon.svg` is the flattened master on the macOS icon grid; `src-tauri/icons/AppIcon.icon` holds the same shapes as Icon Composer layers, so macOS 26+ renders it as Liquid Glass (specular, shadow, dark and clear variants come from the system). The menu-bar tray icon stays a monochrome template.
+The app icon is the same world: a sage-500 tile, a pale sage eyeball and a sage-700 plus for its pupil, three flat layers and nothing else. `SaveMyEyes/Resources/Images/app-icon.svg` is the flattened master on the macOS icon grid; `SaveMyEyes/Resources/Icons/AppIcon.icon` holds the same shapes as Icon Composer layers, so macOS 26+ renders it as Liquid Glass (specular, shadow, dark and clear variants come from the system). The menu-bar tray icon stays a monochrome template.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** let the native material paint the window; the HTML root is `background: transparent`.
+- **Do** let the native material paint the window (`Sources/Windows/GlassBacking.swift`); views paint no background.
 - **Do** use alpha label colours for text and icons so they stay legible in both appearances and under Reduce Transparency.
 - **Do** keep every window to one sage control; sliders stay neutral.
-- **Do** size a window to its content (`useWindowFit`) instead of hard-coding a height.
+- **Do** size a window to its SwiftUI content (fixed width, intrinsic height) instead of hard-coding a height.
 - **Do** use the system font at 13px body, 11px footnote, Apple's macOS scale above.
 - **Do** move focus with what opens: into a floating card (its close button) or a menu pane (its title), and back to the control that opened it on close. Floating cards are `role="dialog"` and close on Escape.
 - **Do** keep live regions (`role="status"`) mounted and change only their text; never put a ticking countdown inside one.

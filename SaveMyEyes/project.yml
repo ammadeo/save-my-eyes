@@ -1,0 +1,93 @@
+# Xcode project definition for xcodegen (`make project` at the repo root regenerates
+# SaveMyEyes.xcodeproj, which is not committed). Sources are folder-based: any .swift file
+# under Sources/ or Tests/ is part of the matching target after regeneration.
+name: SaveMyEyes
+options:
+  bundleIdPrefix: com.ammadeo
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "26.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    MARKETING_VERSION: "0.4.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: NO
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    DEAD_CODE_STRIPPING: YES
+targets:
+  SaveMyEyes:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+      - path: Resources/Images
+        type: folder
+      - path: Resources/Sounds
+        type: folder
+      - path: Resources/Icons/tray.png
+      - path: Resources/Icons/tray@2x.png
+      - path: Resources/Icons/AppIcon.icns
+      - path: Resources/Icons/AppIcon.icon
+    info:
+      path: Resources/Info.plist
+      properties:
+        CFBundleName: Save My Eyes
+        CFBundleDisplayName: Save My Eyes
+        CFBundleIdentifier: com.ammadeo.savemyeyes
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleIconFile: AppIcon
+        CFBundleIconName: AppIcon
+        LSApplicationCategoryType: public.app-category.healthcare-fitness
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        LSUIElement: true
+        NSHumanReadableCopyright: Copyright © 2020-2026 Ammadeo
+        NSCalendarsFullAccessUsageDescription: Save My Eyes checks your calendar so it does not start a break during a meeting. Events never leave your Mac.
+        NSCalendarsUsageDescription: Save My Eyes checks your calendar so it does not start a break during a meeting. Events never leave your Mac.
+        NSPrincipalClass: NSApplication
+        NSSupportsAutomaticTermination: false
+        NSSupportsSuddenTermination: false
+    entitlements:
+      path: Resources/SaveMyEyes.entitlements
+      properties:
+        com.apple.security.personal-information.calendars: true
+    settings:
+      base:
+        PRODUCT_NAME: Save My Eyes
+        PRODUCT_BUNDLE_IDENTIFIER: com.ammadeo.savemyeyes
+        PRODUCT_MODULE_NAME: SaveMyEyes
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_LSUIElement: YES
+        SWIFT_EMIT_LOC_STRINGS: NO
+        COMBINE_HIDPI_IMAGES: YES
+    scheme:
+      testTargets:
+        - SaveMyEyesTests
+      environmentVariables:
+        SME_DEV_EVERY_SECS:
+          value: "8"
+          isEnabled: false
+        SME_DEV_OPEN_MENU:
+          value: "1"
+          isEnabled: false
+  SaveMyEyesTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: SaveMyEyes
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ammadeo.savemyeyes.tests
+        GENERATE_INFOPLIST_FILE: YES
+        # The app's product name has spaces; xcodegen derives TEST_HOST from the target name.
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Save My Eyes.app/Contents/MacOS/Save My Eyes"
+        BUNDLE_LOADER: "$(TEST_HOST)"
