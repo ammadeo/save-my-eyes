@@ -1,17 +1,4 @@
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
+import { createApp } from "vue";
+import App from "./App.vue";
 
-import { Lang } from '@/utils/mixins/i18n'
-Vue.mixin(Lang)
-
-require('@/assets/css/main.css')
-
-Vue.config.productionTip = false
-
-new Vue({
-  router,
-  store,
-  render: (h) => h(App),
-}).$mount('#app')
+createApp(App).mount("#app");
