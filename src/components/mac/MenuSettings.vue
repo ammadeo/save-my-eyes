@@ -85,13 +85,15 @@ onUnmounted(() => clearTimeout(timer));
     </div>
 
     <div class="actions">
-      <p v-if="notice" class="notice" :class="{ 'is-warning': notice.kind !== 'saved' }" role="status">
-        <strong class="font-medium">
-          {{ notice.kind === "failed" ? t("saveFailed") : notice.kind === "fixed" ? t("fixing") : t("saved") }}
-        </strong>
-        <span v-for="line in notice.lines" :key="line" class="block">{{ line }}</span>
-      </p>
-      <span v-else class="grow" />
+      <!-- Always rendered: a live region inserted together with its text is often not read out. -->
+      <div class="min-w-0 grow" role="status">
+        <p v-if="notice" class="notice" :class="{ 'is-warning': notice.kind !== 'saved' }">
+          <strong class="font-medium">
+            {{ notice.kind === "failed" ? t("saveFailed") : notice.kind === "fixed" ? t("fixing") : t("saved") }}
+          </strong>
+          <span v-for="line in notice.lines" :key="line" class="block">{{ line }}</span>
+        </p>
+      </div>
       <button type="button" class="glass-button" :disabled="!changed || saving" @click="reset">{{ t("revert") }}</button>
       <button type="submit" class="glass-button is-primary" :disabled="!changed || saving">{{ tg("settingsSave") }}</button>
     </div>
@@ -120,7 +122,6 @@ onUnmounted(() => clearTimeout(timer));
   min-height: 24px;
 }
 .notice {
-  flex: 1;
   min-width: 0;
   margin: 0;
   padding: 5px 8px;

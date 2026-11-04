@@ -28,7 +28,7 @@ async function openCoffee() {
   <div class="flex items-center gap-5">
     <img class="h-32 w-auto shrink-0 lg:h-40" :src="appreciationImg" :alt="tl('imageAlt')" data-testid="idea-img" />
     <div class="flex max-w-[48ch] flex-col items-start gap-1">
-      <h3 class="text-title-2 text-label" data-testid="idea-title">{{ tl("title") }}</h3>
+      <h2 class="text-title-2 text-label" data-testid="idea-title">{{ tl("title") }}</h2>
       <p class="text-body text-label-secondary" data-testid="idea-content">{{ tl("description") }}</p>
       <ButtonIcon class="is-large mt-3" :disabled="forceCloseLock" icon="coffee" :content="tl('link')" @click="openCoffee" />
       <p class="mt-1 text-footnote text-label-secondary">{{ tl("note") }}</p>

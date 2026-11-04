@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 import BaseButton from "./BaseButton.vue";
 import ButtonIcon from "./ButtonIcon.vue";
 import CardCloseable from "./CardCloseable.vue";
@@ -13,10 +13,16 @@ const emit = defineEmits<{ changeAutoFinishLock: [locked: boolean] }>();
 const { t: tl } = useI18n({ title: t("Stop protection", "Wstrzymaj ochronę") });
 const stop = useStopProtection();
 const open = ref(false);
+const trigger = ref<HTMLButtonElement>();
+const card = ref<InstanceType<typeof CardCloseable>>();
 
-function setOpen(to: boolean) {
+/** Focus follows the card: into it on open, back to the trigger on close. */
+async function setOpen(to: boolean) {
   emit("changeAutoFinishLock", to);
   open.value = to;
+  await nextTick();
+  if (to) card.value?.focus();
+  else trigger.value?.focus();
 }
 
 // Rust closes the break and covers when the next break is rescheduled.
@@ -27,9 +33,9 @@ const pause = (hours: number) => stop.pause(hours);
   <div class="relative w-full">
     <div class="flex justify-end" :class="{ invisible: open && !disabled }">
       <button
+        ref="trigger"
         type="button"
         class="glass-button is-plain"
-        :aria-label="tl('title')"
         data-testid="pause-button"
         :disabled="disabled"
         @click="setOpen(true)"
@@ -41,6 +47,7 @@ const pause = (hours: number) => stop.pause(hours);
     <Transition name="slide">
       <CardCloseable
         v-show="open && !disabled"
+        ref="card"
         absolute
         :title="tl('title')"
         class="slide-enter-right top-0 right-0 z-30 max-h-[calc(100vh-2*var(--spacing-cover))]"

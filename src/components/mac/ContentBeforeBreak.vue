@@ -20,6 +20,7 @@ const { t: tl, tg } = useI18n({
   statusWaiting: t("when you're ready", "kiedy zechcesz"),
   statusIn: t("in", "za"),
   waitingPrefix: t("You're waiting for", "Czekasz już"),
+  autoStart: t("Time until the break starts", "Czas do rozpoczęcia przerwy"),
 });
 
 const start = Date.now();
@@ -68,7 +69,8 @@ onUnmounted(() => clearInterval(waitingTimer));
 </script>
 
 <template>
-  <article class="banner" :class="{ 'is-waiting': waiting }" aria-live="polite">
+  <!-- Not a live region: the status ticks every second and would be read out each time. -->
+  <article class="banner" :class="{ 'is-waiting': waiting }">
     <img class="banner-icon" :src="appIcon" alt="" />
     <div class="banner-body">
       <h1 class="banner-title text-headline">{{ tg("title") }}</h1>
@@ -81,6 +83,7 @@ onUnmounted(() => clearInterval(waitingTimer));
           v-show="!waiting"
           class="glass-progress banner-progress"
           role="progressbar"
+          :aria-label="tl('autoStart')"
           :aria-valuenow="Math.round(percent)"
           aria-valuemin="0"
           aria-valuemax="100"

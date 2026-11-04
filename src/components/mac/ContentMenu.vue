@@ -94,14 +94,14 @@ const nextBreakTime = computed(() =>
     </button>
 
     <div class="glass-group">
-      <button type="button" class="glass-row" @click="emit('run', 'open-stop-protection')">
+      <button type="button" class="glass-row" data-run="open-stop-protection" @click="emit('run', 'open-stop-protection')">
         <span class="glass-row-icon"><BaseIcon icon="pause" class="h-[12px]" /></span>
         <span class="grow">{{ tl("buttonStopProtection") }}</span>
         <svg class="chevron" viewBox="0 0 7 12" width="7" height="12" aria-hidden="true">
           <path d="m1 1 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
-      <button type="button" class="glass-row" @click="emit('run', 'open-settings')">
+      <button type="button" class="glass-row" data-run="open-settings" @click="emit('run', 'open-settings')">
         <span class="glass-row-icon"><BaseIcon icon="settings" class="h-[13px]" /></span>
         <span class="grow">{{ tl("buttonSettings") }}</span>
         <svg class="chevron" viewBox="0 0 7 12" width="7" height="12" aria-hidden="true">
@@ -111,7 +111,7 @@ const nextBreakTime = computed(() =>
     </div>
 
     <div class="glass-group">
-      <button type="button" class="glass-row" @click="emit('run', 'quit')">
+      <button type="button" class="glass-row" aria-keyshortcuts="Meta+Q" @click="emit('run', 'quit')">
         <span class="glass-row-icon"><BaseIcon icon="stop" class="h-[11px]" /></span>
         <span class="grow text-destructive">{{ tl("buttonQuit") }}</span>
         <kbd aria-hidden="true">⌘Q</kbd>

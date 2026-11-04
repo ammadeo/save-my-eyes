@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
 import ContentMenu from "@/components/mac/ContentMenu.vue";
 import type { RunKey } from "@/components/mac/types";
 import ContentStopProtection from "@/components/mac/ContentStopProtection.vue";
@@ -32,9 +32,24 @@ const title = computed(() =>
 const content = ref<HTMLElement>();
 const { track: fitWindow } = useWindowFit(TOOLBAR_HEIGHT + CONTENT_PADDING_BOTTOM);
 
-function open(next: Pane) {
+/**
+ * Focus follows the pane, like a macOS navigation stack: forward lands on the new title so
+ * VoiceOver reads where you are, Back returns to the row that opened the pane.
+ */
+const heading = ref<HTMLElement>();
+let openedFrom: RunKey | undefined;
+
+function open(next: Pane, from?: RunKey) {
   direction.value = next === "menu" ? "pane-back" : "pane-forward";
   pane.value = next;
+  if (from) openedFrom = from;
+  if (next !== "menu") nextTick(() => heading.value?.focus());
+}
+
+function onPaneEntered(el: Element) {
+  if (pane.value !== "menu" || !openedFrom) return;
+  el.querySelector<HTMLElement>(`[data-run="${openedFrom}"]`)?.focus();
+  openedFrom = undefined;
 }
 
 async function run(key: RunKey) {
@@ -44,9 +59,9 @@ async function run(key: RunKey) {
         await setNextBreak({ inSecs: 0, forceType: "long", skipBeforeBreak: true });
         return closeWindow();
       case "open-stop-protection":
-        return open("stop-protection");
+        return open("stop-protection", key);
       case "open-settings":
-        return open("settings");
+        return open("settings", key);
       case "coffee":
         return openUrl("https://buymeacoffee.com/ammadeo");
       case "quit":
@@ -82,10 +97,10 @@ onUnmounted(() => window.removeEventListener("keydown", onKey));
           <path d="M8.5 1.5 2 8l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
-      <h1 class="toolbar-title text-headline" data-tauri-drag-region>{{ title }}</h1>
+      <h1 ref="heading" class="toolbar-title text-headline" tabindex="-1" data-tauri-drag-region>{{ title }}</h1>
     </header>
     <main ref="content" class="content">
-      <Transition :name="direction" mode="out-in" @before-enter="fitWindow">
+      <Transition :name="direction" mode="out-in" @before-enter="fitWindow" @after-enter="onPaneEntered">
         <ContentMenu v-if="pane === 'menu'" key="menu" @run="run" />
         <MenuSettings v-else-if="pane === 'settings'" key="settings" />
         <ContentStopProtection v-else key="stop-protection" @close="closeWindow()" />
