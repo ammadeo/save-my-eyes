@@ -87,13 +87,17 @@ onUnmounted(() => window.removeEventListener("keydown", onKey));
   flex-shrink: 0;
   height: 52px;
   display: flex;
-  align-items: center;
+  /* Align with the default Overlay traffic lights (centred ~16 px from the top). */
+  align-items: flex-start;
+  padding-top: 4px;
   padding-left: 78px; /* traffic lights */
   padding-right: 16px;
   box-sizing: border-box;
 }
 .toolbar-title {
   position: absolute;
+  top: 4px;
+  line-height: 24px;
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
@@ -125,6 +129,6 @@ onUnmounted(() => window.removeEventListener("keydown", onKey));
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 4px 16px 16px;
+  padding: 0 16px 16px;
 }
 </style>
