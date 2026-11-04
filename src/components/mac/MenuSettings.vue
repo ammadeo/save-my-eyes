@@ -9,6 +9,7 @@ import { settingsDict } from "@/settingsDict";
 
 const { t, tg } = useI18n(settingsDict);
 const { draft, changed, saving, save, reset } = useSettingsForm();
+const coffeeUrl = "https://buymeacoffee.com/ammadeo";
 
 type Notice = { kind: "saved" | "fixed" | "failed"; lines: string[] };
 const notice = ref<Notice>();
@@ -29,8 +30,8 @@ onUnmounted(() => clearTimeout(timer));
 <template>
   <form class="settings-pane" @submit.prevent="onSave">
     <div>
-      <h2 class="mac-section-title">{{ t("breaks") }}</h2>
-      <div class="mac-group">
+      <h2 class="glass-section-title">{{ t("breaks") }}</h2>
+      <div class="glass-group">
         <MacSliderRow
           v-model="draft.every"
           :label="t('inputShortEvery')"
@@ -66,14 +67,14 @@ onUnmounted(() => clearTimeout(timer));
       </div>
     </div>
 
-    <div class="mac-group">
-      <label class="mac-row">
+    <div class="glass-group">
+      <label class="glass-row">
         <span class="grow">{{ t("soundUi") }}</span>
-        <input v-model="draft.soundsUi" v-bind="{ switch: '' }" type="checkbox" role="switch" class="mac-switch" />
+        <input v-model="draft.soundsUi" v-bind="{ switch: '' }" type="checkbox" role="switch" class="glass-switch" />
       </label>
-      <label class="mac-row">
+      <label class="glass-row">
         <span class="grow">{{ t("language") }}</span>
-        <select v-model="draft.lang" class="mac-popup">
+        <select v-model="draft.lang" class="glass-select">
           <option value="en">English</option>
           <option value="pl">Polski</option>
         </select>
@@ -81,21 +82,24 @@ onUnmounted(() => clearTimeout(timer));
     </div>
 
     <div class="actions">
-      <p v-if="notice" class="notice" :class="`is-${notice.kind}`" role="status">
-        <strong>{{ notice.kind === "failed" ? t("saveFailed") : notice.kind === "fixed" ? t("fixing") : t("saved") }}</strong>
+      <p v-if="notice" class="notice" :class="{ 'is-warning': notice.kind !== 'saved' }" role="status">
+        <strong class="font-medium">
+          {{ notice.kind === "failed" ? t("saveFailed") : notice.kind === "fixed" ? t("fixing") : t("saved") }}
+        </strong>
         <span v-for="line in notice.lines" :key="line" class="block">{{ line }}</span>
       </p>
       <span v-else class="grow" />
-      <button type="button" class="mac-button" :disabled="!changed || saving" @click="reset">{{ t("revert") }}</button>
-      <button type="submit" class="mac-button is-default" :disabled="!changed || saving">{{ tg("settingsSave") }}</button>
+      <button type="button" class="glass-button" :disabled="!changed || saving" @click="reset">{{ t("revert") }}</button>
+      <button type="submit" class="glass-button is-primary" :disabled="!changed || saving">{{ tg("settingsSave") }}</button>
     </div>
 
-    <p class="credits">
+    <p class="glass-footnote credits">
       {{ t("createdBy") }}
       <a href="https://ammadeo.dev" @click.prevent="openUrl('https://ammadeo.dev')">{{ t("author") }}</a>
       · {{ t("thanksTo") }}
       <a href="https://undraw.co/" @click.prevent="openUrl('https://undraw.co/')">Katerina Limpitsouni</a>
-      {{ t("thanksFor") }}
+      {{ t("thanksFor") }} ·
+      <a :href="coffeeUrl" @click.prevent="openUrl(coffeeUrl)">{{ t("coffee") }}</a>
     </p>
   </form>
 </template>
@@ -106,9 +110,6 @@ onUnmounted(() => clearTimeout(timer));
   flex-direction: column;
   gap: 14px;
 }
-.mac-popup {
-  font: inherit;
-}
 .actions {
   display: flex;
   align-items: flex-start;
@@ -117,27 +118,19 @@ onUnmounted(() => clearTimeout(timer));
 }
 .notice {
   flex: 1;
+  min-width: 0;
   margin: 0;
-  padding: 6px 8px;
-  border-radius: 6px;
+  padding: 5px 8px;
+  border-radius: var(--radius-control);
+  background: var(--fill);
+  color: var(--label-secondary);
   font-size: 11px;
-  background: var(--mac-fill);
+  line-height: 14px;
 }
-.notice.is-fixed,
-.notice.is-failed {
-  background: var(--mac-warning-bg);
-  color: var(--mac-warning-label);
+.notice.is-warning {
+  color: var(--warning);
 }
 .credits {
-  margin: 0 10px;
-  font-size: 11px;
-  color: var(--mac-label-secondary);
-}
-.credits a {
-  color: var(--mac-accent);
-  text-decoration: none;
-}
-.credits a:hover {
-  text-decoration: underline;
+  margin-top: 0;
 }
 </style>

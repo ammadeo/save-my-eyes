@@ -34,6 +34,7 @@ deno task tauri build
 ```
 
 - `deno task build` builds only the frontend; `deno task test` runs the Vitest unit tests; `cargo test` inside `src-tauri` runs the Rust tests.
-- `SME_DEV_EVERY_SECS=8 deno task tauri dev` makes the first break fire after 8 seconds instead of the configured interval.
+- `SME_DEV_EVERY_SECS=8 deno task tauri dev` makes the first break fire after 8 seconds instead of the configured interval; `SME_DEV_OPEN_MENU=1` opens the menu window at startup.
 - Settings are stored in the app config directory as `settings.json` (`settings-dev.json` for debug builds).
 - The migration notes live in [`docs/migration/`](docs/migration/PLAN.md).
+- Design: [`PRODUCT.md`](PRODUCT.md) records what the app is for, [`DESIGN.md`](DESIGN.md) the visual system (sage on native Liquid Glass, system font, follows the macOS appearance). The windows are transparent and painted by the native material from `src-tauri/src/windows.rs`; the CSS tokens live in `src/css/glass.css`.

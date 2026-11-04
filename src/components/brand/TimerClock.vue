@@ -25,17 +25,10 @@ const percentage = computed(() => (total.value ? (elapsed.value / total.value) *
 
 <template>
   <div
-    class="relative flex w-full min-w-full items-center self-start transition-opacity duration-1000 ease-in"
+    class="flex w-full max-w-[680px] flex-col gap-6 self-start transition-opacity duration-1000 ease-out"
     :class="remaining <= 0 ? ['opacity-25'] : []"
   >
-    <p
-      class="shrink-0 grow-0 pr-6 font-body text-3xl leading-none font-semibold text-secondary-100 tabular-nums"
-      role="timer"
-    >
-      {{ timeLeftInfo }}
-    </p>
-    <div class="h-12 w-full">
-      <ProgressbarIcon :min="0" :max="100" :value="percentage" :icon="autoFinish ? 'finish' : ''" />
-    </div>
+    <p class="text-display whitespace-nowrap text-label" role="timer">{{ timeLeftInfo }}</p>
+    <ProgressbarIcon :min="0" :max="100" :value="percentage" :icon="autoFinish ? 'finish' : ''" />
   </div>
 </template>

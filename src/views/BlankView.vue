@@ -19,10 +19,10 @@ const end = () => endBreak().catch((error) => log.warn("end_break failed", error
 </script>
 
 <template>
-  <main class="flex h-screen items-center justify-center bg-secondary-1000 font-body">
-    <div class="opacity-50">
-      <HeaderTitle class="flex justify-center text-center" />
-      <p class="font-preset-info text-center" aria-live="polite">{{ finished ? tl("contentFinished") : tl("content") }}</p>
+  <main class="relative flex h-screen items-center justify-center p-cover">
+    <div class="flex flex-col items-center gap-3 text-center opacity-60">
+      <HeaderTitle />
+      <p class="text-large-title text-label" aria-live="polite">{{ finished ? tl("contentFinished") : tl("content") }}</p>
     </div>
     <BlankBreakButton :finished="finished" @click="end" />
   </main>

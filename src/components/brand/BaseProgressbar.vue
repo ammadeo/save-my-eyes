@@ -7,14 +7,17 @@ const progress = computed(() => ((props.max - props.value - props.min) / props.m
 
 <template>
   <div
-    class="relative h-full w-full flex-1 overflow-hidden rounded-full"
+    class="glass-progress is-wide w-full"
     role="progressbar"
     :aria-valuenow="Math.round(value)"
     :aria-valuemin="min"
     :aria-valuemax="max"
   >
-    <div class="absolute inset-0 rounded-full bg-primary-600 shadow-sm" :style="{ transform: `translateX(-${progress}%)` }" />
-    <div class="h-full w-full rounded-full bg-secondary-1050 inset-shadow-2-top-2" />
+    <!-- The bar slides in from the left; the countdown ticks every 250 ms, the transition fills the gaps. -->
+    <div
+      class="glass-progress-bar absolute inset-0 transition-transform duration-[250ms] ease-linear motion-reduce:transition-none"
+      :style="{ transform: `translateX(-${progress}%)` }"
+    />
     <slot />
   </div>
 </template>

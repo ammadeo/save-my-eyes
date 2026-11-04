@@ -62,21 +62,23 @@ function onChanged() {
 
 <template>
   <div class="relative w-full self-end">
-    <ButtonIcon class="w-full" icon="settings" :content="tl('open')" @click="setShow(true)" />
+    <ButtonIcon class="is-large w-full" :class="{ invisible: show || hasFixLog }" icon="settings" :content="tl('open')" @click="setShow(true)" />
     <Transition name="slide">
       <CardCloseable
         v-if="show || hasFixLog"
         :content="changed ? tg('settingsSave') : ''"
         :title="tl('title')"
         absolute
-        class="slide-leave-bottom right-0 bottom-0 z-40 max-h-[calc(100vh-4rem)] lg:max-h-[calc(100vh-6rem)] xl:max-h-[calc(100vh-8rem)]"
+        class="slide-leave-bottom right-0 bottom-0 z-40 max-h-[calc(100vh-2*var(--spacing-cover))]"
         @close="hasFixLog && !show ? setShow(false) : close()"
         @mouseenter="hovering = true"
         @mouseleave="hovering = false"
       >
         <div v-if="hasFixLog && !show" aria-live="polite">
-          <p class="text-lg text-secondary-100">{{ failed ? tl("saveFailed") : tl("fixing") }}</p>
-          <p v-for="line in fixLog" :key="line" class="text-secondary-100">{{ line }}</p>
+          <p class="text-body" :class="failed ? 'text-destructive' : 'text-warning'">
+            {{ failed ? tl("saveFailed") : tl("fixing") }}
+          </p>
+          <p v-for="line in fixLog" :key="line" class="mt-1 text-footnote text-label-secondary">{{ line }}</p>
         </div>
         <ContentSettings v-else ref="form" @changed="onChanged" />
       </CardCloseable>

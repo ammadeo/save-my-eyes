@@ -9,11 +9,9 @@ withDefaults(defineProps<{ min: number; max: number; value: number; icon: IconNa
 </script>
 
 <template>
-  <BaseProgressbar :min="min" :max="max" :value="value">
-    <BaseIcon
-      class="absolute top-0 right-0 mx-4 h-4 text-secondary-100"
-      :class="small ? ['my-2'] : ['my-4']"
-      :icon="icon"
-    />
-  </BaseProgressbar>
+  <div class="flex w-full items-center gap-3">
+    <BaseProgressbar class="flex-1" :min="min" :max="max" :value="value" />
+    <!-- Hint at the bar's end: the break closes itself when the time is up. -->
+    <BaseIcon v-if="icon" :icon="icon" class="text-label-tertiary" :class="small ? 'h-2.5' : 'h-3'" />
+  </div>
 </template>

@@ -13,18 +13,15 @@ const emit = defineEmits<{ close: [] }>();
 
 <template>
   <BaseCard :absolute="absolute">
-    <div class="flex flex-col p-4">
-      <div class="flex justify-between">
-        <p v-show="!content" class="text-xl text-secondary-100 uppercase">{{ title }}</p>
-        <ButtonRoundable
-          primary
-          :class="content ? ['w-full'] : []"
-          :content="content"
-          :label="closeLabel"
-          @click="emit('close')"
-        />
-      </div>
-      <slot />
+    <div class="mb-4 flex items-center justify-between gap-2">
+      <p v-show="!content" class="text-headline text-label first-letter:uppercase">{{ title }}</p>
+      <ButtonRoundable
+        :class="content ? ['w-full', 'is-large'] : []"
+        :content="content"
+        :label="closeLabel"
+        @click="emit('close')"
+      />
     </div>
+    <slot />
   </BaseCard>
 </template>

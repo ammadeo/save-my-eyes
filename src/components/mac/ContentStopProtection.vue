@@ -12,13 +12,13 @@ async function pauseFor(hours: number) {
 <template>
   <section class="stop-pane">
     <div>
-      <h2 class="mac-section-title">{{ t("stopFor") }}</h2>
-      <div class="mac-group hours">
+      <h2 class="glass-section-title">{{ t("stopFor") }}</h2>
+      <div class="glass-group hours">
         <button
           v-for="option in options"
           :key="option.hours"
           type="button"
-          class="mac-button is-large"
+          class="glass-button is-large"
           data-testid="button-pause-break"
           @click="pauseFor(option.hours)"
         >
@@ -28,13 +28,13 @@ async function pauseFor(hours: number) {
     </div>
 
     <div>
-      <h2 class="mac-section-title">{{ t("turnOffTitle") }}</h2>
-      <div class="mac-group turn-off">
-        <button type="button" class="mac-button is-large is-destructive" data-testid="button-close-app" @click="quit">
+      <h2 class="glass-section-title">{{ t("turnOffTitle") }}</h2>
+      <div class="glass-group turn-off">
+        <button type="button" class="glass-button is-large is-destructive" data-testid="button-close-app" @click="quit">
           {{ t("turnOffContent") }}
         </button>
       </div>
-      <p class="mac-footnote">{{ t("turnOffInfo") }}</p>
+      <p class="glass-footnote">{{ t("turnOffInfo") }}</p>
     </div>
   </section>
 </template>
@@ -48,14 +48,14 @@ async function pauseFor(hours: number) {
 .hours {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  padding: 12px;
+  gap: 6px;
+  padding: 6px; /* 14px group − 6px = 8px control radius, concentric */
 }
 .turn-off {
   display: flex;
-  padding: 12px;
+  padding: 6px;
 }
-.turn-off .mac-button {
+.turn-off .glass-button {
   flex: 1;
 }
 </style>

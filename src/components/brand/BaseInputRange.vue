@@ -48,33 +48,34 @@ function onBlur() {
 </script>
 
 <template>
-  <div class="relative grid grid-cols-[auto_repeat(5,minmax(0,1fr))] gap-x-2">
-    <label :for="id" class="col-span-6 mb-1 font-display text-secondary-200">{{ name }}</label>
-
-    <div
-      class="row-span-1 flex w-24 cursor-text justify-center rounded-full bg-primary-700 px-2 text-secondary-100 inset-shadow-1 focus-within:bg-primary-800 hover:bg-primary-800 md:col-span-1"
-      :class="large(['col-span-1'], ['col-span-6'])"
-      @click="input?.focus()"
-    >
-      <input
-        :id="id"
-        ref="input"
-        type="number"
-        class="selection-darker bg-transparent pr-1 text-right font-body outline-hidden"
-        :class="widthClass"
-        :max="max"
-        :min="min"
-        :step="step"
-        :value="floorValue"
-        @input="onInput"
-        @blur="onBlur"
-      />
-      <span class="selection-darker">{{ suffix }}</span>
+  <div>
+    <div class="flex items-center justify-between gap-3">
+      <label :for="id" class="text-body text-label">{{ name }}</label>
+      <!-- The number field is the keyboard path; the slider below is for the pointer. -->
+      <div
+        class="number-field flex h-6 shrink-0 cursor-text items-center gap-1 rounded-control border-[0.5px] border-separator bg-surface px-2"
+        @click="input?.focus()"
+      >
+        <input
+          :id="id"
+          ref="input"
+          type="number"
+          class="number-input bg-transparent text-right text-label tabular-nums caret-accent"
+          :class="widthClass"
+          :max="max"
+          :min="min"
+          :step="step"
+          :value="floorValue"
+          @input="onInput"
+          @blur="onBlur"
+        />
+        <span class="text-label-secondary">{{ suffix }}</span>
+      </div>
     </div>
     <input
       type="range"
-      class="brand-range col-span-5 md:block"
-      :class="large([], ['hidden'])"
+      class="glass-slider mt-2"
+      :class="large([], ['hidden', 'md:block'])"
       :max="max"
       :min="min"
       :step="step"
@@ -84,15 +85,31 @@ function onBlur() {
       @input="onInput"
       @change="onBlur"
     />
-
-    <p class="col-start-2 col-end-4 text-secondary-200 md:block" :class="large([], ['hidden'])">{{ min }} {{ suffix }}</p>
-    <p class="col-start-4 col-end-7 text-right text-secondary-200 md:block" :class="large([], ['hidden'])">
-      {{ max }} {{ suffix }}
-    </p>
+    <div class="mt-0.5 justify-between text-footnote text-label-tertiary" :class="large(['flex'], ['hidden', 'md:flex'])">
+      <p>{{ min }} {{ suffix }}</p>
+      <p>{{ max }} {{ suffix }}</p>
+    </div>
     <Transition name="fade">
-      <p v-if="warning" class="absolute top-full z-10 w-full rounded-xs bg-warn-400 px-2 py-1 text-sm text-black shadow-sm">
+      <p v-if="warning" class="mt-2 rounded-control bg-fill px-2 py-1 text-footnote text-warning" role="status">
         {{ warning }}
       </p>
     </Transition>
   </div>
 </template>
+
+<style scoped>
+.number-input {
+  -moz-appearance: textfield;
+  border: 0;
+  padding: 0;
+  font: inherit;
+}
+/* The field wrapper carries the focus ring, not the bare input. */
+.number-input:focus-visible {
+  outline: none;
+}
+.number-field:focus-within {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+</style>

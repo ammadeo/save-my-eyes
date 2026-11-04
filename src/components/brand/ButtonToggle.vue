@@ -1,31 +1,74 @@
 <script setup lang="ts">
-import BaseButton from "./BaseButton.vue";
-
 const props = defineProps<{ on: boolean; label?: string }>();
 const emit = defineEmits<{ toggle: [on: boolean] }>();
 </script>
 
 <template>
+  <!-- A macOS-style switch; the icon slots, when given, show the current state beside it. -->
   <button
     type="button"
     role="switch"
     :aria-checked="on"
     :aria-label="label"
-    class="relative flex h-11 w-18 cursor-pointer items-center justify-evenly rounded-full bg-secondary-1050 inset-shadow-2-top-2 focus:outline-hidden"
+    class="switch inline-flex items-center gap-2"
     @click="emit('toggle', !props.on)"
   >
-    <div class="flex h-full scale-75 items-center justify-center opacity-75"><slot name="iconOn" /></div>
-    <div class="flex h-full scale-75 items-center justify-center opacity-75"><slot name="iconOff" /></div>
-    <BaseButton
-      class="bottom-0 left-0 h-10 w-10 transition-transform duration-100 ease-in"
-      :class="on ? [] : ['translate-x-8']"
-      center
-      absolute
-      tabindex="-1"
-      aria-hidden="true"
-    >
+    <span class="switch-track" :class="{ 'is-on': on }" aria-hidden="true"><span class="switch-knob" /></span>
+    <span v-if="$slots.iconOn || $slots.iconOff" class="inline-flex h-3.5 items-center text-label-secondary" aria-hidden="true">
       <slot v-if="on" name="iconOn" />
       <slot v-else name="iconOff" />
-    </BaseButton>
+    </span>
   </button>
 </template>
+
+<style scoped>
+.switch {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+.switch:focus-visible {
+  border-radius: 999px;
+}
+.switch-track {
+  position: relative;
+  flex-shrink: 0;
+  width: 26px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--fill);
+  border: 0.5px solid var(--separator);
+  box-sizing: border-box;
+  transition: background-color 150ms ease-out;
+}
+.switch-track.is-on {
+  background: var(--accent);
+  border-color: transparent;
+}
+.switch-knob {
+  position: absolute;
+  top: 1.5px;
+  left: 1.5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: oklch(100% 0 0);
+  border: 0.5px solid var(--separator);
+  box-sizing: border-box;
+  transition: transform 150ms cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.is-on .switch-knob {
+  transform: translateX(10px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .switch-track,
+  .switch-knob {
+    transition: none;
+  }
+}
+</style>

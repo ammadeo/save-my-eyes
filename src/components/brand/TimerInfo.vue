@@ -41,5 +41,5 @@ const info = computed(() => {
 </script>
 
 <template>
-  <p class="font-preset-info mb-8 first-letter:uppercase" aria-live="polite">{{ info }}</p>
+  <p class="text-large-title max-w-[40ch] text-label first-letter:uppercase" aria-live="polite">{{ info }}</p>
 </template>
