@@ -13,13 +13,13 @@
   <li>It's free! <a href="https://www.buymeacoffee.com/ammadeo">You can buy me a coffee here :coffee:</a></li> 
 </ul>
 <br/>
-<p><a href="https://github.com/ammadeo/save-my-eyes/releases/download/v0.2.2/save-my-eyes-Setup-0.2.2.exe">Download for Windows (v0.2.2, Electron)</a>. A native macOS build on Tauri is in progress on the <code>tauri-migration</code> branch.</p>
+<p><a href="https://github.com/ammadeo/save-my-eyes/releases/download/v0.3.0/Save.My.Eyes_0.3.0_aarch64.dmg">Download for macOS (v0.3.0, Apple Silicon, macOS 12+)</a>. The build is not notarized yet: on first launch right-click the app and choose Open. The last Windows build is the <a href="https://github.com/ammadeo/save-my-eyes/releases/download/v0.2.2/save-my-eyes-Setup-0.2.2.exe">Electron v0.2.2 installer</a>.</p>
 <br/>
 </p>
 
 ## Development (Tauri 2 + Vue 3 + Deno)
 
-Prerequisites: [Deno](https://deno.com) 2.9 (pinned in `.tool-versions`), a Rust toolchain via [rustup](https://rustup.rs), and on macOS the Xcode Command Line Tools.
+Prerequisites: [Deno](https://deno.com) 2.9 (pinned in `.tool-versions`), a Rust toolchain via [rustup](https://rustup.rs), and on macOS the Xcode Command Line Tools (full Xcode 26+ to compile the Liquid Glass app icon; without it the build falls back to `icon.icns`).
 
 ```bash
 deno install
