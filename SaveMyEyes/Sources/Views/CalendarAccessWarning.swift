@@ -1,4 +1,4 @@
-// The persistent warning shown while "Don't break during meetings" is on but Save My Eyes
+// The persistent warning shown while "Pause breaks during calendar events" is on but Save My Eyes
 // cannot read the calendar (`CalendarStatus.needsAccess`): in the menu's main pane and in
 // the Meetings settings section. Inline, never a modal, and it stays until access is back or
 // the switch is turned off. Its re-enable button is, with the switch itself, the only thing
@@ -7,12 +7,12 @@
 import SwiftUI
 
 private enum T {
-    static let title = L("Breaks aren't held during meetings", "Przerwy nie czekają na koniec spotkań")
+    static let title = L("Breaks aren't paused during calendar events", "Przerwy nie czekają na koniec spotkań")
     static let detail = L("Save My Eyes can't read your calendar.", "Save My Eyes nie może odczytać kalendarza.")
     static let allow = L("Allow…", "Zezwól…")
     static let openSettings = L("Open Privacy Settings…", "Otwórz ustawienia prywatności…")
     static let turnOff = L("Turn off", "Wyłącz")
-    static let turnOffHint = L("Turns off Don't break during meetings", "Wyłącza Bez przerw w trakcie spotkań")
+    static let turnOffHint = L("Turns off Pause breaks during calendar events", "Wyłącza Bez przerw w trakcie spotkań")
 }
 
 /// Row content without its own group: the main pane wraps it in a `GlassGroup`, the

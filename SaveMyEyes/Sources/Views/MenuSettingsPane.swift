@@ -1,4 +1,4 @@
-// The menu's settings pane: breaks, meetings (the calendar and calls switches apply at once),
+// The menu's settings pane: breaks, meetings (the calendar and camera/microphone switches apply at once),
 // sounds and language, then Revert / Save with a notice, and the credits. Port of
 // MenuSettings.vue + MenuCalendar.vue.
 
@@ -6,15 +6,15 @@ import SwiftUI
 
 private enum T {
     static let meetings = L("Meetings", "Spotkania")
-    static let toggle = L("Don't break during meetings", "Bez przerw w trakcie spotkań")
-    static let calls = L("Don't break during calls", "Bez przerw w trakcie rozmów")
+    static let toggle = L("Pause breaks during calendar events", "Bez przerw w trakcie spotkań")
+    static let calls = L("Pause breaks while camera or microphone is on", "Bez przerw w trakcie rozmów")
     static let callsDetail = L(
-        "A call means an app is using your camera or microphone. Save My Eyes only knows that they are on: it can't see, hear or record anything.",
+        "Save My Eyes only knows that an app is using them: it can't see, hear or record anything.",
         "Za rozmowę uznajemy użycie kamery lub mikrofonu przez dowolną aplikację. Save My Eyes wie tylko, że są włączone: nie może niczego zobaczyć, usłyszeć ani nagrać.")
-    static let grace = L("Pause breaks after a call ends", "Wstrzymaj przerwy po zakończeniu rozmowy")
+    static let grace = L("Resume breaks after a meeting ends", "Wstrzymaj przerwy po zakończeniu rozmowy")
     static let graceZero = L("Immediately", "Od razu")
     static let hint = L(
-        "A break that falls during an event from the Calendar app waits until the event ends. For Google Calendar, add your Google account in System Settings › Internet Accounts.",
+        "Uses events from the Calendar app. All-day, declined and free events don't count. For Google Calendar, add your Google account in System Settings › Internet Accounts.",
         "Przerwa wypadająca w trakcie wydarzenia z aplikacji Kalendarz poczeka do jego końca. Aby użyć Kalendarza Google, dodaj konto Google w Ustawieniach systemowych › Konta internetowe.")
 }
 
@@ -110,10 +110,10 @@ struct MenuSettingsPane: View {
     }
 }
 
-/// Meetings: the calendar switch (with the access warning under it when the switch is on but
-/// the calendar cannot be read), the calls switch (a camera or microphone in use, with small
-/// print saying what the app can and cannot know), then the pause after a call, which applies
-/// to both. The switches apply at once (ticking the calendar one is what shows the macOS
+/// Meetings: the calendar switch (small print saying which events count, and the access
+/// warning under it when the switch is on but the calendar cannot be read), the camera or
+/// microphone switch (small print saying what the app can and cannot know), then the pause
+/// after a meeting, which applies to both. The switches apply at once (ticking the calendar one is what shows the macOS
 /// permission prompt; the calls one needs no permission), the grace slider goes with the draft.
 private struct CalendarSection: View {
     let model: AppModel
@@ -127,7 +127,7 @@ private struct CalendarSection: View {
         VStack(alignment: .leading, spacing: 0) {
             SectionTitle(text: model.t(T.meetings))
             GlassGroup {
-                SwitchRow(label: model.t(T.toggle),
+                SwitchRow(label: model.t(T.toggle), detail: model.t(T.hint),
                           isOn: Binding(get: { enabled }, set: { apply($0) }),
                           disabled: busy)
                 if enabled && model.calendarStatus.needsAccess {
@@ -142,7 +142,6 @@ private struct CalendarSection: View {
                 SliderRow(label: model.t(T.grace), value: $grace, range: SettingsFormRules.calendarGraceMin,
                           scale: 60, suffix: model.t(Strings.minutesSuffix), zeroLabel: model.t(T.graceZero))
             }
-            Footnote(text: model.t(T.hint))
         }
         // Reads access only (never prompts), so a grant given in System Settings shows here.
         .task { await model.refreshCalendar() }

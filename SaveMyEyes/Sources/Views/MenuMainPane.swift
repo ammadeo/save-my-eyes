@@ -1,4 +1,5 @@
-// The menu's first pane: next-break status (or the meeting or call going on), the
+// The menu's first pane: next-break status (or the meeting going on: a calendar event, or a
+// camera or microphone in use), the
 // calendar access warning when needed, the long-break shortcut, stop protection / settings rows
 // and Quit. Port of ContentMenu.vue.
 
@@ -8,15 +9,15 @@ private enum T {
     static let breakNext = L("Next", "Następna")
     static let breakIn = L("in", "za")
     static let breakIsNow = L("is still going", "trwa")
-    static let heldForMeeting = L("Moved to after your call", "Przesunięta na czas po rozmowie")
+    static let heldForMeeting = L("Moved to after your meeting", "Przesunięta na czas po rozmowie")
     static let meetingUntil = L("until {time}", "do {time}")
     static let meetingUntitled = L("Busy", "Zajęte")
-    static let callPaused = L("Breaks paused until the end of your call", "Przerwy wstrzymane do końca rozmowy")
-    static let callNext = L("Your next break is scheduled after the meeting", "Następna przerwa zaplanowana jest po spotkaniu")
+    static let callPaused = L("Breaks are paused", "Przerwy wstrzymane do końca rozmowy")
+    static let callNext = L("Your next break starts after this event ends", "Następna przerwa zaplanowana jest po spotkaniu")
     static let cameraOn = L("Camera is on", "Kamera jest włączona")
     static let microphoneOn = L("Microphone is on", "Mikrofon jest włączony")
     static let cameraAndMicrophoneOn = L("Camera and microphone are on", "Kamera i mikrofon są włączone")
-    static let deviceNext = L("Your next break is scheduled after the call", "Następna przerwa zaplanowana jest po rozmowie")
+    static let deviceNext = L("Your next break starts once the camera and microphone are off", "Następna przerwa zaplanowana jest po rozmowie")
     static let startLongBreak = L("Start a long break now", "Zacznij długą przerwę teraz")
     static let stopProtection = L("Stop protection", "Wstrzymaj ochronę")
     static let settings = L("Settings", "Ustawienia")
@@ -120,7 +121,7 @@ struct MenuMainPane: View {
                           until: until, next: model.t(T.callNext))
     }
 
-    /// A call is going on (a calendar meeting, or a camera or microphone in use): what it is, then the pause.
+    /// A meeting is going on (a calendar event, or a camera or microphone in use): what it is, then the pause.
     private func callStatus(icon: String, label: String, until: String? = nil, next: String) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 6) {

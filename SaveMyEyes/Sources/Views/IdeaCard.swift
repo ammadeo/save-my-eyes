@@ -1,15 +1,15 @@
 // Bottom-left of the cover: one random break idea per break type, or after a finished long
-// break the "Like what you see?" donation card. Port of IndexIdea.vue + ContentDonation.vue.
+// break the "Save My Eyes is free" donation card. Port of IndexIdea.vue + ContentDonation.vue.
 
 import SwiftUI
 
 private enum T {
     static let title = L("Try this break idea", "Zainspiruj się")
     static let donationAlt = L("Spread love", "Podziel się miłością")
-    static let donationTitle = L("Like what you see?", "Podoba Ci się aplikacja?")
-    static let donationText = L("Consider supporting development of this project", "Rozważ wsparcie rozwoju tego projektu")
+    static let donationTitle = L("Save My Eyes is free", "Podoba Ci się aplikacja?")
+    static let donationText = L("If these breaks help you, you can support its development", "Rozważ wsparcie rozwoju tego projektu")
     static let donationLink = L("Buy me a coffee", "Zamów mi kawę")
-    static let donationNote = L("Will open your default browser", "Otworzy się w Twojej przeglądarce")
+    static let donationNote = L("Opens in your browser", "Otworzy się w Twojej przeglądarce")
 }
 
 struct Idea {
@@ -21,22 +21,22 @@ struct Idea {
     static let long: [Idea] = [
         Idea(title: L("Do some exercises", "Poćwicz chwilę"), image: "workout",
              alt: L("Woman dancing", "Tańcząca kobieta"),
-             content: L("A few minutes of workout will help you relax from sitting position",
+             content: L("A few minutes of movement gives your body a rest from sitting",
                         "Kilka minut ćwiczeń pomoże ci się zrelaksować")),
         Idea(title: L("Go outside", "Wyjdź na świeże powietrze"), image: "outside",
-             alt: L("Woman walk through a forest", "Kobieta idzie przez las"),
+             alt: L("Woman walking through a forest", "Kobieta idzie przez las"),
              content: L("Go out to a park or a forest. Being close to nature will help you relax",
                         "Pójdź na spacer do parku. Kontakt z naturą pomoże ci się zrelaksować")),
         Idea(title: L("Relax a bit", "Zrelaksuj się"), image: "mindfulness",
-             alt: L("Woman meditating in front of ancient temple", "Kobieta medytuje przed świątynią"),
-             content: L("Do what you do to relax. It could be drinking tea, meditating or whatever you like. But remember not to use your phone or computer now",
+             alt: L("Woman meditating in front of an ancient temple", "Kobieta medytuje przed świątynią"),
+             content: L("Do whatever relaxes you: drink tea, meditate. Just stay off your phone and computer",
                         "Zrób to co zwykle, gdy potrzebujesz się odprężyć. Przykładowo wypij herbatę, bądź pomedytuj. Pamiętaj, żeby nie używać do tego komputera, ani telefonu")),
     ]
 
     static let short: [Idea] = [
         Idea(title: L("Look out the window", "Wyjrzyj przez okno"), image: "window",
              alt: L("Woman looks out the window", "Kobieta spogląda przez okno"),
-             content: L("Look far away through a window to help your eyes relax",
+             content: L("Focus on something far away to let your eyes relax",
                         "Patrzenie w dal pomoże Ci uniknąć krótkowzroczności")),
         Idea(title: L("Look at plants", "Popatrz na rośliny"), image: "plants",
              alt: L("Man is sitting in front of flowers", "Mężczyzna siedzi przy kwiatach"),

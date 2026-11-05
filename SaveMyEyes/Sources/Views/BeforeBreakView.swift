@@ -8,13 +8,13 @@ import SwiftUI
 
 private enum T {
     // Polish is kept short: both buttons must fit the 360 pt card side by side.
-    static let start = L("start a break now", "zacznij przerwę")
+    static let start = L("start this break", "zacznij przerwę")
     static let wait = L("wait", "zaczekaj")
-    static let skip = L("skip a break", "pomiń")
+    static let skip = L("skip this break", "pomiń")
     static let base = L("will start", "zacznie się")
     static let statusWaiting = L("when you're ready", "kiedy zechcesz")
     static let statusIn = L("in", "za")
-    static let waitingPrefix = L("You're waiting for", "Czekasz już")
+    static let waitingPrefix = L("You've been waiting for", "Czekasz już")
     static let autoStart = L("Time until the break starts", "Czas do rozpoczęcia przerwy")
 }
 
