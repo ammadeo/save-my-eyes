@@ -8,7 +8,6 @@
   <li>App will run on a computer startup</li>
   <li>It's easy to customize Your break time</li>
   <li>It'll prevent You from using Your computer, when You need a break (Don't worry You can always skip it with one click :wink:)</li>
-  <li>If a break screen ever goes wrong (nothing visible, a button missing, the app frozen), <kbd>Control</kbd>+<kbd>Option</kbd>+<kbd>Command</kbd>+<kbd>Escape</kbd> (⌃⌥⌘⎋) skips the break from anywhere</li>
   <li>You can accesses all options from tray menu</li>
   <li>It works on multiple monitors setup</li>
   <li>It holds a break while your calendar shows a meeting, or while an app is using your camera or microphone</li>

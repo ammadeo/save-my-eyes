@@ -21,17 +21,10 @@ final class SkipBeacon {
     func report(usable: Bool) { self.usable = usable }
 }
 
-private enum EscapeStrings {
-    static let shortcutHint = L("Also: %@ skips the break from anywhere", "Także: %@ pomija przerwę z dowolnego miejsca")
-}
-
 extension View {
-    /// On a cover's exit button: report its frame to the window (escape hatch) and name the
-    /// emergency shortcut in its tooltip.
-    @MainActor
-    func reportsSkipButton(to beacon: SkipBeacon?, model: AppModel) -> some View {
-        help(String(format: model.t(EscapeStrings.shortcutHint), EscapeRules.shortcutLabel))
-            .background {
+    /// On a cover's exit button: report its frame to the window (escape hatch).
+    func reportsSkipButton(to beacon: SkipBeacon?) -> some View {
+        background {
                 GeometryReader { proxy in
                     let frame = proxy.frame(in: .global)
                     Color.clear
@@ -70,7 +63,7 @@ final class CoverWindow: NSWindow {
         // The window is sized to the screen, never to the SwiftUI content.
         hosting.sizingOptions = []
         self.hosting = hosting
-        fallbackButton = FirstClickButton(title: "\(fallbackTitle)  \(EscapeRules.shortcutLabel)", target: nil, action: nil)
+        fallbackButton = FirstClickButton(title: fallbackTitle, target: nil, action: nil)
         super.init(contentRect: screen.frame, styleMask: [.borderless], backing: .buffered, defer: false)
         title = "Save My Eyes"
         isReleasedWhenClosed = false
@@ -95,7 +88,6 @@ final class CoverWindow: NSWindow {
         fallbackButton.font = .systemFont(ofSize: NSFont.systemFontSize(for: .large), weight: .medium)
         fallbackButton.isHidden = true
         fallbackButton.setAccessibilityLabel(fallbackTitle)
-        fallbackButton.toolTip = EscapeRules.shortcutLabel
         fallbackButton.translatesAutoresizingMaskIntoConstraints = false
         root.addSubview(fallbackButton)
         NSLayoutConstraint.activate([

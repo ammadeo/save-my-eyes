@@ -147,7 +147,7 @@ struct BreakView: View {
         }
         .glassButton(finished ? .primary : .quiet, size: .xl)
         .disabled(forceCloseLock || startCloseLock)
-        .reportsSkipButton(to: beacon, model: model)
+        .reportsSkipButton(to: beacon)
         // Fading out after a click: if the cover then stays, the window's fallback takes over.
         .onChange(of: closing, initial: true) { beacon?.report(usable: !closing) }
     }

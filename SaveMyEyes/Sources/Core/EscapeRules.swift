@@ -1,17 +1,14 @@
-// The rules behind the break's escape hatch (PRODUCT.md › "Never trap"): however a cover
-// goes wrong, the user can always leave it. Pure, so they can be unit-tested; the window
-// layer (`Sources/Windows/BreakEscape.swift`, `CoverWindow`) applies them.
+// The rules behind the break's escape hatch (PRODUCT.md › "Never trap"): if a cover goes
+// wrong, the user can still leave it. Pure, so they can be unit-tested; the window layer
+// (`CoverWindow`, `CoverWatchdog`) applies them.
 //
-// Three layers, each independent of the one before:
-// 1. The SwiftUI exit button on every cover. Each cover reports where its button is; if the
-//    button is missing, off-screen or stuck for `fallbackAfter` seconds, the window shows a
-//    native AppKit "Skip break" button that does not depend on SwiftUI at all.
-// 2. A keyboard shortcut (Control-Option-Command-Escape) registered system-wide while a
-//    cover is up, so a break can be skipped even when nothing on screen can be seen or
-//    clicked (a display that is off, a cover drawn wrong, every Space hidden).
-// 3. A watchdog thread: if the main thread stops answering for `watchdogLimit` seconds while
-//    a cover is up, nothing in the app can close the cover, so the app relaunches itself
-//    (the covers go away with the old process).
+// - Each cover reports where its SwiftUI exit button is; if the button is missing,
+//   off-screen or stuck for `fallbackAfter` seconds, the window shows a native AppKit
+//   "Skip break" button that does not depend on SwiftUI at all.
+// - If the main thread stops answering for `watchdogLimit` seconds while a cover is up,
+//   nothing in the app can close the cover, so the watchdog crashes the app on purpose: the
+//   covers go away with it and the crash report tells what happened. No attempt is made to
+//   recover from that; it is a bug to report, not a state to live with.
 
 import CoreGraphics
 import Foundation
@@ -20,13 +17,8 @@ enum EscapeRules {
     /// Seconds a cover's exit button may be missing before the native fallback shows. Long
     /// enough for the first render and the opening animation, short enough to never trap.
     static let fallbackAfter: TimeInterval = 3
-    /// Seconds without an answer from the main thread before the watchdog relaunches the app.
+    /// Seconds without an answer from the main thread before the watchdog stops the app.
     static let watchdogLimit = 20
-
-    /// Virtual key code of Escape (`kVK_Escape`).
-    static let shortcutKeyCode: UInt16 = 0x35
-    /// Shown on the fallback button and in the exit buttons' tooltips.
-    static let shortcutLabel = "⌃⌥⌘⎋"
 
     /// Whether a cover's exit button can be seen and clicked: it was laid out with a real
     /// size, entirely inside the cover, and is not mid-close (a click that did nothing).

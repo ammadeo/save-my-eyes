@@ -2,9 +2,9 @@
 // idempotent. Closing a break window for any reason is reported to the model, deferred one
 // turn so the scheduler is never re-entered from inside a close.
 //
-// While a break cover is up, the escape hatch (`EscapeRules`) is armed: the emergency
-// shortcut, the watchdog, and each cover's native fallback button all end in
-// `escapeBreak(reason:)`, which closes the covers here instead of trusting the scheduler to.
+// While a break cover is up, the escape hatch (`EscapeRules`) is armed: each cover's native
+// fallback button ends in `escapeBreak(reason:)`, which closes the covers here instead of
+// trusting the scheduler to, and `CoverWatchdog` watches for a hung main thread.
 
 import AppKit
 import SwiftUI
@@ -20,10 +20,8 @@ final class WindowManager: NSObject, WindowCoordinating {
     private var breakCover: CoverWindow?
     private var blankCovers: [CoverWindow] = []
     private var screenObserver: NSObjectProtocol?
-    private lazy var shortcut = EmergencyShortcut { [weak self] in
-        self?.escapeBreak(reason: "emergency shortcut")
-    }
     private let watchdog = CoverWatchdog()
+    private var escapeArmed = false
 
     private static let fallbackTitle = L("Skip break", "Pomiń przerwę")
 
@@ -156,15 +154,14 @@ final class WindowManager: NSObject, WindowCoordinating {
     }
 
     private func armEscape() {
-        guard !shortcut.isActive else { return }
-        shortcut.activate()
+        guard !escapeArmed else { return }
+        escapeArmed = true
         watchdog.start()
-        Log.info("windows", "escape hatch armed: \(EscapeRules.shortcutLabel) skips the break")
     }
 
     private func disarmEscape() {
-        guard shortcut.isActive else { return }
-        shortcut.deactivate()
+        guard escapeArmed else { return }
+        escapeArmed = false
         watchdog.stop()
     }
 

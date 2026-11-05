@@ -33,7 +33,7 @@ struct BlankCoverView: View {
                     IconLabel(text: model.t(finished ? T.finish : T.skip), icon: finished ? "checkmark" : "forward.end.fill")
                 }
                 .glassButton(finished ? .primary : .quiet, size: .large)
-                .reportsSkipButton(to: beacon, model: model)
+                .reportsSkipButton(to: beacon)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }
             .padding(pad)

@@ -49,7 +49,7 @@ A menu-bar agent that enforces breaks gently: the break is a full-screen cover y
 ## Product Principles
 
 - Only what has to be there is there: a break screen is a pause, not a dashboard.
-- Never trap: every cover offers a one-click exit, and the exit survives the cover breaking (`Sources/Core/EscapeRules.swift`): a native fallback button appears if a cover's exit button is missing, off-screen or stuck for 3 s; Control-Option-Command-Escape skips the break system-wide while a cover is up, even when nothing on screen can be seen; a watchdog relaunches the app if its main thread hangs for 20 s with a cover up.
+- Never trap: every cover offers a one-click exit, and the exit survives the cover breaking (`Sources/Core/EscapeRules.swift`): a native fallback button appears if a cover's exit button is missing, off-screen or stuck for 3 s. Critical failures are not worked around: if the main thread hangs for 20 s with a cover up, a watchdog crashes the app on purpose, so the screens are released and the crash report can go to Apple. No global shortcuts are registered.
 - Follow the Mac: system appearance, system font, system materials and controls where a native one exists.
 - Calm by default: colour only on the one action that matters and on progress.
 - Bilingual parity: every string exists in English and Polish.
