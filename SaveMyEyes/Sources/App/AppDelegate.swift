@@ -23,7 +23,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         NSApp.setActivationPolicy(.accessory)
 
-        let model = AppModel(calendar: CalendarService(), calls: CallDetector())
+        var calls = CallDetector()
+        #if DEBUG
+        if let secs = ProcessInfo.processInfo.environment["SME_DEV_CALL"].flatMap(TimeInterval.init) {
+            Log.info("startup", "SME_DEV_CALL=\(secs): the microphone reads as in use for \(secs) s")
+            calls = CallDetector(probes: [.microphone: DevCallProbe(secs: secs)])
+        }
+        #endif
+        let model = AppModel(calendar: CalendarService(), calls: calls)
         let windows = WindowManager(model: model)
         model.windows = windows
         let statusItem = StatusItemController(model: model, windows: windows)
@@ -68,3 +75,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         false
     }
 }
+
+#if DEBUG
+/// Dev aid (`SME_DEV_CALL=<secs>`): a microphone that reads as in use for the first `secs`
+/// seconds, to see the paused state (menu-bar icon, menu status) without starting a call.
+/// Needs "Pause breaks while camera or microphone is on" switched on.
+private final class DevCallProbe: CallProbe {
+    private let until: Date
+
+    init(secs: TimeInterval) {
+        until = Date().addingTimeInterval(secs)
+    }
+
+    func anyRunning() -> Bool { Date() < until }
+
+    func startObserving(_ onChange: @escaping () -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + until.timeIntervalSinceNow + 0.1, execute: onChange)
+    }
+
+    func stopObserving() {}
+}
+#endif

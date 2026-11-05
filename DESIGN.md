@@ -233,7 +233,7 @@ The seven unDraw illustrations (`SaveMyEyes/Resources/Images/*.svg`) are recolou
 - Skin tones and plain greys are unDraw's own; brick texture in `window.svg` is `#8fa394` so it reads softly on both appearances.
 - No blue, purple, pink or yellow may return. Keep each picture at 128–160px tall inside its card.
 
-The app icon is the same world: a sage-500 tile, a pale sage eyeball and a sage-700 plus for its pupil, three flat layers and nothing else. `SaveMyEyes/Resources/Images/app-icon.svg` is the flattened master on the macOS icon grid; `SaveMyEyes/Resources/Icons/AppIcon.icon` holds the same shapes as Icon Composer layers, so macOS 26+ renders it as Liquid Glass (specular, shadow, dark and clear variants come from the system). The menu-bar tray icon stays a monochrome template.
+The app icon is the same world: a sage-500 tile, a pale sage eyeball and a sage-700 plus for its pupil, three flat layers and nothing else. `SaveMyEyes/Resources/Images/app-icon.svg` is the flattened master on the macOS icon grid; `SaveMyEyes/Resources/Icons/AppIcon.icon` holds the same shapes as Icon Composer layers, so macOS 26+ renders it as Liquid Glass (specular, shadow, dark and clear variants come from the system). The menu-bar tray icon stays a monochrome template, drawn in code (`TrayIcon`): the eyeball ring with the plus pupil, and the same ring with pause bars for a pupil while breaks are on hold (stopped protection, a calendar event, or a camera or microphone in use), so a paused state shows without opening the menu. The glyph changes and nothing else: no badge, no dimming, no colour.
 
 ## Do's and Don'ts
 

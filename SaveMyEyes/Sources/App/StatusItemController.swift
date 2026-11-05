@@ -1,7 +1,9 @@
 // Menu-bar status item (port of `src-tauri/src/tray.rs`): template icon, left click toggles
 // the menu popover, right click (or control-click) shows Open / Start long break now / Quit.
+// While breaks are on hold (`AppModel.breakPause`) the icon's pupil turns into pause bars.
 
 import AppKit
+import Observation
 
 @MainActor
 final class StatusItemController: NSObject {
@@ -12,6 +14,8 @@ final class StatusItemController: NSObject {
     private let openItem = NSMenuItem()
     private let longBreakItem = NSMenuItem()
     private let quitItem = NSMenuItem()
+    private var paused = false
+    private var pauseEnd: Timer?
 
     var button: NSStatusBarButton? { item.button }
 
@@ -22,12 +26,6 @@ final class StatusItemController: NSObject {
         super.init()
 
         if let button = item.button {
-            let image = NSImage(named: "tray")
-            image?.isTemplate = true
-            if image == nil { Log.warn("tray", "tray image missing from the bundle") }
-            button.image = image
-            button.toolTip = "Save My Eyes"
-            button.setAccessibilityLabel("Save My Eyes")
             button.target = self
             button.action = #selector(clicked(_:))
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
@@ -42,14 +40,51 @@ final class StatusItemController: NSObject {
         menu.addItem(.separator())
         menu.addItem(quitItem)
         relabel(model.lang)
+        trackPause()
         Log.info("tray", "status item ready")
     }
 
-    /// Re-label the right-click menu after a language change.
+    /// Re-label the right-click menu and the button after a language change.
     func relabel(_ lang: Lang) {
         openItem.title = lang.pick(Strings.trayOpen)
         longBreakItem.title = lang.pick(Strings.trayLongBreak)
         quitItem.title = lang.pick(Strings.trayQuit)
+        show(paused: paused)
+    }
+
+    /// Show whether breaks are on hold, and look again whenever the model changes.
+    private func trackPause() {
+        let pause = withObservationTracking {
+            model.breakPause(now: Date())
+        } onChange: { [weak self] in
+            // Fires before the new value is set: read it on the next turn.
+            Task { @MainActor in self?.trackPause() }
+        }
+        if (pause != nil) != paused {
+            Log.info("tray", pause != nil ? "breaks are on hold, showing the pause icon" : "breaks are back on, showing the normal icon")
+        }
+        show(paused: pause != nil)
+
+        // A meeting ending is a moment in time, not a change in the model: look again then.
+        // (Stopped protection ends with its break coming due, which the scheduler publishes.)
+        pauseEnd?.invalidate()
+        pauseEnd = nil
+        if case .meeting(let meeting) = pause {
+            let timer = Timer(timeInterval: max(0, meeting.until.timeIntervalSinceNow), repeats: false) { [weak self] _ in
+                Task { @MainActor in self?.trackPause() }
+            }
+            RunLoop.main.add(timer, forMode: .common)
+            pauseEnd = timer
+        }
+    }
+
+    private func show(paused: Bool) {
+        self.paused = paused
+        guard let button = item.button else { return }
+        let label = paused ? model.lang.pick(Strings.trayPaused) : "Save My Eyes"
+        button.image = paused ? TrayIcon.paused : TrayIcon.normal
+        button.toolTip = label
+        button.setAccessibilityLabel(label)
     }
 
     @objc private func clicked(_ sender: NSStatusBarButton) {

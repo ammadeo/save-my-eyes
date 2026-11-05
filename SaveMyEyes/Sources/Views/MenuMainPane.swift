@@ -10,6 +10,7 @@ private enum T {
     static let breakIn = L("in", "za")
     static let breakIsNow = L("is still going", "trwa")
     static let heldForMeeting = L("Moved to after your meeting", "Przesunięta na czas po rozmowie")
+    static let protectionStopped = L("Protection is stopped until then", "Do tego czasu ochrona jest wstrzymana")
     static let meetingUntil = L("until {time}", "do {time}")
     static let meetingUntitled = L("Busy", "Zajęte")
     static let callPaused = L("Breaks are paused", "Przerwy wstrzymane do końca rozmowy")
@@ -72,20 +73,19 @@ struct MenuMainPane: View {
     // MARK: Status
 
     @ViewBuilder private func status(now: Date) -> some View {
-        let state = model.breakState
-        let isBreakNow = state.phase != .idle || (state.scheduledAt.map { $0 <= now } ?? false)
-        if !isBreakNow, let meeting = model.calendarStatus.meeting, meeting.until > now {
+        switch model.breakPause(now: now) {
+        case .meeting(let meeting):
             meetingStatus(meeting)
-        } else if !isBreakNow, model.callStatus.inUse {
+        case .devices(let active):
             // A camera or microphone in use has no end time; the scheduler keeps re-arming the
             // break a few seconds ahead, so a countdown would only flicker.
-            let active = model.callStatus.active
             let camera = active.contains(.camera)
             callStatus(icon: camera ? "video" : "mic",
                        label: model.t(active.count > 1 ? T.cameraAndMicrophoneOn : camera ? T.cameraOn : T.microphoneOn),
                        next: model.t(T.deviceNext))
-        } else {
-            breakStatus(state: state, isBreakNow: isBreakNow, now: now)
+        case .stopped, nil:
+            let state = model.breakState
+            breakStatus(state: state, isBreakNow: state.isBreakNow(now), now: now)
         }
     }
 
@@ -101,8 +101,8 @@ struct MenuMainPane: View {
                     .font(.system(size: 26, weight: .medium))
                     .monospacedDigit()
                     .padding(.top, 2)
-                if state.heldForMeeting {
-                    Text(model.t(T.heldForMeeting))
+                if state.heldForMeeting || state.protectionStopped {
+                    Text(model.t(state.heldForMeeting ? T.heldForMeeting : T.protectionStopped))
                         .font(.smeFootnote)
                         .foregroundStyle(Theme.labelSecondary)
                         .padding(.top, 4)
