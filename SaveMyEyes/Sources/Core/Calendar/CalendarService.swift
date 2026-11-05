@@ -6,6 +6,10 @@
 // (`Scheduler` calls `refresh()`), so a meeting added a moment ago still holds the break. No
 // access, a failed read or a stale cache all mean "not busy": a calendar problem never stops
 // breaks.
+//
+// macOS is asked for access only from `requestAccess()`, in answer to a click (the switch, or
+// "re-enable" in the warning). Nothing here asks at launch or on a timer: a switch that is on
+// without access shows as `CalendarStatus.needsAccess` and the views warn about it.
 
 import AppKit
 import EventKit
@@ -29,6 +33,8 @@ final class CalendarService: CalendarServicing {
     private var store = EKEventStore()
     private var timer: Timer?
     private var storeObserver: NSObjectProtocol?
+    /// Access at the last refresh, to notice a grant given in System Settings.
+    private var lastAccess: CalendarAccess?
 
     private var grace: TimeInterval { TimeInterval(graceSecs) }
 
@@ -46,8 +52,17 @@ final class CalendarService: CalendarServicing {
     /// the new status.
     func refresh() async {
         var fetched: [Busy]?
+        let access = Self.access()
+        if access == .granted, let lastAccess, lastAccess != .granted {
+            // Granted in System Settings since the last look: a store created before the
+            // grant can keep returning nothing.
+            Log.info("calendar", "access granted since the last refresh, reopening the store")
+            store = EKEventStore()
+            observeStore()
+        }
+        lastAccess = access
         if enabled {
-            switch Self.access() {
+            switch access {
             case .granted:
                 let now = Date()
                 let (from, to) = (now.addingTimeInterval(-Self.lookBack), now.addingTimeInterval(Self.lookAhead))
@@ -74,9 +89,9 @@ final class CalendarService: CalendarServicing {
         onStatusChanged?(status)
     }
 
-    /// Refresh every minute and whenever the calendar store changes. When the feature is on
-    /// but macOS has never been asked (e.g. a rebuilt, re-signed dev app lost its grant), ask
-    /// first.
+    /// Refresh every minute and whenever the calendar store changes. Does not ask for access:
+    /// when the feature is on but the grant is missing (e.g. a rebuilt, re-signed dev app lost
+    /// it), the status says so and the views show the warning.
     func start() {
         guard timer == nil else { return }
         let t = Timer(timeInterval: Self.refreshEvery, repeats: true) { [weak self] _ in
@@ -86,12 +101,7 @@ final class CalendarService: CalendarServicing {
         RunLoop.main.add(t, forMode: .common)
         timer = t
         observeStore()
-        Task { @MainActor in
-            if enabled, Self.access() == .notDetermined {
-                _ = await requestAccess()
-            }
-            await refresh()
-        }
+        Task { @MainActor in await refresh() }
     }
 
     /// Ask macOS for calendar access if it was never asked; resolves once the user answers.
@@ -109,6 +119,7 @@ final class CalendarService: CalendarServicing {
             store = EKEventStore()
             observeStore()
         }
+        lastAccess = access
         onStatusChanged?(status)
         return access
     }

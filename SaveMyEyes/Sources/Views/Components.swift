@@ -400,15 +400,26 @@ struct SliderRow: View {
     }
 }
 
-/// A row with a label and a native switch (sage when on).
+/// A row with a label, an optional line of small print under it, and a native switch (sage when on).
 struct SwitchRow: View {
     let label: String
+    /// Small secondary text under the label.
+    var detail: String? = nil
     @Binding var isOn: Bool
     var disabled = false
 
     var body: some View {
         GlassRow {
-            Text(label).frame(maxWidth: .infinity, alignment: .leading)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                if let detail {
+                    Text(detail)
+                        .font(.smeFootnote)
+                        .foregroundStyle(Theme.labelSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
             Toggle(label, isOn: $isOn)
                 .toggleStyle(.switch)
                 .controlSize(.small)

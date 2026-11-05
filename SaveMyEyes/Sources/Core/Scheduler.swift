@@ -1,9 +1,10 @@
 // Break state machine and timer: idle --(timer)--> before --(start)--> active --(end)--> idle.
 //
-// A break that comes due during a calendar meeting is held until the meeting ends
-// (`BusySource.heldUntil`); if a long break would have come due while it waited, the held
-// break becomes that long break (`indexAfterHold`). Everything runs on the main actor; the
-// window layer is driven through the `onFire` / `onCloseBreakWindows` callbacks.
+// A break that comes due during a call (a calendar meeting, or a camera or microphone in
+// use) is held until the call ends (`BusySource.heldUntil`, asked again each time the hold
+// runs out); if a long break would have come due while it waited, the held break becomes
+// that long break (`indexAfterHold`). Everything runs on the main actor; the window layer is
+// driven through the `onFire` / `onCloseBreakWindows` callbacks.
 
 import Foundation
 
@@ -249,11 +250,18 @@ final class Scheduler {
             let h = held ?? Hold(index: breakIndex, since: scheduledAt ?? now)
             held = h
             breakIndex = BreakRules.indexAfterHold(index: h.index, since: h.since, firesAt: at, every: every, longEvery: s.breaks.long.every)
+            let extended = heldForMeeting
             heldForMeeting = true
             _ = arm(at: at)
             let state = snapshot
-            Log.info("scheduler", "in a meeting, holding break \(state.breakIndex) (long=\(state.isLong))")
-            emit(state)
+            if extended {
+                // An open-ended hold (a device in use) is asked again every half minute: publish, but
+                // do not log each round.
+                onStateChanged?(state)
+            } else {
+                Log.info("scheduler", "in a call, holding break \(state.breakIndex) (long=\(state.isLong))")
+                emit(state)
+            }
             return state
         }
         if let h = held {

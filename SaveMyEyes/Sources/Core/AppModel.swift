@@ -1,5 +1,5 @@
-// The one object the views talk to: settings, break state, calendar status, and every
-// action. Owns the scheduler and the calendar service; drives the window layer through
+// The one object the views talk to: settings, break state, calendar and call status, and
+// every action. Owns the scheduler, the calendar service and call detection; drives the window layer through
 // `WindowCoordinating`. Replaces the Tauri commands/events bridge.
 
 import AppKit
@@ -12,6 +12,7 @@ final class AppModel {
     private(set) var settings: Settings
     private(set) var breakState: BreakState
     private(set) var calendarStatus: CalendarStatus
+    private(set) var callStatus: CallStatus
     /// Bumped when the break clock reaches zero while the cover stays open (long break or an
     /// open card), so blank covers can switch to "Break has ended".
     private(set) var breakEndedCount = 0
@@ -21,6 +22,7 @@ final class AppModel {
 
     @ObservationIgnored let scheduler: Scheduler
     @ObservationIgnored let calendar: CalendarServicing
+    @ObservationIgnored let calls: CallDetecting
     @ObservationIgnored let sounds = SoundPlayer()
     @ObservationIgnored private let settingsURL: URL
     /// The window layer; set by the app delegate at startup.
@@ -33,20 +35,25 @@ final class AppModel {
     /// Current-language lookup for the views.
     func t(_ l: L) -> String { settings.lang.pick(l) }
 
-    init(settingsURL: URL = Settings.defaultURL, calendar: CalendarServicing) {
+    init(settingsURL: URL = Settings.defaultURL, calendar: CalendarServicing, calls: CallDetecting) {
         self.settingsURL = settingsURL
         let loaded = Settings.load(from: settingsURL)
         Log.info("startup", "settings from \(settingsURL.path): \(loaded)")
         self.settings = loaded
         self.calendar = calendar
         self.calendarStatus = calendar.status
+        self.calls = calls
+        // Configured before the first read so the published status starts out right.
+        calls.enabled = loaded.calls.enabled
+        calls.graceSecs = loaded.calendar.graceSecs
+        self.callStatus = calls.status
         var scheduler: Scheduler! = nil
         scheduler = Scheduler(settings: { loaded })
         self.scheduler = scheduler
         self.breakState = scheduler.snapshot
 
         scheduler.settings = { [unowned self] in self.settings }
-        scheduler.busySource = calendar
+        scheduler.busySource = BusySources([calendar, calls])
         scheduler.onStateChanged = { [unowned self] state in
             if state.phase != .active { self.breakEnded = false }
             self.breakState = state
@@ -64,6 +71,7 @@ final class AppModel {
         calendar.enabled = loaded.calendar.enabled
         calendar.graceSecs = loaded.calendar.graceSecs
         calendar.onStatusChanged = { [unowned self] status in self.calendarStatus = status }
+        calls.onStatusChanged = { [unowned self] status in self.callStatus = status }
     }
 
     /// Start the services and schedule the first break. Returns the initial state (for the
@@ -71,6 +79,7 @@ final class AppModel {
     @discardableResult
     func start() -> BreakState {
         calendar.start()
+        calls.start()
         scheduler.start()
         return scheduler.setNextBreak()
     }
@@ -92,6 +101,9 @@ final class AppModel {
         settings = next
         calendar.enabled = next.calendar.enabled
         calendar.graceSecs = next.calendar.graceSecs
+        calls.enabled = next.calls.enabled
+        calls.graceSecs = next.calendar.graceSecs
+        callStatus = calls.status
         var failure: Error?
         do {
             try next.save(to: settingsURL)
@@ -160,6 +172,7 @@ final class AppModel {
 
     /// Turn meeting-aware breaks on or off. Turning on asks macOS for calendar access the
     /// first time (resolves once the user answers the prompt). Applies at once, not on Save.
+    /// This and `restoreCalendarAccess()` are the only places the app asks for access.
     @discardableResult
     func setCalendarEnabled(_ enabled: Bool) async -> CalendarStatus {
         if enabled {
@@ -175,6 +188,43 @@ final class AppModel {
 
     func openCalendarPrivacy() {
         calendar.openPrivacySettings()
+    }
+
+    /// "Re-enable" in the access warning (`CalendarStatus.needsAccess`): ask macOS again when
+    /// it can still be asked (the grant was lost), otherwise open Privacy settings, because
+    /// macOS shows its prompt only once. "Ignore" is `setCalendarEnabled(false)`.
+    func restoreCalendarAccess() async {
+        if calendar.status.access == .notDetermined {
+            await setCalendarEnabled(true)
+        } else {
+            openCalendarPrivacy()
+        }
+    }
+
+    /// Re-read the calendar and its access now (the menu calls this when it opens, so a grant
+    /// just given in System Settings clears the warning without waiting for the next minute).
+    func refreshCalendar() async {
+        await calendar.refresh()
+        calendarStatus = calendar.status
+    }
+
+    /// Everything the menu's status shows, re-read as it opens: the calendar, and which
+    /// devices are in use (a backstop for a listener that did not fire).
+    func refreshCallStatus() async {
+        await refreshCalendar()
+        await calls.refresh()
+    }
+
+    // MARK: Calls
+
+    /// Turn "no breaks during calls" (a camera or microphone in use) on or off. Applies at
+    /// once, not on Save; no permission is involved.
+    @discardableResult
+    func setCallsEnabled(_ enabled: Bool) -> CallStatus {
+        var next = settings
+        next.calls.enabled = enabled
+        _ = store(next)
+        return callStatus
     }
 
     // MARK: App
