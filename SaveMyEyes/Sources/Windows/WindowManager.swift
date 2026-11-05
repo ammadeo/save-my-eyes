@@ -1,6 +1,10 @@
 // The window layer driven by `AppModel` (port of `src-tauri/src/windows.rs`). Every call is
 // idempotent. Closing a break window for any reason is reported to the model, deferred one
 // turn so the scheduler is never re-entered from inside a close.
+//
+// While a break cover is up, the escape hatch (`EscapeRules`) is armed: the emergency
+// shortcut, the watchdog, and each cover's native fallback button all end in
+// `escapeBreak(reason:)`, which closes the covers here instead of trusting the scheduler to.
 
 import AppKit
 import SwiftUI
@@ -16,6 +20,12 @@ final class WindowManager: NSObject, WindowCoordinating {
     private var breakCover: CoverWindow?
     private var blankCovers: [CoverWindow] = []
     private var screenObserver: NSObjectProtocol?
+    private lazy var shortcut = EmergencyShortcut { [weak self] in
+        self?.escapeBreak(reason: "emergency shortcut")
+    }
+    private let watchdog = CoverWatchdog()
+
+    private static let fallbackTitle = L("Skip break", "Pomiń przerwę")
 
     init(model: AppModel) {
         self.model = model
@@ -81,15 +91,17 @@ final class WindowManager: NSObject, WindowCoordinating {
             Log.error("windows", "openBreakCovers: no screen")
             return
         }
-        let cover = CoverWindow(screen: screen, rootView: BreakView(model: model))
+        let cover = makeCover(on: screen) { BreakView(model: self.model, beacon: $0) }
         cover.onClose = { [weak self, model] in
             guard let self else { return }
             self.breakCover = nil
             self.stopObservingScreens()
+            self.disarmEscape()
             Log.info("windows", "break cover closed")
             Task { @MainActor in model.breakWindowClosed() }
         }
         breakCover = cover
+        armEscape()
         syncBlankCovers()
         startObservingScreens()
         NSApp.forceActivate()
@@ -103,6 +115,57 @@ final class WindowManager: NSObject, WindowCoordinating {
         blankCovers = []
         blanks.forEach { $0.close() }
         breakCover?.close()
+        disarmEscape()
+    }
+
+    // MARK: Escape hatch
+
+    /// Close every cover now and end the break, whatever state the scheduler is in. Closing
+    /// the break cover reports it to the model (which schedules the next break); the check
+    /// after it covers a scheduler that somehow still thinks the break is on. Exactly one
+    /// of the two reschedules, in either order.
+    func escapeBreak(reason: String) {
+        guard breakCover != nil || !blankCovers.isEmpty else { return }
+        Log.warn("windows", "escaping the break (\(reason)): closing \(blankCovers.count + (breakCover == nil ? 0 : 1)) cover(s)")
+        closeBreakWindows()
+        Task { @MainActor [model] in
+            if model.breakState.phase == .active { model.endBreak() }
+        }
+    }
+
+    /// The exit button ended the break, which normally closes the covers at once. If these
+    /// same covers are still up a second later, escape.
+    func ensureBreakCoversClosed() {
+        guard let cover = breakCover else {
+            if !blankCovers.isEmpty { escapeBreak(reason: "blank covers left without a break cover") }
+            return
+        }
+        Task { @MainActor [weak self, weak cover] in
+            try? await Task.sleep(for: .seconds(1))
+            guard let self, let cover, cover === self.breakCover else { return }
+            self.escapeBreak(reason: "exit button did not close the cover")
+        }
+    }
+
+    private func makeCover<Content: View>(on screen: NSScreen, _ content: (SkipBeacon) -> Content) -> CoverWindow {
+        let beacon = SkipBeacon()
+        return CoverWindow(screen: screen, rootView: content(beacon), beacon: beacon,
+                           fallbackTitle: model.t(Self.fallbackTitle)) { [weak self] in
+            self?.escapeBreak(reason: "fallback button")
+        }
+    }
+
+    private func armEscape() {
+        guard !shortcut.isActive else { return }
+        shortcut.activate()
+        watchdog.start()
+        Log.info("windows", "escape hatch armed: \(EscapeRules.shortcutLabel) skips the break")
+    }
+
+    private func disarmEscape() {
+        guard shortcut.isActive else { return }
+        shortcut.deactivate()
+        watchdog.stop()
     }
 
     /// One blank cover per display other than the break cover's; follows plugged and
@@ -123,7 +186,7 @@ final class WindowManager: NSObject, WindowCoordinating {
             if let existing = blankCovers.first(where: { $0.displayID == screen.displayID }) {
                 existing.place(on: screen)
             } else {
-                let blank = CoverWindow(screen: screen, rootView: BlankCoverView(model: model))
+                let blank = makeCover(on: screen) { BlankCoverView(model: self.model, beacon: $0) }
                 blankCovers.append(blank)
                 blank.orderFrontRegardless()
             }

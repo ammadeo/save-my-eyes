@@ -24,6 +24,8 @@ private enum CoverFocus: Hashable {
 
 struct BreakView: View {
     let model: AppModel
+    /// Tells the window where the exit button is (escape hatch, `EscapeRules`).
+    var beacon: SkipBeacon?
 
     @State private var isLong: Bool
     @State private var startDate: Date
@@ -44,8 +46,9 @@ struct BreakView: View {
     @FocusState private var focus: CoverFocus?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(model: AppModel) {
+    init(model: AppModel, beacon: SkipBeacon? = nil) {
         self.model = model
+        self.beacon = beacon
         let state = model.breakState
         let start = state.startedAt ?? Date()
         _isLong = State(initialValue: state.isLong)
@@ -144,12 +147,15 @@ struct BreakView: View {
         }
         .glassButton(finished ? .primary : .quiet, size: .xl)
         .disabled(forceCloseLock || startCloseLock)
+        .reportsSkipButton(to: beacon, model: model)
+        // Fading out after a click: if the cover then stays, the window's fallback takes over.
+        .onChange(of: closing, initial: true) { beacon?.report(usable: !closing) }
     }
 
     private func close() {
         guard !closing else { return }
         closing = true
-        model.endBreak()
+        model.exitBreak()
     }
 
     private func onClockFinished() async {

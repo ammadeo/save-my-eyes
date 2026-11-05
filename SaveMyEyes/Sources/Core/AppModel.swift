@@ -134,6 +134,13 @@ final class AppModel {
         scheduler.endBreak()
     }
 
+    /// A cover's exit button (skip or finish): end the break, and make sure the covers really
+    /// went away (the window layer closes them itself if they did not).
+    func exitBreak() {
+        endBreak()
+        windows?.ensureBreakCoversClosed()
+    }
+
     /// The break clock ran out but the cover stays (long break, or an open card).
     func notifyBreakEnded() {
         breakEndedCount += 1
