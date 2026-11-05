@@ -31,8 +31,6 @@ targets:
         type: folder
       - path: Resources/Sounds
         type: folder
-      - path: Resources/Icons/tray.png
-      - path: Resources/Icons/tray@2x.png
       - path: Resources/Icons/AppIcon.icon
     info:
       path: Resources/Info.plist

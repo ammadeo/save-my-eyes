@@ -32,6 +32,11 @@ final class AppModel {
 
     var lang: Lang { settings.lang }
 
+    /// Why breaks are on hold at `now`, if they are.
+    func breakPause(now: Date) -> BreakPause? {
+        BreakPause.current(state: breakState, calendar: calendarStatus, calls: callStatus, now: now)
+    }
+
     /// Current-language lookup for the views.
     func t(_ l: L) -> String { settings.lang.pick(l) }
 
@@ -154,7 +159,7 @@ final class AppModel {
 
     /// Stop protection: the next break is a long one in `hours`.
     func pauseProtection(hours: Int) {
-        setNextBreak(NextBreakOptions(inSecs: hours * 3600, forceType: .long))
+        setNextBreak(NextBreakOptions(inSecs: hours * 3600, forceType: .long, stopsProtection: true))
     }
 
     /// "Start a long break now" (menu, tray): straight to the cover, no before-break card.

@@ -25,10 +25,11 @@ test: project
 	$(XCB) -configuration Debug test 2>&1 | grep -E "Test Case.*(failed|error)|error:|Executed|TEST SUCCEEDED|TEST FAILED|BUILD FAILED" | tail -40
 
 # Debug build with the dev aids: SME_DEV_EVERY_SECS=8 fires the first break after 8 s,
-# SME_DEV_OPEN_MENU=1 opens the menu at startup (settings / stop-protection open that pane).
+# SME_DEV_OPEN_MENU=1 opens the menu at startup (settings / stop-protection open that pane),
+# SME_DEV_CALL=20 makes the microphone read as in use for 20 s (the paused menu-bar icon).
 run: build
 	pkill -x "Save My Eyes" || true
-	open $(APP) --env SME_DEV_EVERY_SECS=$${SME_DEV_EVERY_SECS:-} --env SME_DEV_OPEN_MENU=$${SME_DEV_OPEN_MENU:-}
+	open $(APP) --env SME_DEV_EVERY_SECS=$${SME_DEV_EVERY_SECS:-} --env SME_DEV_OPEN_MENU=$${SME_DEV_OPEN_MENU:-} --env SME_DEV_CALL=$${SME_DEV_CALL:-}
 
 release: project
 	$(XCB) -configuration Release build 2>&1 | tail -5

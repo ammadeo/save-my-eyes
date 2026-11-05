@@ -53,6 +53,17 @@ final class SchedulerTests: XCTestCase {
         XCTAssertEqual(fired, [.breakNow])
     }
 
+    func testStoppedProtectionLastsUntilItsBreak() {
+        let sch = make()
+        XCTAssertFalse(sch.setNextBreak(NextBreakOptions(inSecs: 3600)).protectionStopped)
+        XCTAssertTrue(sch.setNextBreak(NextBreakOptions(inSecs: 3600, forceType: .long, stopsProtection: true)).protectionStopped)
+        XCTAssertFalse(sch.startBreak().protectionStopped, "over once the break is on screen")
+
+        _ = sch.setNextBreak(NextBreakOptions(inSecs: 3600, stopsProtection: true))
+        XCTAssertFalse(sch.setNextBreak(NextBreakOptions(inSecs: 3600)).protectionStopped, "any other reschedule ends it")
+        XCTAssertFalse(sch.setNextBreak(NextBreakOptions(inSecs: 0, stopsProtection: true)).protectionStopped, "a break due now fires")
+    }
+
     func testNowSkipsBeforeBreakWhenAsked() {
         let sch = make()
         let st = sch.setNextBreak(NextBreakOptions(inSecs: 0, forceType: .long, skipBeforeBreak: true))
