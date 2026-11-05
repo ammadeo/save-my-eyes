@@ -49,9 +49,10 @@ dist: project
 	$(XCB) -configuration Release ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO build 2>&1 | grep -E "error:|warning:|BUILD" | tail -5
 	rm -rf "$(DIST)/dmg" "$(DMG)" && mkdir -p "$(DIST)/dmg"
 	$(if $(SIGN_ID),codesign --force --options runtime --timestamp --entitlements SaveMyEyes/Resources/SaveMyEyes.entitlements --sign "$(SIGN_ID)" "$(RELEASE_APP)")
+	codesign --verify --strict "$(RELEASE_APP)"
 	cp -R "$(RELEASE_APP)" "$(DIST)/dmg/"
 	ln -s /Applications "$(DIST)/dmg/Applications"
-	hdiutil create -quiet -volname "Save My Eyes" -srcfolder "$(DIST)/dmg" -ov -format UDZO "$(DMG)"
+	hdiutil create -volname "Save My Eyes" -srcfolder "$(DIST)/dmg" -ov -format UDZO "$(DMG)"
 	rm -rf "$(DIST)/dmg"
 	$(if $(SIGN_ID),codesign --force --timestamp --sign "$(SIGN_ID)" "$(DMG)")
 	$(if $(SIGN_ID),xcrun notarytool submit "$(DMG)" --keychain-profile "$(NOTARY_PROFILE)" --wait)
