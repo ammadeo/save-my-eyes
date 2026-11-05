@@ -13,7 +13,7 @@ DERIVED  ?= SaveMyEyes/build
 APP       = $(DERIVED)/Build/Products/Debug/Save\ My\ Eyes.app
 XCB       = xcodebuild -project $(PROJECT) -scheme $(SCHEME) -derivedDataPath $(DERIVED) -destination 'platform=macOS' CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES
 
-.PHONY: project build test run release dist clean
+.PHONY: project build test run release dist install clean
 
 project:
 	cd SaveMyEyes && $(XCODEGEN) generate --quiet
@@ -35,21 +35,38 @@ release: project
 	@echo "App: $(DERIVED)/Build/Products/Release/Save My Eyes.app"
 
 # Universal (Apple silicon + Intel) release build packaged as dist/Save-My-Eyes-<version>.dmg.
-# Ad-hoc signed: Developer ID signing and notarization need an Apple Developer account.
+# Signed and notarized by itself when a "Developer ID Application" certificate is in the keychain
+# (one-time setup in the README), so downloads open without the "Apple could not verify" warning.
+# Without the certificate the build stays ad-hoc signed.
 VERSION = $(shell sed -n 's/^ *MARKETING_VERSION: "\(.*\)"/\1/p' SaveMyEyes/project.yml)
 DIST    = dist
 DMG     = $(DIST)/Save-My-Eyes-$(VERSION).dmg
 RELEASE_APP = $(DERIVED)/Build/Products/Release/Save My Eyes.app
+SIGN_ID ?= $(shell security find-identity -v -p codesigning | sed -n 's/.*"\(Developer ID Application:.*\)"/\1/p' | head -1)
+NOTARY_PROFILE ?= save-my-eyes
 
 dist: project
 	$(XCB) -configuration Release ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO build 2>&1 | grep -E "error:|warning:|BUILD" | tail -5
 	rm -rf "$(DIST)/dmg" "$(DMG)" && mkdir -p "$(DIST)/dmg"
+	$(if $(SIGN_ID),codesign --force --options runtime --timestamp --entitlements SaveMyEyes/Resources/SaveMyEyes.entitlements --sign "$(SIGN_ID)" "$(RELEASE_APP)")
+	codesign --verify --strict "$(RELEASE_APP)"
 	cp -R "$(RELEASE_APP)" "$(DIST)/dmg/"
 	ln -s /Applications "$(DIST)/dmg/Applications"
-	hdiutil create -quiet -volname "Save My Eyes" -srcfolder "$(DIST)/dmg" -ov -format UDZO "$(DMG)"
+	hdiutil create -volname "Save My Eyes" -srcfolder "$(DIST)/dmg" -ov -format UDZO "$(DMG)"
 	rm -rf "$(DIST)/dmg"
+	$(if $(SIGN_ID),codesign --force --timestamp --sign "$(SIGN_ID)" "$(DMG)")
+	$(if $(SIGN_ID),xcrun notarytool submit "$(DMG)" --keychain-profile "$(NOTARY_PROFILE)" --wait)
+	$(if $(SIGN_ID),xcrun stapler staple "$(DMG)")
 	@lipo -archs "$(RELEASE_APP)/Contents/MacOS/Save My Eyes"
 	@ls -la "$(DMG)"
+
+# Replaces the app in /Applications with the build from `make dist` and starts it. A build copied
+# here was never downloaded, so it carries no quarantine flag and opens without a warning.
+install: dist
+	pkill -x "Save My Eyes" || true
+	rm -rf "/Applications/Save My Eyes.app"
+	cp -R "$(RELEASE_APP)" /Applications/
+	open "/Applications/Save My Eyes.app"
 
 clean:
 	rm -rf $(DERIVED) $(PROJECT)

@@ -13,7 +13,7 @@ settings:
   base:
     SWIFT_VERSION: "5.0"
     SWIFT_STRICT_CONCURRENCY: minimal
-    MARKETING_VERSION: "0.4.0"
+    MARKETING_VERSION: "0.5.0"
     CURRENT_PROJECT_VERSION: "1"
     CODE_SIGN_STYLE: Manual
     CODE_SIGN_IDENTITY: "-"
@@ -33,7 +33,6 @@ targets:
         type: folder
       - path: Resources/Icons/tray.png
       - path: Resources/Icons/tray@2x.png
-      - path: Resources/Icons/AppIcon.icns
       - path: Resources/Icons/AppIcon.icon
     info:
       path: Resources/Info.plist

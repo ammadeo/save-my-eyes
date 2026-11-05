@@ -39,7 +39,21 @@ SME_DEV_EVERY_SECS=8 SME_DEV_OPEN_MENU=1 make run
 
 - `make project` writes `SaveMyEyes/SaveMyEyes.xcodeproj`; open it in Xcode to work there. Any `.swift` file added under `SaveMyEyes/Sources` or `SaveMyEyes/Tests` is picked up on the next `make project` (every `make` target runs it).
 - `make run` starts a debug build. `SME_DEV_EVERY_SECS=8` makes the first break fire after 8 seconds instead of the configured interval; `SME_DEV_OPEN_MENU=1` (or `settings` / `stop-protection`) opens the menu at startup; `SME_DEV_AUTOSTART=1` lets a debug build register itself as a login item (release builds always do).
-- `make release` builds `Save My Eyes.app` for distribution (ad-hoc signed; Developer ID signing and notarization need an Apple Developer account).
+- `make release` builds `Save My Eyes.app`. `make dist` builds the universal DMG in `dist/`, and `make install` also puts that build in `/Applications` and starts it.
+- `make dist` signs and notarizes the DMG by itself when a Developer ID certificate is on the Mac; otherwise it stays ad-hoc signed and downloads show "Apple could not verify" (see [Signing releases](#signing-releases)).
 - Settings are stored as JSON in `~/Library/Application Support/com.ammadeo.savemyeyes/settings.json` (`settings-dev.json` for debug builds), the same file the earlier Tauri build used.
 - Layout: `SaveMyEyes/Sources/Core` (settings, scheduler, calendar, call detection, model), `Sources/Windows` (status item popover, before-break panel, break covers, glass material), `Sources/Views` (SwiftUI), `Sources/App` (entry, login item, notification), `Tests` (XCTest).
 - Design: [`PRODUCT.md`](PRODUCT.md) records what the app is for, [`DESIGN.md`](DESIGN.md) the visual system (sage on native Liquid Glass, system font, follows the macOS appearance). The history of the Electron → Tauri → Swift rewrites lives in [`docs/migration/`](docs/migration/PLAN.md).
+
+### Signing releases
+
+Only a paid [Apple Developer Program](https://developer.apple.com/programs/) membership can remove the "Apple could not verify" warning from downloaded builds. A free Apple ID can't create the certificate. Setup is once per Mac:
+
+1. In Xcode, open Settings › Accounts, add the Apple ID, then Manage Certificates › + › Developer ID Application.
+2. Create an app-specific password at [account.apple.com](https://account.apple.com), then save the notarization login in the keychain:
+
+```bash
+xcrun notarytool store-credentials save-my-eyes --apple-id <apple-id> --team-id <team-id>
+```
+
+From then on every `make dist` signs with the hardened runtime, notarizes, and staples the ticket to the DMG.
