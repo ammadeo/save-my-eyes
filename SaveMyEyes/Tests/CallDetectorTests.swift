@@ -213,4 +213,21 @@ final class CallDetectorTests: XCTestCase {
         XCTAssertFalse(camera.observing || microphone.observing)
         XCTAssertEqual(detector.status, .off)
     }
+
+    // MARK: What the pause says
+
+    func testThePauseNamesTheDeviceThenTheGrace() {
+        service.enabled = true
+        service.start()
+        probe.set(true)
+        var pause = service.pause(now: now)
+        XCTAssertEqual(pause?.symbol, "video")
+        XCTAssertEqual(pause?.label.en, "Camera is on")
+        XCTAssertNil(pause?.endsAt, "nobody knows when a device goes off")
+
+        probe.set(false)
+        pause = service.pause(now: now)
+        XCTAssertEqual(pause?.label.en, "Pause after a call")
+        XCTAssertEqual(pause?.endsAt, now.addingTimeInterval(60))
+    }
 }

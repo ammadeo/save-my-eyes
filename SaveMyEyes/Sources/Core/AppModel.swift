@@ -23,6 +23,12 @@ final class AppModel {
     @ObservationIgnored let scheduler: Scheduler
     @ObservationIgnored let calendar: CalendarServicing
     @ObservationIgnored let calls: CallDetecting
+    @ObservationIgnored let stopProtection: StopProtection
+    /// Everything that can put breaks on hold. A new way to pause breaks is one more
+    /// `PauseSource` in this list (see `init`).
+    @ObservationIgnored private let pauses: PauseSources
+    /// Bumped whenever a source says its answer changed, so views reading `pause(now:)` update.
+    private var pauseChanges = 0
     @ObservationIgnored let sounds = SoundPlayer()
     @ObservationIgnored private let settingsURL: URL
     /// The window layer; set by the app delegate at startup.
@@ -32,9 +38,12 @@ final class AppModel {
 
     var lang: Lang { settings.lang }
 
-    /// Why breaks are on hold at `now`, if they are.
-    func breakPause(now: Date) -> BreakPause? {
-        BreakPause.current(state: breakState, calendar: calendarStatus, calls: callStatus, now: now)
+    /// The pause in effect at `now`, if breaks are on hold: what the menu-bar icon and the
+    /// menu's status show. `nil` while a break is on screen (one the user started during a
+    /// meeting is a break, not a pause).
+    func pause(now: Date) -> Pause? {
+        _ = pauseChanges
+        return breakState.isBreakNow(now) ? nil : pauses.pause(now: now)
     }
 
     /// Current-language lookup for the views.
@@ -56,9 +65,16 @@ final class AppModel {
         scheduler = Scheduler(settings: { loaded })
         self.scheduler = scheduler
         self.breakState = scheduler.snapshot
+        let stopProtection = StopProtection()
+        self.stopProtection = stopProtection
+        // Every way to pause breaks. The scheduler, the menu-bar icon and the menu all go by
+        // this one list.
+        let pauses = PauseSources([stopProtection, calendar, calls])
+        self.pauses = pauses
 
         scheduler.settings = { [unowned self] in self.settings }
-        scheduler.busySource = BusySources([calendar, calls])
+        scheduler.pauseSource = pauses
+        pauses.onPauseChanged = { [unowned self] in self.pauseChanges &+= 1 }
         scheduler.onStateChanged = { [unowned self] state in
             if state.phase != .active { self.breakEnded = false }
             self.breakState = state
@@ -159,11 +175,13 @@ final class AppModel {
 
     /// Stop protection: the next break is a long one in `hours`.
     func pauseProtection(hours: Int) {
-        setNextBreak(NextBreakOptions(inSecs: hours * 3600, forceType: .long, stopsProtection: true))
+        stopProtection.stop(until: Date().addingTimeInterval(TimeInterval(hours * 3600)))
+        setNextBreak(NextBreakOptions(inSecs: hours * 3600, forceType: .long))
     }
 
     /// "Start a long break now" (menu, tray): straight to the cover, no before-break card.
     func startLongBreakNow() {
+        stopProtection.resume()
         setNextBreak(NextBreakOptions(inSecs: 0, forceType: .long, skipBeforeBreak: true))
     }
 

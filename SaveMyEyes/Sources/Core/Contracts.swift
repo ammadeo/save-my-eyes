@@ -34,31 +34,62 @@ struct CalendarStatus: Equatable, Sendable {
     var needsAccess: Bool { enabled && access != .granted }
 }
 
-/// What the scheduler asks before firing a break.
+// MARK: - Pauses
+
+/// One reason breaks are on hold right now. Everything that pauses breaks (a calendar event,
+/// a camera or microphone in use, stopped protection, whatever comes next) is a `PauseSource`
+/// answering with one of these, and that one answer does all of it: the scheduler holds a due
+/// break until `holdsUntil`, the menu-bar icon shows pause bars, and the menu shows `symbol`,
+/// `label`, `endsAt` and `next`. Nothing downstream knows which source it came from, so a
+/// new way to pause is a new source in `AppModel`'s list and nothing else.
+struct Pause: Equatable, Sendable {
+    /// When a break due now fires instead. A source that cannot know when it ends (a device
+    /// in use) answers a short while ahead; the scheduler asks again then, so the hold lasts
+    /// as long as the source keeps answering.
+    var holdsUntil: Date
+    /// When the pause ends, if anybody knows; the menu shows it as "until 14:30".
+    var endsAt: Date?
+    /// SF Symbol for the menu's status line.
+    var symbol: String
+    /// What is going on: a meeting's title, "Camera is on".
+    var label: L
+    /// What happens to the next break.
+    var next: L
+}
+
 @MainActor
-protocol BusySource: AnyObject {
-    /// When a break due at `now` should fire instead (end of the current busy block plus the
-    /// grace period), or `nil` to fire now: feature off, no access, free, or a stale cache.
-    /// A source that cannot know when it stops being busy (a camera or microphone in use)
-    /// returns a date a short while ahead; the scheduler asks again then, so the hold lasts as long as it keeps
-    /// answering.
-    func heldUntil(now: Date) -> Date?
+protocol PauseSource: AnyObject {
+    /// The pause in effect at `now`, or `nil` when this source holds nothing: feature off, no
+    /// access, free, or a stale cache.
+    func pause(now: Date) -> Pause?
+    /// Called by the source whenever its answer may have changed for a reason other than time
+    /// passing (a pause that ends at `endsAt` needs no call).
+    var onPauseChanged: (() -> Void)? { get set }
     /// Re-read the underlying state (calendar store, cameras and microphones) so a change a
     /// moment ago still counts.
     func refresh() async
 }
 
-/// Several sources as one: the break waits for the one that holds it longest.
-@MainActor
-final class BusySources: BusySource {
-    private let sources: [BusySource]
+extension PauseSource {
+    /// When a break due at `now` should fire instead, or `nil` to fire now.
+    func heldUntil(now: Date) -> Date? { pause(now: now)?.holdsUntil }
+}
 
-    init(_ sources: [BusySource]) {
+/// Several sources as one: the pause that holds longest is the one in effect.
+@MainActor
+final class PauseSources: PauseSource {
+    private let sources: [PauseSource]
+    var onPauseChanged: (() -> Void)?
+
+    init(_ sources: [PauseSource]) {
         self.sources = sources
+        for source in sources {
+            source.onPauseChanged = { [weak self] in self?.onPauseChanged?() }
+        }
     }
 
-    func heldUntil(now: Date) -> Date? {
-        sources.compactMap { $0.heldUntil(now: now) }.max()
+    func pause(now: Date) -> Pause? {
+        sources.compactMap { $0.pause(now: now) }.max { $0.holdsUntil < $1.holdsUntil }
     }
 
     func refresh() async {
@@ -70,7 +101,7 @@ final class BusySources: BusySource {
 
 /// EventKit-backed calendar service (`CalendarService`). Owned and configured by `AppModel`.
 @MainActor
-protocol CalendarServicing: BusySource {
+protocol CalendarServicing: PauseSource {
     /// Mirrors `Settings.calendar.enabled`; set by the model whenever settings change.
     var enabled: Bool { get set }
     /// Mirrors `Settings.calendar.graceSecs`.
@@ -112,7 +143,7 @@ struct CallStatus: Equatable, Sendable {
 /// last one goes off. It reads only whether a device is in use: it cannot see, hear or record
 /// anything, and needs no permission. Owned and configured by `AppModel`.
 @MainActor
-protocol CallDetecting: BusySource {
+protocol CallDetecting: PauseSource {
     /// Mirrors `Settings.calls.enabled`; set by the model whenever settings change. Devices
     /// are watched only while this is true.
     var enabled: Bool { get set }

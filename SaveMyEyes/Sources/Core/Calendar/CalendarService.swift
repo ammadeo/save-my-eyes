@@ -15,6 +15,11 @@ import AppKit
 import EventKit
 import Foundation
 
+private enum T {
+    static let untitled = L("Busy", "Zajęte")
+    static let next = L("Your next break starts after this event ends", "Następna przerwa zaplanowana jest po spotkaniu")
+}
+
 @MainActor
 final class CalendarService: CalendarServicing {
     /// Reading the local calendar store is cheap; a minute keeps the menu's meeting line fresh.
@@ -27,6 +32,7 @@ final class CalendarService: CalendarServicing {
     var enabled = false
     var graceSecs = 60
     var onStatusChanged: ((CalendarStatus) -> Void)?
+    var onPauseChanged: (() -> Void)?
 
     private var busy: [Busy] = []
     private var fetchedAt: Date?
@@ -42,10 +48,12 @@ final class CalendarService: CalendarServicing {
         CalendarStatus(enabled: enabled, access: Self.access(), meeting: meetingNow(Date()), syncedAt: fetchedAt)
     }
 
-    func heldUntil(now: Date) -> Date? {
+    /// A meeting going on holds breaks until it ends, plus the grace period.
+    func pause(now: Date) -> Pause? {
         guard let meeting = meetingNow(now) else { return nil }
-        Log.info("calendar", "in a meeting until \(Self.iso(meeting.until)), holding the break for \(graceSecs)s after")
-        return meeting.until.addingTimeInterval(grace)
+        let title = meeting.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        return Pause(holdsUntil: meeting.until.addingTimeInterval(grace), endsAt: meeting.until, symbol: "calendar",
+                     label: title.isEmpty ? T.untitled : L(verbatim: title), next: T.next)
     }
 
     /// Re-read busy events into the cache (cleared when disabled or unreadable) and publish
@@ -87,6 +95,7 @@ final class CalendarService: CalendarServicing {
             fetchedAt = nil
         }
         onStatusChanged?(status)
+        onPauseChanged?()
     }
 
     /// Refresh every minute and whenever the calendar store changes. Does not ask for access:
@@ -121,6 +130,7 @@ final class CalendarService: CalendarServicing {
         }
         lastAccess = access
         onStatusChanged?(status)
+        onPauseChanged?()
         return access
     }
 

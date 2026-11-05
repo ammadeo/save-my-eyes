@@ -1,6 +1,6 @@
 // Menu-bar status item (port of `src-tauri/src/tray.rs`): template icon, left click toggles
 // the menu popover, right click (or control-click) shows Open / Start long break now / Quit.
-// While breaks are on hold (`AppModel.breakPause`) the icon's pupil turns into pause bars.
+// While breaks are on hold (`AppModel.pause`, whatever the source) the icon's pupil turns into pause bars.
 
 import AppKit
 import Observation
@@ -55,7 +55,7 @@ final class StatusItemController: NSObject {
     /// Show whether breaks are on hold, and look again whenever the model changes.
     private func trackPause() {
         let pause = withObservationTracking {
-            model.breakPause(now: Date())
+            model.pause(now: Date())
         } onChange: { [weak self] in
             // Fires before the new value is set: read it on the next turn.
             Task { @MainActor in self?.trackPause() }
@@ -65,12 +65,11 @@ final class StatusItemController: NSObject {
         }
         show(paused: pause != nil)
 
-        // A meeting ending is a moment in time, not a change in the model: look again then.
-        // (Stopped protection ends with its break coming due, which the scheduler publishes.)
+        // A pause running out is a moment in time, not a change in the model: look again then.
         pauseEnd?.invalidate()
         pauseEnd = nil
-        if case .meeting(let meeting) = pause {
-            let timer = Timer(timeInterval: max(0, meeting.until.timeIntervalSinceNow), repeats: false) { [weak self] _ in
+        if let endsAt = pause?.endsAt {
+            let timer = Timer(timeInterval: max(0, endsAt.timeIntervalSinceNow), repeats: false) { [weak self] _ in
                 Task { @MainActor in self?.trackPause() }
             }
             RunLoop.main.add(timer, forMode: .common)

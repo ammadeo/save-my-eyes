@@ -10,6 +10,15 @@
 
 import Foundation
 
+private enum T {
+    static let cameraOn = L("Camera is on", "Kamera jest włączona")
+    static let microphoneOn = L("Microphone is on", "Mikrofon jest włączony")
+    static let cameraAndMicrophoneOn = L("Camera and microphone are on", "Kamera i mikrofon są włączone")
+    static let deviceNext = L("Your next break starts once the camera and microphone are off", "Następna przerwa zaplanowana jest po rozmowie")
+    static let afterCall = L("Pause after a call", "Wstrzymanie po rozmowie")
+    static let afterCallNext = L("Your next break starts after this pause", "Następna przerwa zacznie się po tym wstrzymaniu")
+}
+
 @MainActor
 final class CallDetector: CallDetecting {
     var enabled = false {
@@ -17,6 +26,7 @@ final class CallDetector: CallDetecting {
     }
     var graceSecs = 60
     var onStatusChanged: ((CallStatus) -> Void)?
+    var onPauseChanged: (() -> Void)?
 
     private let probes: [CallDevice: CallProbe]
     private let clock: () -> Date
@@ -36,9 +46,18 @@ final class CallDetector: CallDetecting {
 
     var status: CallStatus { CallStatus(enabled: enabled, active: enabled ? active : []) }
 
-    func heldUntil(now: Date) -> Date? {
-        guard enabled, watching else { return nil }
-        return CallRules.heldUntil(now: now, inUse: !active.isEmpty, offAt: offAt, grace: TimeInterval(graceSecs))
+    /// A device in use holds breaks for as long as it stays on (nobody knows until when),
+    /// then for the grace period after the last one goes off.
+    func pause(now: Date) -> Pause? {
+        guard enabled, watching,
+              let until = CallRules.heldUntil(now: now, inUse: !active.isEmpty, offAt: offAt, grace: TimeInterval(graceSecs))
+        else { return nil }
+        if active.isEmpty {
+            return Pause(holdsUntil: until, endsAt: until, symbol: "phone.down", label: T.afterCall, next: T.afterCallNext)
+        }
+        let camera = active.contains(.camera)
+        return Pause(holdsUntil: until, endsAt: nil, symbol: camera ? "video" : "mic",
+                     label: active.count > 1 ? T.cameraAndMicrophoneOn : camera ? T.cameraOn : T.microphoneOn, next: T.deviceNext)
     }
 
     /// Polling backstop for a missed listener callback.
@@ -53,6 +72,7 @@ final class CallDetector: CallDetecting {
         apply(publishing: false)
         published = status
         onStatusChanged?(published)
+        onPauseChanged?()
     }
 
     // MARK: Internals
@@ -110,6 +130,7 @@ final class CallDetector: CallDetecting {
         guard next != published else { return }
         published = next
         onStatusChanged?(next)
+        onPauseChanged?()
     }
 }
 

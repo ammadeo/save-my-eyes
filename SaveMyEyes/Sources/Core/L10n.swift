@@ -5,12 +5,17 @@
 import Foundation
 
 /// One bilingual string.
-struct L: Sendable {
+struct L: Equatable, Sendable {
     let en: String
     let pl: String
     init(_ en: String, _ pl: String) {
         self.en = en
         self.pl = pl
+    }
+
+    /// Text that is the same in every language (a meeting's title).
+    init(verbatim text: String) {
+        self.init(text, text)
     }
 }
 
