@@ -135,7 +135,7 @@ final class AppModel {
     }
 
     /// A cover's exit button (skip or finish): end the break, and make sure the covers really
-    /// went away (the window layer closes them itself if they did not).
+    /// went away (the app stops if they did not).
     func exitBreak() {
         endBreak()
         windows?.ensureBreakCoversClosed()

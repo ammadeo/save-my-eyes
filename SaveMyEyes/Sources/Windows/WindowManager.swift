@@ -2,9 +2,8 @@
 // idempotent. Closing a break window for any reason is reported to the model, deferred one
 // turn so the scheduler is never re-entered from inside a close.
 //
-// While a break cover is up, the escape hatch (`EscapeRules`) is armed: each cover's native
-// fallback button ends in `escapeBreak(reason:)`, which closes the covers here instead of
-// trusting the scheduler to, and `CoverWatchdog` watches for a hung main thread.
+// While a break cover is up, the escape hatch (`EscapeRules`) is armed: `CoverWatchdog`
+// crashes the app if the main thread hangs or no cover has a reachable exit button.
 
 import AppKit
 import SwiftUI
@@ -22,8 +21,6 @@ final class WindowManager: NSObject, WindowCoordinating {
     private var screenObserver: NSObjectProtocol?
     private let watchdog = CoverWatchdog()
     private var escapeArmed = false
-
-    private static let fallbackTitle = L("Skip break", "Pomiń przerwę")
 
     init(model: AppModel) {
         self.model = model
@@ -118,45 +115,35 @@ final class WindowManager: NSObject, WindowCoordinating {
 
     // MARK: Escape hatch
 
-    /// Close every cover now and end the break, whatever state the scheduler is in. Closing
-    /// the break cover reports it to the model (which schedules the next break); the check
-    /// after it covers a scheduler that somehow still thinks the break is on. Exactly one
-    /// of the two reschedules, in either order.
-    func escapeBreak(reason: String) {
-        guard breakCover != nil || !blankCovers.isEmpty else { return }
-        Log.warn("windows", "escaping the break (\(reason)): closing \(blankCovers.count + (breakCover == nil ? 0 : 1)) cover(s)")
-        closeBreakWindows()
-        Task { @MainActor [model] in
-            if model.breakState.phase == .active { model.endBreak() }
-        }
-    }
-
-    /// The exit button ended the break, which normally closes the covers at once. If these
-    /// same covers are still up a second later, escape.
+    /// The exit button ended the break, which closes the covers at once. If these same
+    /// covers are still up a moment later, the app stops (`EscapeRules`).
     func ensureBreakCoversClosed() {
         guard let cover = breakCover else {
-            if !blankCovers.isEmpty { escapeBreak(reason: "blank covers left without a break cover") }
+            if !blankCovers.isEmpty { CoverWatchdog.crash("blank covers left without a break cover") }
             return
         }
         Task { @MainActor [weak self, weak cover] in
-            try? await Task.sleep(for: .seconds(1))
+            try? await Task.sleep(for: .seconds(EscapeRules.closeTimeout))
             guard let self, let cover, cover === self.breakCover else { return }
-            self.escapeBreak(reason: "exit button did not close the cover")
+            CoverWatchdog.crash("the exit button did not close the break cover")
         }
+    }
+
+    /// One cover with a working exit is enough: any Skip button closes every cover.
+    private var exitReachable: Bool {
+        let covers = [breakCover].compactMap { $0 } + blankCovers
+        return covers.isEmpty || covers.contains(where: \.exitReachable)
     }
 
     private func makeCover<Content: View>(on screen: NSScreen, _ content: (SkipBeacon) -> Content) -> CoverWindow {
         let beacon = SkipBeacon()
-        return CoverWindow(screen: screen, rootView: content(beacon), beacon: beacon,
-                           fallbackTitle: model.t(Self.fallbackTitle)) { [weak self] in
-            self?.escapeBreak(reason: "fallback button")
-        }
+        return CoverWindow(screen: screen, rootView: content(beacon), beacon: beacon)
     }
 
     private func armEscape() {
         guard !escapeArmed else { return }
         escapeArmed = true
-        watchdog.start()
+        watchdog.start { [weak self] in self?.exitReachable ?? true }
     }
 
     private func disarmEscape() {
