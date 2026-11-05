@@ -12,6 +12,8 @@ private enum T {
 
 struct BlankCoverView: View {
     let model: AppModel
+    /// Tells the window where the exit button is (escape hatch, `EscapeRules`).
+    var beacon: SkipBeacon?
     @State private var finished = false
 
     var body: some View {
@@ -27,10 +29,11 @@ struct BlankCoverView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                Button { model.endBreak() } label: {
+                Button { model.exitBreak() } label: {
                     IconLabel(text: model.t(finished ? T.finish : T.skip), icon: finished ? "checkmark" : "forward.end.fill")
                 }
                 .glassButton(finished ? .primary : .quiet, size: .large)
+                .reportsSkipButton(to: beacon)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }
             .padding(pad)

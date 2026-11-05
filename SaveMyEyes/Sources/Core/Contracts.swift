@@ -144,6 +144,9 @@ protocol WindowCoordinating: AnyObject {
     func openBreakCovers()
     /// Before-break card, break cover and blank covers. Never the menu.
     func closeBreakWindows()
+    /// After a cover's exit button ended the break: if the same covers are still up a moment
+    /// later, the app stops (`EscapeRules`).
+    func ensureBreakCoversClosed()
     /// The menu popover under the status item, on the given pane.
     func openMenu(pane: MenuPane)
     func closeMenu()
