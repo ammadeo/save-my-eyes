@@ -3,8 +3,8 @@
 import SwiftUI
 
 private enum T {
-    static let shortFinished = L("short break has ended", "krótka przerwa zakończyła się")
-    static let longFinished = L("long break has ended", "długa przerwa zakończyła się")
+    static let shortFinished = L("short break ended", "krótka przerwa zakończyła się")
+    static let longFinished = L("long break ended", "długa przerwa zakończyła się")
     static let shortStarted = L("take a short break for", "krótka przerwa przez")
     static let longStarted = L("take a long break for", "długa przerwa przez")
     static let ago = L("ago", "temu")
@@ -13,7 +13,7 @@ private enum T {
     static let left = L("left", "zostało")
 }
 
-/// "Take a short break for 20 seconds", then "Short break has ended 2 minutes ago".
+/// "Take a short break for 20 seconds", then "Short break ended 2 minutes ago".
 struct TimerInfo: View {
     let model: AppModel
     let isLong: Bool

@@ -10,7 +10,7 @@
   <li>It'll prevent You from using Your computer, when You need a break (Don't worry You can always skip it with one click :wink:)</li>
   <li>You can accesses all options from tray menu</li>
   <li>It works on multiple monitors setup</li>
-  <li>It holds a break while your calendar shows a meeting, or while an app is using your camera or microphone</li>
+  <li>It pauses breaks during calendar events, and while an app is using your camera or microphone</li>
   <li>It's free! <a href="https://www.buymeacoffee.com/ammadeo">You can buy me a coffee here :coffee:</a></li>
 </ul>
 <br/>

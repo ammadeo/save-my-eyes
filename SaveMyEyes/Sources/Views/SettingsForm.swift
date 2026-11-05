@@ -1,6 +1,6 @@
 // Settings form shared by the menu's settings pane and the cover's settings card.
 // Port of src/fixes.ts and src/composables/useSettingsForm.ts: a draft in seconds, clamped
-// to the ranges the UI offers on save, with a bilingual "Fixing X from A to B" log.
+// to the ranges the UI offers on save, with a bilingual "Changed X from A to B" log.
 // Nothing is persisted until `save()`.
 
 import Foundation
@@ -105,11 +105,11 @@ enum SettingsFormRules {
     }
 
     private static let names: [FixCode: L] = [
-        .shortEvery: L("short break every", "czas między krótkimi przerwami"),
+        .shortEvery: L("time between short breaks", "czas między krótkimi przerwami"),
         .shortLast: L("short break length", "długość krótkiej przerwy"),
-        .longEvery: L("long break every", "czas między długimi przerwami"),
+        .longEvery: L("time between long breaks", "czas między długimi przerwami"),
         .longLast: L("long break length", "długość długiej przerwy"),
-        .calendarGrace: L("pause after a call", "wstrzymanie po rozmowie"),
+        .calendarGrace: L("pause after a meeting", "wstrzymanie po rozmowie"),
     ]
 
     private static func formatSeconds(_ value: Int, lang: Lang) -> String {
@@ -123,7 +123,7 @@ enum SettingsFormRules {
         let f = formatSeconds(Int((from * scale + 0.5).rounded(.down)), lang: lang)
         let t = formatSeconds(Int((to * scale + 0.5).rounded(.down)), lang: lang)
         let name = lang.pick(names[code]!)
-        return lang == .pl ? "Naprawiam \(name) z \(f) na \(t)" : "Fixing \(name) from \(f) to \(t)"
+        return lang == .pl ? "Naprawiam \(name) z \(f) na \(t)" : "Changed \(name) from \(f) to \(t)"
     }
 
     static func message(_ fix: Fix, lang: Lang, every: Int) -> String {

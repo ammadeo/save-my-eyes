@@ -38,7 +38,7 @@ enum Strings {
 
     // Tray menu (also relabelled when the language changes).
     static let trayOpen = L("Open Save My Eyes", "Otwórz Save My Eyes")
-    static let trayLongBreak = L("Start long break now", "Rozpocznij długą przerwę teraz")
+    static let trayLongBreak = L("Start a long break now", "Rozpocznij długą przerwę teraz")
     static let trayQuit = L("Quit", "Zakończ")
 
     /// Startup notification body.
