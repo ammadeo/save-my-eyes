@@ -25,14 +25,14 @@ A menu-bar agent that enforces breaks gently: the break is a full-screen cover y
 - Runs as a menu-bar-only agent (no Dock icon), started at login.
 - Four surfaces, all created from `WindowManager` at runtime: the menu (an `NSPopover` under the status item with countdown, long-break shortcut, stop protection, settings, quit), the before-break card (a non-activating panel top-right of the primary display: Wait / Start / Skip, auto-starts in 5 s), the break cover (full-screen window on the primary display: countdown, idea card, skip/finish, inline settings and stop protection), and a blank cover on every other display.
 - Short breaks auto-close when the clock ends; long breaks wait for the user. Short and long sound cues play at start and end when sounds are on.
-- Settings (cadence, lengths, sounds, language, meeting hold and its pause after a call) persist in a JSON file and are clamped by `Settings.validate()`.
+- Settings (cadence, lengths, sounds, language, meeting hold, call hold while a camera or microphone is in use, and their shared pause after a call) persist in a JSON file and are clamped by `Settings.validate()`.
 
 ## Capabilities and Constraints
 
 - Swift 5 language mode, SwiftUI views hosted in AppKit windows, xcodegen project (`SaveMyEyes/project.yml`), XCTest unit tests (`make test`).
 - macOS 14 is the minimum, the development Mac runs macOS 27.2. The native window materials (Liquid Glass on macOS 26+, NSVisualEffectView materials before) are painted by `Sources/Windows/GlassBacking.swift`; SwiftUI views paint no background.
-- `AppModel` is the one object views talk to; `WindowCoordinating` and `CalendarServicing` (`Sources/Core/Contracts.swift`) are the fixed seams between core, windows and calendar.
-- Unit tests in `SaveMyEyes/Tests` must keep passing; they cover settings clamping and persistence, the break rules and scheduler, calendar rules and the settings form.
+- `AppModel` is the one object views talk to; `WindowCoordinating`, `CalendarServicing` and `CallDetecting` (`Sources/Core/Contracts.swift`) are the fixed seams between core, windows, calendar and call detection.
+- Unit tests in `SaveMyEyes/Tests` must keep passing; they cover settings clamping and persistence, the break rules and scheduler, calendar rules, call detection and the settings form.
 - Terminology: "short break", "long break", "stop protection" (pause for 1–3 h), "turn off protection" (quit for this session).
 
 ## Brand Commitments
@@ -53,6 +53,7 @@ A menu-bar agent that enforces breaks gently: the break is a full-screen cover y
 - Follow the Mac: system appearance, system font, system materials and controls where a native one exists.
 - Calm by default: colour only on the one action that matters and on progress.
 - Bilingual parity: every string exists in English and Polish.
+- Ask only in answer to a click: a macOS permission is requested only when the user ticks the switch that needs it (or presses re-enable in its warning), never at launch or on a timer; if access goes missing while the switch is on, a persistent inline warning (not a modal, never auto-dismissed) offers re-enable or turn off.
 
 ## Accessibility & Inclusion
 

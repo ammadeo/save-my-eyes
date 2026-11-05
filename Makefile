@@ -4,7 +4,12 @@
 XCODEGEN ?= xcodegen
 PROJECT   = SaveMyEyes/SaveMyEyes.xcodeproj
 SCHEME    = SaveMyEyes
-DERIVED   = SaveMyEyes/build
+# Build products stay inside the repo (git-ignored). With the repo under a folder macOS
+# protects (Documents, Desktop, Downloads), `make test` makes macOS ask "would like to access
+# files in your Documents folder" after every rebuild: the test host reads its build folder,
+# and each ad-hoc signed build is a new app to the privacy system. `make run` does not ask.
+# `make test DERIVED=<a folder outside Documents>` avoids the prompt.
+DERIVED  ?= SaveMyEyes/build
 APP       = $(DERIVED)/Build/Products/Debug/Save\ My\ Eyes.app
 XCB       = xcodebuild -project $(PROJECT) -scheme $(SCHEME) -derivedDataPath $(DERIVED) -destination 'platform=macOS' CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES
 

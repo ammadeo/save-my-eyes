@@ -23,7 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         NSApp.setActivationPolicy(.accessory)
 
-        let model = AppModel(calendar: CalendarService())
+        let model = AppModel(calendar: CalendarService(), calls: CallDetector())
         let windows = WindowManager(model: model)
         model.windows = windows
         let statusItem = StatusItemController(model: model, windows: windows)

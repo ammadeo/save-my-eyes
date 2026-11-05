@@ -14,6 +14,7 @@ final class SettingsTests: XCTestCase {
         XCTAssertTrue(s.sounds.ui && s.sounds.voice)
         XCTAssertFalse(s.calendar.enabled)
         XCTAssertEqual(s.calendar.graceSecs, 60)
+        XCTAssertFalse(s.calls.enabled)
     }
 
     func testDefaultsAreValid() {
@@ -73,6 +74,7 @@ final class SettingsTests: XCTestCase {
             "sounds": ["ui": true, "voice": true],
             "lang": "en",
             "calendar": ["enabled": false, "graceSecs": 60],
+            "calls": ["enabled": false],
         ]
         XCTAssertEqual(v as NSDictionary, expected as NSDictionary)
     }
@@ -89,6 +91,14 @@ final class SettingsTests: XCTestCase {
         let t = Settings.fromJSON(Data(#"{ "calendar": { "enabled": true, "graceSecs": 0 } }"#.utf8))
         XCTAssertTrue(t.calendar.enabled)
         XCTAssertEqual(t.calendar.graceSecs, 0)
+    }
+
+    func testCallsKeyIsOptional() {
+        XCTAssertFalse(Settings.fromJSON(Data(#"{ "lang": "en" }"#.utf8)).calls.enabled, "older files have no calls key")
+        XCTAssertFalse(Settings.fromJSON(Data(#"{ "calls": {} }"#.utf8)).calls.enabled)
+        let on = Settings.fromJSON(Data(#"{ "calls": { "enabled": true } }"#.utf8))
+        XCTAssertTrue(on.calls.enabled)
+        XCTAssertFalse(on.calendar.enabled, "the calls switch is separate from the calendar one")
     }
 
     func testCorruptJSONGivesDefaults() {
@@ -120,6 +130,7 @@ final class SettingsTests: XCTestCase {
             lang: .pl,
             calendar: .init(enabled: true, graceSecs: 120)
         ))
+        XCTAssertFalse(s.calls.enabled)
     }
 
     func testSaveAndLoadRoundtrip() throws {
@@ -129,8 +140,10 @@ final class SettingsTests: XCTestCase {
         var s = base()
         s.breaks.every = 900
         s.sounds.ui = false
+        s.calls.enabled = true
         try s.save(to: path)
         XCTAssertEqual(Settings.load(from: path), s)
+        XCTAssertTrue(Settings.load(from: path).calls.enabled)
         XCTAssertEqual(Settings.load(from: dir.appendingPathComponent("missing.json")).breaks, Settings.Breaks())
     }
 

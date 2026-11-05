@@ -25,6 +25,7 @@ struct Settings: Codable, Equatable, Sendable {
     var sounds = Sounds()
     var lang: Lang = .system
     var calendar = CalendarSettings()
+    var calls = CallSettings()
 
     struct Breaks: Codable, Equatable, Sendable {
         /// Seconds between breaks.
@@ -101,11 +102,26 @@ struct Settings: Codable, Equatable, Sendable {
         }
     }
 
-    init(breaks: Breaks = Breaks(), sounds: Sounds = Sounds(), lang: Lang = .system, calendar: CalendarSettings = CalendarSettings()) {
+    struct CallSettings: Codable, Equatable, Sendable {
+        /// Hold breaks while any app uses a camera or a microphone (a call the calendar does
+        /// not know about, or one that runs over). The pause after it is `calendar.graceSecs`.
+        var enabled = false
+        init(enabled: Bool = false) {
+            self.enabled = enabled
+        }
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            enabled = try c.decodeIfPresent(Bool.self, forKey: .enabled) ?? false
+        }
+    }
+
+    init(breaks: Breaks = Breaks(), sounds: Sounds = Sounds(), lang: Lang = .system,
+         calendar: CalendarSettings = CalendarSettings(), calls: CallSettings = CallSettings()) {
         self.breaks = breaks
         self.sounds = sounds
         self.lang = lang
         self.calendar = calendar
+        self.calls = calls
     }
 
     init(from decoder: Decoder) throws {
@@ -114,6 +130,7 @@ struct Settings: Codable, Equatable, Sendable {
         sounds = try c.decodeIfPresent(Sounds.self, forKey: .sounds) ?? Sounds()
         lang = try c.decodeIfPresent(Lang.self, forKey: .lang) ?? .system
         calendar = try c.decodeIfPresent(CalendarSettings.self, forKey: .calendar) ?? CalendarSettings()
+        calls = try c.decodeIfPresent(CallSettings.self, forKey: .calls) ?? CallSettings()
     }
 }
 
