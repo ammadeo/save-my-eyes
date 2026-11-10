@@ -2,7 +2,7 @@ import XCTest
 @testable import SaveMyEyes
 
 @MainActor
-private final class FakeProbe: CallProbe {
+private final class FakeProbe: DeviceProbe {
     var running = false
     var onChange: (() -> Void)?
     var observing: Bool { onChange != nil }
@@ -19,16 +19,16 @@ private final class FakeProbe: CallProbe {
 }
 
 @MainActor
-final class CallDetectorTests: XCTestCase {
+final class DeviceDetectorTests: XCTestCase {
     private var probe: FakeProbe!
     private var clock = Date(timeIntervalSince1970: 1_800_000_000)
-    private var service: CallDetector!
-    private var statuses: [CallStatus] = []
+    private var service: DeviceDetector!
+    private var statuses: [DeviceStatus] = []
 
     override func setUp() async throws {
         probe = FakeProbe()
         statuses = []
-        service = CallDetector(probes: [.camera: probe], clock: { [unowned self] in self.clock })
+        service = DeviceDetector(probes: [.camera: probe], clock: { [unowned self] in self.clock })
         service.graceSecs = 60
         service.onStatusChanged = { [unowned self] in self.statuses.append($0) }
     }
@@ -53,15 +53,15 @@ final class CallDetectorTests: XCTestCase {
         probe.running = true
         service.start()
         XCTAssertTrue(probe.observing)
-        XCTAssertEqual(service.status, CallStatus(enabled: true, active: [.camera]))
-        XCTAssertEqual(service.heldUntil(now: now), now.addingTimeInterval(CallRules.recheck))
+        XCTAssertEqual(service.status, DeviceStatus(enabled: true, active: [.camera]))
+        XCTAssertEqual(service.heldUntil(now: now), now.addingTimeInterval(DeviceRules.recheck))
     }
 
     func testEnablingWhileOffDoesNotHold() {
         service.start()
         service.enabled = true
         XCTAssertTrue(probe.observing)
-        XCTAssertEqual(service.status, CallStatus(enabled: true, active: []))
+        XCTAssertEqual(service.status, DeviceStatus(enabled: true, active: []))
         XCTAssertNil(service.heldUntil(now: now))
     }
 
@@ -69,12 +69,12 @@ final class CallDetectorTests: XCTestCase {
         service.start()
         service.enabled = true
         probe.set(true)
-        XCTAssertEqual(service.heldUntil(now: now), now.addingTimeInterval(CallRules.recheck))
+        XCTAssertEqual(service.heldUntil(now: now), now.addingTimeInterval(DeviceRules.recheck))
 
         advance(100)
         probe.set(false)
         let offAt = now
-        XCTAssertEqual(service.status, CallStatus(enabled: true, active: []))
+        XCTAssertEqual(service.status, DeviceStatus(enabled: true, active: []))
         advance(30)
         XCTAssertEqual(service.heldUntil(now: now), offAt.addingTimeInterval(60))
         advance(30)
@@ -88,7 +88,7 @@ final class CallDetectorTests: XCTestCase {
         probe.set(false)
         advance(20)
         probe.set(true)
-        XCTAssertEqual(service.heldUntil(now: now), now.addingTimeInterval(CallRules.recheck))
+        XCTAssertEqual(service.heldUntil(now: now), now.addingTimeInterval(DeviceRules.recheck))
         // The old off moment is forgotten: going off again starts a fresh grace.
         advance(100)
         probe.set(false)
@@ -102,13 +102,13 @@ final class CallDetectorTests: XCTestCase {
         probe.set(false)
         service.enabled = false
         XCTAssertFalse(probe.observing)
-        XCTAssertEqual(service.status, CallStatus(enabled: false, active: []))
+        XCTAssertEqual(service.status, DeviceStatus(enabled: false, active: []))
         probe.running = true
         XCTAssertNil(service.heldUntil(now: now))
 
         // Re-enabling while the camera is on means in use at once, without a callback.
         service.enabled = true
-        XCTAssertEqual(service.status, CallStatus(enabled: true, active: [.camera]))
+        XCTAssertEqual(service.status, DeviceStatus(enabled: true, active: [.camera]))
         probe.set(false)
         service.enabled = false
         service.enabled = true
@@ -127,9 +127,9 @@ final class CallDetectorTests: XCTestCase {
         service.graceSecs = 30
         XCTAssertEqual(statuses, [
             .off,
-            CallStatus(enabled: true, active: []),
-            CallStatus(enabled: true, active: [.camera]),
-            CallStatus(enabled: true, active: []),
+            DeviceStatus(enabled: true, active: []),
+            DeviceStatus(enabled: true, active: [.camera]),
+            DeviceStatus(enabled: true, active: []),
         ])
     }
 
@@ -139,8 +139,8 @@ final class CallDetectorTests: XCTestCase {
         probe.set(true, notify: false)
         XCTAssertNil(service.heldUntil(now: now))
         await service.refresh()
-        XCTAssertEqual(service.status, CallStatus(enabled: true, active: [.camera]))
-        XCTAssertEqual(service.heldUntil(now: now), now.addingTimeInterval(CallRules.recheck))
+        XCTAssertEqual(service.status, DeviceStatus(enabled: true, active: [.camera]))
+        XCTAssertEqual(service.heldUntil(now: now), now.addingTimeInterval(DeviceRules.recheck))
         probe.set(false, notify: false)
         await service.refresh()
         XCTAssertEqual(service.heldUntil(now: now), now.addingTimeInterval(60))
@@ -155,7 +155,7 @@ final class CallDetectorTests: XCTestCase {
     }
 
     func testDefaultInitUsesTheRealProbes() {
-        let real = CallDetector()
+        let real = DeviceDetector()
         XCTAssertEqual(real.status, .off)
         XCTAssertNil(real.heldUntil(now: Date()))
     }
@@ -163,7 +163,7 @@ final class CallDetectorTests: XCTestCase {
     /// The real probes only read "in use" flags: watching and reading must work unattended
     /// (no permission involved) and leave nothing behind.
     func testRealProbesWatchAndStopCleanly() {
-        for probe in [CMIOCameraProbe(), CoreAudioMicrophoneProbe()] as [CallProbe] {
+        for probe in [CMIOCameraProbe(), CoreAudioMicrophoneProbe()] as [DeviceProbe] {
             probe.startObserving {}
             _ = probe.anyRunning()
             probe.stopObserving()
@@ -173,9 +173,9 @@ final class CallDetectorTests: XCTestCase {
 
     // MARK: Camera and microphone together
 
-    private func makeBoth() -> (camera: FakeProbe, microphone: FakeProbe, detector: CallDetector) {
+    private func makeBoth() -> (camera: FakeProbe, microphone: FakeProbe, detector: DeviceDetector) {
         let (camera, microphone) = (FakeProbe(), FakeProbe())
-        let detector = CallDetector(probes: [.camera: camera, .microphone: microphone], clock: { [unowned self] in self.clock })
+        let detector = DeviceDetector(probes: [.camera: camera, .microphone: microphone], clock: { [unowned self] in self.clock })
         detector.graceSecs = 60
         detector.enabled = true
         detector.start()
@@ -185,8 +185,8 @@ final class CallDetectorTests: XCTestCase {
     func testMicrophoneAloneCountsAsACall() {
         let (_, microphone, detector) = makeBoth()
         microphone.set(true)
-        XCTAssertEqual(detector.status, CallStatus(enabled: true, active: [.microphone]))
-        XCTAssertEqual(detector.heldUntil(now: now), now.addingTimeInterval(CallRules.recheck))
+        XCTAssertEqual(detector.status, DeviceStatus(enabled: true, active: [.microphone]))
+        XCTAssertEqual(detector.heldUntil(now: now), now.addingTimeInterval(DeviceRules.recheck))
     }
 
     func testGraceStartsWhenTheLastDeviceGoesOff() {
@@ -197,7 +197,7 @@ final class CallDetectorTests: XCTestCase {
         advance(100)
         camera.set(false) // camera off, still talking
         XCTAssertEqual(detector.status.active, [.microphone])
-        XCTAssertEqual(detector.heldUntil(now: now), now.addingTimeInterval(CallRules.recheck))
+        XCTAssertEqual(detector.heldUntil(now: now), now.addingTimeInterval(DeviceRules.recheck))
         advance(100)
         microphone.set(false)
         XCTAssertFalse(detector.status.inUse)
@@ -212,5 +212,24 @@ final class CallDetectorTests: XCTestCase {
         detector.enabled = false
         XCTAssertFalse(camera.observing || microphone.observing)
         XCTAssertEqual(detector.status, .off)
+    }
+
+    // MARK: What the pause says
+
+    func testThePauseNamesTheDeviceThenTheGrace() {
+        service.enabled = true
+        service.start()
+        probe.set(true)
+        var pause = service.pause(now: now)
+        XCTAssertEqual(pause?.symbol, "video")
+        XCTAssertEqual(pause?.label.en, "Camera is on")
+        XCTAssertNil(pause?.endsAt, "nobody knows when a device goes off")
+
+        probe.set(false)
+        pause = service.pause(now: now)
+        XCTAssertEqual(pause?.label.en, "Pause after a meeting")
+        XCTAssertEqual(pause?.endsAt, now.addingTimeInterval(60))
+        advance(60)
+        XCTAssertNil(service.pause(now: now), "over once the pause after the meeting has run")
     }
 }

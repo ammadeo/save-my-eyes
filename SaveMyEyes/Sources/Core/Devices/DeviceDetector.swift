@@ -1,4 +1,4 @@
-// Call detection without a calendar: is any app using a camera or a microphone right now?
+// Meeting detection without a calendar: is any app using a camera or a microphone right now?
 // Each kind of device has a probe (`CameraProbe`, `MicrophoneProbe`) that only reads whether
 // a device is in use. Nothing is opened, so the app cannot see, hear or record anything, and
 // no permission is involved.
@@ -10,35 +10,50 @@
 
 import Foundation
 
+private enum T {
+    static let cameraOn = L("Camera is on", "Kamera jest włączona")
+    static let microphoneOn = L("Microphone is on", "Mikrofon jest włączony")
+    static let cameraAndMicrophoneOn = L("Camera and microphone are on", "Kamera i mikrofon są włączone")
+    static let deviceNext = L("Your next break starts once the camera and microphone are off", "Następna przerwa zaplanowana jest po rozmowie")
+}
+
 @MainActor
-final class CallDetector: CallDetecting {
+final class DeviceDetector: DeviceDetecting {
     var enabled = false {
         didSet { if enabled != oldValue { apply() } }
     }
     var graceSecs = 60
-    var onStatusChanged: ((CallStatus) -> Void)?
+    var onStatusChanged: ((DeviceStatus) -> Void)?
+    var onPauseChanged: (() -> Void)?
 
-    private let probes: [CallDevice: CallProbe]
+    private let probes: [Device: DeviceProbe]
     private let clock: () -> Date
     private var started = false
     private var watching = false
-    private var active: Set<CallDevice> = []
+    private var active: Set<Device> = []
     /// When the last device in use was seen going off; nil while one is on, or none was seen on.
     private var offAt: Date?
-    private var published = CallStatus.off
+    private var published = DeviceStatus.off
 
     /// `probes` defaults to the real camera and microphone ones (`nil` so the default is built
     /// on the main actor).
-    init(probes: [CallDevice: CallProbe]? = nil, clock: @escaping () -> Date = Date.init) {
+    init(probes: [Device: DeviceProbe]? = nil, clock: @escaping () -> Date = Date.init) {
         self.probes = probes ?? [.camera: CMIOCameraProbe(), .microphone: CoreAudioMicrophoneProbe()]
         self.clock = clock
     }
 
-    var status: CallStatus { CallStatus(enabled: enabled, active: enabled ? active : []) }
+    var status: DeviceStatus { DeviceStatus(enabled: enabled, active: enabled ? active : []) }
 
-    func heldUntil(now: Date) -> Date? {
+    /// A device in use holds breaks for as long as it stays on (nobody knows until when), then
+    /// the pause after a meeting follows from the moment the last one went off.
+    func pause(now: Date) -> Pause? {
         guard enabled, watching else { return nil }
-        return CallRules.heldUntil(now: now, inUse: !active.isEmpty, offAt: offAt, grace: TimeInterval(graceSecs))
+        if active.isEmpty {
+            return offAt.flatMap { Pause.afterMeeting(endedAt: $0, grace: TimeInterval(graceSecs), now: now) }
+        }
+        let camera = active.contains(.camera)
+        return Pause(holdsUntil: now.addingTimeInterval(DeviceRules.recheck), endsAt: nil, symbol: camera ? "video" : "mic",
+                     label: active.count > 1 ? T.cameraAndMicrophoneOn : camera ? T.cameraOn : T.microphoneOn, next: T.deviceNext)
     }
 
     /// Polling backstop for a missed listener callback.
@@ -53,15 +68,16 @@ final class CallDetector: CallDetecting {
         apply(publishing: false)
         published = status
         onStatusChanged?(published)
+        onPauseChanged?()
     }
 
     // MARK: Internals
 
-    private func read() -> Set<CallDevice> {
+    private func read() -> Set<Device> {
         Set(probes.filter { $0.value.anyRunning() }.keys)
     }
 
-    private static func names(_ devices: Set<CallDevice>) -> String {
+    private static func names(_ devices: Set<Device>) -> String {
         devices.isEmpty ? "nothing" : devices.map(\.rawValue).sorted().joined(separator: " and ")
     }
 
@@ -75,7 +91,7 @@ final class CallDetector: CallDetecting {
             }
             active = read()
             offAt = nil
-            Log.info("calls", "watching cameras and microphones, in use: \(Self.names(active))")
+            Log.info("devices", "watching cameras and microphones, in use: \(Self.names(active))")
         } else if !shouldWatch, watching {
             watching = false
             for probe in probes.values {
@@ -83,7 +99,7 @@ final class CallDetector: CallDetecting {
             }
             active = []
             offAt = nil
-            Log.info("calls", "stopped watching cameras and microphones")
+            Log.info("devices", "stopped watching cameras and microphones")
         }
         if publishing { publish() }
     }
@@ -97,10 +113,10 @@ final class CallDetector: CallDetecting {
         active = now
         if !now.isEmpty {
             offAt = nil
-            Log.info("calls", "in use: \(Self.names(now)), breaks are held")
+            Log.info("devices", "in use: \(Self.names(now)), breaks are held")
         } else if wasInUse {
             offAt = clock()
-            Log.info("calls", "camera and microphone are off, holding breaks for \(graceSecs)s more")
+            Log.info("devices", "camera and microphone are off, the pause after a meeting runs for \(graceSecs)s")
         }
         publish()
     }
@@ -110,13 +126,14 @@ final class CallDetector: CallDetecting {
         guard next != published else { return }
         published = next
         onStatusChanged?(next)
+        onPauseChanged?()
     }
 }
 
-/// The system half of `CallDetector` for one kind of device, behind a seam so the detector's
+/// The system half of `DeviceDetector` for one kind of device, behind a seam so the detector's
 /// state logic can be tested.
 @MainActor
-protocol CallProbe: AnyObject {
+protocol DeviceProbe: AnyObject {
     /// Is a device of this kind in use by any process right now? False on any error.
     func anyRunning() -> Bool
     /// Call `onChange` on the main queue whenever a device may have started or stopped, or

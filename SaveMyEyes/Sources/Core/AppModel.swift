@@ -1,5 +1,5 @@
-// The one object the views talk to: settings, break state, calendar and call status, and
-// every action. Owns the scheduler, the calendar service and call detection; drives the window layer through
+// The one object the views talk to: settings, break state, calendar and device status, and
+// every action. Owns the scheduler, the calendar service and device detection; drives the window layer through
 // `WindowCoordinating`. Replaces the Tauri commands/events bridge.
 
 import AppKit
@@ -12,7 +12,7 @@ final class AppModel {
     private(set) var settings: Settings
     private(set) var breakState: BreakState
     private(set) var calendarStatus: CalendarStatus
-    private(set) var callStatus: CallStatus
+    private(set) var deviceStatus: DeviceStatus
     /// Bumped when the break clock reaches zero while the cover stays open (long break or an
     /// open card), so blank covers can switch to "Break has ended".
     private(set) var breakEndedCount = 0
@@ -22,7 +22,13 @@ final class AppModel {
 
     @ObservationIgnored let scheduler: Scheduler
     @ObservationIgnored let calendar: CalendarServicing
-    @ObservationIgnored let calls: CallDetecting
+    @ObservationIgnored let devices: DeviceDetecting
+    @ObservationIgnored let stopProtection: StopProtection
+    /// Everything that can put breaks on hold. A new way to pause breaks is one more
+    /// `PauseSource` in this list (see `init`).
+    @ObservationIgnored private let pauses: PauseSources
+    /// Bumped whenever a source says its answer changed, so views reading `pause(now:)` update.
+    private var pauseChanges = 0
     @ObservationIgnored let sounds = SoundPlayer()
     @ObservationIgnored private let settingsURL: URL
     /// The window layer; set by the app delegate at startup.
@@ -32,33 +38,43 @@ final class AppModel {
 
     var lang: Lang { settings.lang }
 
-    /// Why breaks are on hold at `now`, if they are.
-    func breakPause(now: Date) -> BreakPause? {
-        BreakPause.current(state: breakState, calendar: calendarStatus, calls: callStatus, now: now)
+    /// The pause in effect at `now`, if breaks are on hold: what the menu-bar icon and the
+    /// menu's status show. `nil` while a break is on screen (one the user started during a
+    /// meeting is a break, not a pause).
+    func pause(now: Date) -> Pause? {
+        _ = pauseChanges
+        return breakState.isBreakNow(now) ? nil : pauses.pause(now: now)
     }
 
     /// Current-language lookup for the views.
     func t(_ l: L) -> String { settings.lang.pick(l) }
 
-    init(settingsURL: URL = Settings.defaultURL, calendar: CalendarServicing, calls: CallDetecting) {
+    init(settingsURL: URL = Settings.defaultURL, calendar: CalendarServicing, devices: DeviceDetecting) {
         self.settingsURL = settingsURL
         let loaded = Settings.load(from: settingsURL)
         Log.info("startup", "settings from \(settingsURL.path): \(loaded)")
         self.settings = loaded
         self.calendar = calendar
         self.calendarStatus = calendar.status
-        self.calls = calls
+        self.devices = devices
         // Configured before the first read so the published status starts out right.
-        calls.enabled = loaded.calls.enabled
-        calls.graceSecs = loaded.calendar.graceSecs
-        self.callStatus = calls.status
+        devices.enabled = loaded.devices.enabled
+        devices.graceSecs = loaded.calendar.graceSecs
+        self.deviceStatus = devices.status
         var scheduler: Scheduler! = nil
         scheduler = Scheduler(settings: { loaded })
         self.scheduler = scheduler
         self.breakState = scheduler.snapshot
+        let stopProtection = StopProtection()
+        self.stopProtection = stopProtection
+        // Every way to pause breaks. The scheduler, the menu-bar icon and the menu all go by
+        // this one list.
+        let pauses = PauseSources([stopProtection, calendar, devices])
+        self.pauses = pauses
 
         scheduler.settings = { [unowned self] in self.settings }
-        scheduler.busySource = BusySources([calendar, calls])
+        scheduler.pauseSource = pauses
+        pauses.onPauseChanged = { [unowned self] in self.pauseChanges &+= 1 }
         scheduler.onStateChanged = { [unowned self] state in
             if state.phase != .active { self.breakEnded = false }
             self.breakState = state
@@ -76,7 +92,7 @@ final class AppModel {
         calendar.enabled = loaded.calendar.enabled
         calendar.graceSecs = loaded.calendar.graceSecs
         calendar.onStatusChanged = { [unowned self] status in self.calendarStatus = status }
-        calls.onStatusChanged = { [unowned self] status in self.callStatus = status }
+        devices.onStatusChanged = { [unowned self] status in self.deviceStatus = status }
     }
 
     /// Start the services and schedule the first break. Returns the initial state (for the
@@ -84,7 +100,7 @@ final class AppModel {
     @discardableResult
     func start() -> BreakState {
         calendar.start()
-        calls.start()
+        devices.start()
         scheduler.start()
         return scheduler.setNextBreak()
     }
@@ -106,9 +122,9 @@ final class AppModel {
         settings = next
         calendar.enabled = next.calendar.enabled
         calendar.graceSecs = next.calendar.graceSecs
-        calls.enabled = next.calls.enabled
-        calls.graceSecs = next.calendar.graceSecs
-        callStatus = calls.status
+        devices.enabled = next.devices.enabled
+        devices.graceSecs = next.calendar.graceSecs
+        deviceStatus = devices.status
         var failure: Error?
         do {
             try next.save(to: settingsURL)
@@ -159,11 +175,13 @@ final class AppModel {
 
     /// Stop protection: the next break is a long one in `hours`.
     func pauseProtection(hours: Int) {
-        setNextBreak(NextBreakOptions(inSecs: hours * 3600, forceType: .long, stopsProtection: true))
+        stopProtection.stop(until: Date().addingTimeInterval(TimeInterval(hours * 3600)))
+        setNextBreak(NextBreakOptions(inSecs: hours * 3600, forceType: .long))
     }
 
     /// "Start a long break now" (menu, tray): straight to the cover, no before-break card.
     func startLongBreakNow() {
+        stopProtection.resume()
         setNextBreak(NextBreakOptions(inSecs: 0, forceType: .long, skipBeforeBreak: true))
     }
 
@@ -213,7 +231,7 @@ final class AppModel {
         }
     }
 
-    /// Re-read the calendar and its access now (the menu calls this when it opens, so a grant
+    /// Re-read the calendar and its access now (the menu devices this when it opens, so a grant
     /// just given in System Settings clears the warning without waiting for the next minute).
     func refreshCalendar() async {
         await calendar.refresh()
@@ -222,21 +240,21 @@ final class AppModel {
 
     /// Everything the menu's status shows, re-read as it opens: the calendar, and which
     /// devices are in use (a backstop for a listener that did not fire).
-    func refreshCallStatus() async {
+    func refreshSources() async {
         await refreshCalendar()
-        await calls.refresh()
+        await devices.refresh()
     }
 
-    // MARK: Calls
+    // MARK: Devices
 
-    /// Turn "no breaks during calls" (a camera or microphone in use) on or off. Applies at
+    /// Turn "pause breaks while camera or microphone is on" on or off. Applies at
     /// once, not on Save; no permission is involved.
     @discardableResult
-    func setCallsEnabled(_ enabled: Bool) -> CallStatus {
+    func setDevicesEnabled(_ enabled: Bool) -> DeviceStatus {
         var next = settings
-        next.calls.enabled = enabled
+        next.devices.enabled = enabled
         _ = store(next)
-        return callStatus
+        return deviceStatus
     }
 
     // MARK: App

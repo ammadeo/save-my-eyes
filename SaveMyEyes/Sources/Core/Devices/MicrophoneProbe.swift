@@ -11,7 +11,7 @@ import Foundation
 /// CoreAudio-backed probe: listeners on the device list, the process list and each input
 /// device's IsRunningSomewhere, all delivered on the main queue.
 @MainActor
-final class CoreAudioMicrophoneProbe: CallProbe {
+final class CoreAudioMicrophoneProbe: DeviceProbe {
     private var onChange: (() -> Void)?
     /// Input devices that currently carry `runningListener`.
     private var observed: [AudioObjectID] = []
@@ -83,7 +83,7 @@ final class CoreAudioMicrophoneProbe: CallProbe {
             }
         }
         if Set(kept) != Set(observed) {
-            Log.info("calls", "\(kept.count) microphone(s) watched")
+            Log.info("devices", "\(kept.count) microphone(s) watched")
         }
         observed = kept
     }

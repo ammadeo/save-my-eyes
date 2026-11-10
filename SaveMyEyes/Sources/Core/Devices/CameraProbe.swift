@@ -9,7 +9,7 @@ import Foundation
 /// CoreMediaIO-backed probe: listeners on the system object's device list and on each
 /// device's IsRunningSomewhere, all delivered on the main queue.
 @MainActor
-final class CMIOCameraProbe: CallProbe {
+final class CMIOCameraProbe: DeviceProbe {
     private var onChange: (() -> Void)?
     /// Devices that currently carry `runningListener`.
     private var observed: [CMIOObjectID] = []
@@ -40,7 +40,7 @@ final class CMIOCameraProbe: CallProbe {
         var addr = Self.address(kCMIOHardwarePropertyDevices)
         let status = CMIOObjectAddPropertyListenerBlock(Self.system, &addr, DispatchQueue.main, devices)
         if status != noErr {
-            Log.warn("calls", "cannot watch the camera list (CMIO \(status)), relying on refresh")
+            Log.warn("devices", "cannot watch the camera list (CMIO \(status)), relying on refresh")
         }
         syncDevices()
     }
@@ -73,11 +73,11 @@ final class CMIOCameraProbe: CallProbe {
             if status == noErr {
                 kept.append(id)
             } else {
-                Log.warn("calls", "cannot watch camera \(id) (CMIO \(status)), relying on refresh")
+                Log.warn("devices", "cannot watch camera \(id) (CMIO \(status)), relying on refresh")
             }
         }
         if Set(kept) != Set(observed) {
-            Log.info("calls", "\(kept.count) camera(s) watched")
+            Log.info("devices", "\(kept.count) camera(s) watched")
         }
         observed = kept
     }

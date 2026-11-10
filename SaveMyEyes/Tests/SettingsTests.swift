@@ -14,7 +14,7 @@ final class SettingsTests: XCTestCase {
         XCTAssertTrue(s.sounds.ui && s.sounds.voice)
         XCTAssertFalse(s.calendar.enabled)
         XCTAssertEqual(s.calendar.graceSecs, 60)
-        XCTAssertFalse(s.calls.enabled)
+        XCTAssertFalse(s.devices.enabled)
     }
 
     func testDefaultsAreValid() {
@@ -74,7 +74,7 @@ final class SettingsTests: XCTestCase {
             "sounds": ["ui": true, "voice": true],
             "lang": "en",
             "calendar": ["enabled": false, "graceSecs": 60],
-            "calls": ["enabled": false],
+            "devices": ["enabled": false],
         ]
         XCTAssertEqual(v as NSDictionary, expected as NSDictionary)
     }
@@ -93,12 +93,17 @@ final class SettingsTests: XCTestCase {
         XCTAssertEqual(t.calendar.graceSecs, 0)
     }
 
-    func testCallsKeyIsOptional() {
-        XCTAssertFalse(Settings.fromJSON(Data(#"{ "lang": "en" }"#.utf8)).calls.enabled, "older files have no calls key")
-        XCTAssertFalse(Settings.fromJSON(Data(#"{ "calls": {} }"#.utf8)).calls.enabled)
-        let on = Settings.fromJSON(Data(#"{ "calls": { "enabled": true } }"#.utf8))
-        XCTAssertTrue(on.calls.enabled)
-        XCTAssertFalse(on.calendar.enabled, "the calls switch is separate from the calendar one")
+    func testOldCallsKeyIsStillRead() {
+        XCTAssertTrue(Settings.fromJSON(Data(#"{ "calls": { "enabled": true } }"#.utf8)).devices.enabled, "written as calls until 0.5.0")
+        XCTAssertTrue(Settings.fromJSON(Data(#"{ "calls": { "enabled": false }, "devices": { "enabled": true } }"#.utf8)).devices.enabled, "the new key wins")
+    }
+
+    func testDevicesKeyIsOptional() {
+        XCTAssertFalse(Settings.fromJSON(Data(#"{ "lang": "en" }"#.utf8)).devices.enabled, "older files have no devices key")
+        XCTAssertFalse(Settings.fromJSON(Data(#"{ "devices": {} }"#.utf8)).devices.enabled)
+        let on = Settings.fromJSON(Data(#"{ "devices": { "enabled": true } }"#.utf8))
+        XCTAssertTrue(on.devices.enabled)
+        XCTAssertFalse(on.calendar.enabled, "the devices switch is separate from the calendar one")
     }
 
     func testCorruptJSONGivesDefaults() {
@@ -130,7 +135,7 @@ final class SettingsTests: XCTestCase {
             lang: .pl,
             calendar: .init(enabled: true, graceSecs: 120)
         ))
-        XCTAssertFalse(s.calls.enabled)
+        XCTAssertFalse(s.devices.enabled)
     }
 
     func testSaveAndLoadRoundtrip() throws {
@@ -140,10 +145,10 @@ final class SettingsTests: XCTestCase {
         var s = base()
         s.breaks.every = 900
         s.sounds.ui = false
-        s.calls.enabled = true
+        s.devices.enabled = true
         try s.save(to: path)
         XCTAssertEqual(Settings.load(from: path), s)
-        XCTAssertTrue(Settings.load(from: path).calls.enabled)
+        XCTAssertTrue(Settings.load(from: path).devices.enabled)
         XCTAssertEqual(Settings.load(from: dir.appendingPathComponent("missing.json")).breaks, Settings.Breaks())
     }
 

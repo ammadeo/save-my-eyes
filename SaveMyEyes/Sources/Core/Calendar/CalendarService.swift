@@ -3,7 +3,7 @@
 // added in System Settings → Internet Accounts.
 //
 // The cache is re-read every minute, when the store changes, and right before a break fires
-// (`Scheduler` calls `refresh()`), so a meeting added a moment ago still holds the break. No
+// (`Scheduler` devices `refresh()`), so a meeting added a moment ago still holds the break. No
 // access, a failed read or a stale cache all mean "not busy": a calendar problem never stops
 // breaks.
 //
@@ -27,6 +27,7 @@ final class CalendarService: CalendarServicing {
     var enabled = false
     var graceSecs = 60
     var onStatusChanged: ((CalendarStatus) -> Void)?
+    var onPauseChanged: (() -> Void)?
 
     private var busy: [Busy] = []
     private var fetchedAt: Date?
@@ -42,10 +43,9 @@ final class CalendarService: CalendarServicing {
         CalendarStatus(enabled: enabled, access: Self.access(), meeting: meetingNow(Date()), syncedAt: fetchedAt)
     }
 
-    func heldUntil(now: Date) -> Date? {
-        guard let meeting = meetingNow(now) else { return nil }
-        Log.info("calendar", "in a meeting until \(Self.iso(meeting.until)), holding the break for \(graceSecs)s after")
-        return meeting.until.addingTimeInterval(grace)
+    /// A meeting going on holds breaks until it ends, then the pause after a meeting follows.
+    func pause(now: Date) -> Pause? {
+        freshBusy(now).flatMap { CalendarRules.pause(busy: $0, now: now, grace: grace) }
     }
 
     /// Re-read busy events into the cache (cleared when disabled or unreadable) and publish
@@ -87,6 +87,7 @@ final class CalendarService: CalendarServicing {
             fetchedAt = nil
         }
         onStatusChanged?(status)
+        onPauseChanged?()
     }
 
     /// Refresh every minute and whenever the calendar store changes. Does not ask for access:
@@ -121,6 +122,7 @@ final class CalendarService: CalendarServicing {
         }
         lastAccess = access
         onStatusChanged?(status)
+        onPauseChanged?()
         return access
     }
 
@@ -132,10 +134,15 @@ final class CalendarService: CalendarServicing {
 
     // MARK: Internals
 
+    /// The cached busy events, when the feature is on and the cache is fresh.
+    private func freshBusy(_ now: Date) -> [Busy]? {
+        guard enabled, let at = fetchedAt, now.timeIntervalSince(at) <= Self.staleAfter else { return nil }
+        return busy
+    }
+
     /// The meeting going on at `now` per a fresh cache, if the feature is on.
     private func meetingNow(_ now: Date) -> Meeting? {
-        guard enabled, let at = fetchedAt, now.timeIntervalSince(at) <= Self.staleAfter else { return nil }
-        return CalendarRules.currentMeeting(busy: busy, now: now, grace: grace)
+        freshBusy(now).flatMap { CalendarRules.currentMeeting(busy: $0, now: now, grace: grace) }
     }
 
     private func observeStore() {

@@ -4,6 +4,11 @@
 
 import Foundation
 
+private enum T {
+    static let untitled = L("Busy", "Zajęte")
+    static let next = L("Your next break starts after this event ends", "Następna przerwa zaplanowana jest po spotkaniu")
+}
+
 struct Interval: Equatable, Sendable {
     var start: Date
     var end: Date
@@ -61,5 +66,20 @@ enum CalendarRules {
         }
         return meeting
     }
-}
 
+    /// When the last meeting before `now` ended, if any: the start of the pause after it.
+    static func lastMeetingEnd(busy: [Busy], now: Date) -> Date? {
+        busy.map(\.interval.end).filter { $0 <= now }.max()
+    }
+
+    /// The pause in effect at `now`: the meeting going on (held until it ends plus `grace`,
+    /// shown under its title), else the shared pause after the last one.
+    static func pause(busy: [Busy], now: Date, grace: TimeInterval) -> Pause? {
+        if let meeting = currentMeeting(busy: busy, now: now, grace: grace) {
+            let title = meeting.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            return Pause(holdsUntil: meeting.until.addingTimeInterval(grace), endsAt: meeting.until, symbol: "calendar",
+                         label: title.isEmpty ? T.untitled : L(verbatim: title), next: T.next)
+        }
+        return lastMeetingEnd(busy: busy, now: now).flatMap { Pause.afterMeeting(endedAt: $0, grace: grace, now: now) }
+    }
+}

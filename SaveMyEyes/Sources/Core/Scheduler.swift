@@ -1,7 +1,7 @@
 // Break state machine and timer: idle --(timer)--> before --(start)--> active --(end)--> idle.
 //
-// A break that comes due during a call (a calendar meeting, or a camera or microphone in
-// use) is held until the call ends (`BusySource.heldUntil`, asked again each time the hold
+// A break that comes due during a meeting (a calendar event, or a camera or microphone in
+// use, stopped protection: any `PauseSource`) is held until the pause lets go (`Pause.holdsUntil`, asked again each time the hold
 // runs out); if a long break would have come due while it waited, the held break becomes
 // that long break (`indexAfterHold`). Everything runs on the main actor; the window layer is
 // driven through the `onFire` / `onCloseBreakWindows` callbacks.
@@ -71,7 +71,7 @@ final class Scheduler {
     static let watchdogInterval: TimeInterval = 30
 
     var settings: () -> Settings
-    var busySource: BusySource?
+    var pauseSource: PauseSource?
     var onStateChanged: ((BreakState) -> Void)?
     var onFire: ((Fired) -> Void)?
     var onCloseBreakWindows: (() -> Void)?
@@ -84,8 +84,6 @@ final class Scheduler {
     private(set) var activeLength = 0
     private var skipBeforeBreak = false
     private(set) var heldForMeeting = false
-    /// The user stopped protection until the break now scheduled; over once that break comes due.
-    private(set) var protectionStopped = false
     private var held: Hold?
     /// Bumped on every (re)schedule and on break start; a timer only fires if it still matches.
     private(set) var generation: UInt64 = 0
@@ -112,8 +110,7 @@ final class Scheduler {
             scheduledAt: scheduledAt,
             lengthSecs: phase == .active ? activeLength : BreakRules.breakLength(isLong: long, breaks: s.breaks),
             startedAt: startedAt,
-            heldForMeeting: heldForMeeting,
-            protectionStopped: protectionStopped
+            heldForMeeting: heldForMeeting
         )
     }
 
@@ -141,7 +138,6 @@ final class Scheduler {
         startedAt = nil
         skipBeforeBreak = opts.skipBeforeBreak
         heldForMeeting = false
-        protectionStopped = opts.stopsProtection
         held = nil
         let generation = arm(at: Date().addingTimeInterval(TimeInterval(delay)))
         let state = snapshot
@@ -177,7 +173,7 @@ final class Scheduler {
         guard phase == .idle, let at = scheduledAt, at <= Date() else { return }
         Log.info("scheduler", "deadline passed without timer (sleep?), firing now")
         let generation = self.generation
-        await busySource?.refresh()
+        await pauseSource?.refresh()
         fire(generation: generation, hold: true)
     }
 
@@ -216,7 +212,7 @@ final class Scheduler {
                 Task { @MainActor in
                     guard let self else { return }
                     // Read the calendar now so a meeting added since the last refresh counts.
-                    await self.busySource?.refresh()
+                    await self.pauseSource?.refresh()
                     self.fire(generation: generation, hold: true)
                 }
             }
@@ -233,7 +229,6 @@ final class Scheduler {
         phase = .active
         scheduledAt = nil
         heldForMeeting = false
-        protectionStopped = false
         startedAt = Date()
         activeLength = BreakRules.breakLength(
             isLong: BreakRules.isLong(breakIndex: breakIndex, longEvery: s.breaks.long.every),
@@ -247,12 +242,12 @@ final class Scheduler {
     @discardableResult
     private func fire(generation: UInt64, hold: Bool) -> BreakState? {
         guard generation == self.generation, phase == .idle else { return nil }
-        protectionStopped = false
         let s = settings()
         let now = Date()
         let every = BreakRules.effectiveDelay(inSecs: nil, every: s.breaks.every, devOverride: BreakRules.devOverride)
         timer = nil
-        if hold, let at = busySource?.heldUntil(now: now) {
+        if hold, let pause = pauseSource?.pause(now: now) {
+            let at = pause.holdsUntil
             let h = held ?? Hold(index: breakIndex, since: scheduledAt ?? now)
             held = h
             breakIndex = BreakRules.indexAfterHold(index: h.index, since: h.since, firesAt: at, every: every, longEvery: s.breaks.long.every)
@@ -265,7 +260,7 @@ final class Scheduler {
                 // do not log each round.
                 onStateChanged?(state)
             } else {
-                Log.info("scheduler", "in a call, holding break \(state.breakIndex) (long=\(state.isLong))")
+                Log.info("scheduler", "paused (\(pause.label.en)), holding break \(state.breakIndex) (long=\(state.isLong))")
                 emit(state)
             }
             return state

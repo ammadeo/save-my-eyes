@@ -3,10 +3,11 @@ import XCTest
 
 /// Busy source stub: holds until a fixed date when set.
 @MainActor
-private final class FakeBusy: BusySource {
+private final class FakeBusy: PauseSource {
     var until: Date?
     var refreshes = 0
-    func heldUntil(now: Date) -> Date? { until }
+    var onPauseChanged: (() -> Void)?
+    func pause(now: Date) -> Pause? { until.map { .holding(until: $0) } }
     func refresh() async { refreshes += 1 }
 }
 
@@ -51,17 +52,6 @@ final class SchedulerTests: XCTestCase {
         XCTAssertNotNil(st.startedAt)
         XCTAssertNil(st.scheduledAt)
         XCTAssertEqual(fired, [.breakNow])
-    }
-
-    func testStoppedProtectionLastsUntilItsBreak() {
-        let sch = make()
-        XCTAssertFalse(sch.setNextBreak(NextBreakOptions(inSecs: 3600)).protectionStopped)
-        XCTAssertTrue(sch.setNextBreak(NextBreakOptions(inSecs: 3600, forceType: .long, stopsProtection: true)).protectionStopped)
-        XCTAssertFalse(sch.startBreak().protectionStopped, "over once the break is on screen")
-
-        _ = sch.setNextBreak(NextBreakOptions(inSecs: 3600, stopsProtection: true))
-        XCTAssertFalse(sch.setNextBreak(NextBreakOptions(inSecs: 3600)).protectionStopped, "any other reschedule ends it")
-        XCTAssertFalse(sch.setNextBreak(NextBreakOptions(inSecs: 0, stopsProtection: true)).protectionStopped, "a break due now fires")
     }
 
     func testNowSkipsBeforeBreakWhenAsked() {
@@ -115,7 +105,7 @@ final class SchedulerTests: XCTestCase {
     func testTimerFiresAndRefreshesCalendar() async {
         let sch = make()
         let busy = FakeBusy()
-        sch.busySource = busy
+        sch.pauseSource = busy
         _ = sch.setNextBreak(NextBreakOptions(inSecs: 1))
         XCTAssertEqual(sch.phase, .idle)
         try? await Task.sleep(for: .milliseconds(1500))
@@ -137,7 +127,7 @@ final class SchedulerTests: XCTestCase {
         let sch = make()
         let busy = FakeBusy()
         busy.until = Date().addingTimeInterval(3600)
-        sch.busySource = busy
+        sch.pauseSource = busy
         _ = sch.setNextBreak(NextBreakOptions(inSecs: 1))
         try? await Task.sleep(for: .milliseconds(1500))
         XCTAssertEqual(sch.phase, .idle)
@@ -152,7 +142,7 @@ final class SchedulerTests: XCTestCase {
         let busy = FakeBusy()
         // Two full intervals pass during the meeting: break 1 would have been followed by 2 and 3 (long).
         busy.until = Date().addingTimeInterval(TimeInterval(2 * settings.breaks.every + 10))
-        sch.busySource = busy
+        sch.pauseSource = busy
         _ = sch.setNextBreak(NextBreakOptions(inSecs: 1))
         try? await Task.sleep(for: .milliseconds(1500))
         XCTAssertTrue(sch.heldForMeeting)
@@ -164,7 +154,7 @@ final class SchedulerTests: XCTestCase {
         let sch = make()
         let busy = FakeBusy()
         busy.until = Date().addingTimeInterval(3600)
-        sch.busySource = busy
+        sch.pauseSource = busy
         let st = sch.setNextBreak(NextBreakOptions(inSecs: 0, forceType: .long, skipBeforeBreak: true))
         XCTAssertEqual(st.phase, .active)
         XCTAssertFalse(st.heldForMeeting)
@@ -173,7 +163,7 @@ final class SchedulerTests: XCTestCase {
     func testCheckDeadlineFiresPastDueBreak() async {
         let sch = make()
         let busy = FakeBusy()
-        sch.busySource = busy
+        sch.pauseSource = busy
         _ = sch.setNextBreak(NextBreakOptions(inSecs: 1))
         // Simulate sleep: the timer is gone but the deadline passes.
         try? await Task.sleep(for: .milliseconds(200))
