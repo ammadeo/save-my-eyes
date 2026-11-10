@@ -1,6 +1,6 @@
 // Break state machine and timer: idle --(timer)--> before --(start)--> active --(end)--> idle.
 //
-// A break that comes due during a call (a calendar meeting, or a camera or microphone in
+// A break that comes due during a meeting (a calendar event, or a camera or microphone in
 // use, stopped protection: any `PauseSource`) is held until the pause lets go (`Pause.holdsUntil`, asked again each time the hold
 // runs out); if a long break would have come due while it waited, the held break becomes
 // that long break (`indexAfterHold`). Everything runs on the main actor; the window layer is

@@ -17,7 +17,7 @@ final class SettingsFormTests: XCTestCase {
     private func makeModel(_ settings: Settings = Settings(lang: .en)) throws -> AppModel {
         let url = dir.appendingPathComponent("settings.json")
         try settings.save(to: url)
-        return AppModel(settingsURL: url, calendar: CalendarService(), calls: CallDetector())
+        return AppModel(settingsURL: url, calendar: CalendarService(), devices: DeviceDetector())
     }
 
     private func base(enabled: Bool = true, grace: Int = 60) -> Settings {
@@ -67,9 +67,9 @@ final class SettingsFormTests: XCTestCase {
 
     func testKeepsCallsEnabledFromBase() {
         var on = base()
-        on.calls.enabled = true
-        XCTAssertTrue(withGrace(180, from: on).settings.calls.enabled)
-        XCTAssertFalse(withGrace(180, from: base()).settings.calls.enabled)
+        on.devices.enabled = true
+        XCTAssertTrue(withGrace(180, from: on).settings.devices.enabled)
+        XCTAssertFalse(withGrace(180, from: base()).settings.devices.enabled)
     }
 
     func testGraceMessageInBothLanguages() {
@@ -192,24 +192,24 @@ final class SettingsFormTests: XCTestCase {
 
     func testSetCallsEnabledPersistsAtOnce() throws {
         let model = try makeModel()
-        XCTAssertFalse(model.settings.calls.enabled)
-        model.setCallsEnabled(true)
-        XCTAssertTrue(model.settings.calls.enabled)
+        XCTAssertFalse(model.settings.devices.enabled)
+        model.setDevicesEnabled(true)
+        XCTAssertTrue(model.settings.devices.enabled)
         let url = dir.appendingPathComponent("settings.json")
-        XCTAssertTrue(Settings.load(from: url).calls.enabled)
-        model.setCallsEnabled(false)
-        XCTAssertFalse(model.settings.calls.enabled)
-        XCTAssertFalse(Settings.load(from: url).calls.enabled)
+        XCTAssertTrue(Settings.load(from: url).devices.enabled)
+        model.setDevicesEnabled(false)
+        XCTAssertFalse(model.settings.devices.enabled)
+        XCTAssertFalse(Settings.load(from: url).devices.enabled)
     }
 
     func testFormSaveKeepsCallsSwitch() throws {
         let model = try makeModel()
         let form = SettingsForm(model: model)
-        model.setCallsEnabled(true)
+        model.setDevicesEnabled(true)
         form.draft.shortLast = 30
         XCTAssertTrue(form.save().ok)
-        XCTAssertTrue(model.settings.calls.enabled)
-        XCTAssertTrue(Settings.load(from: dir.appendingPathComponent("settings.json")).calls.enabled)
+        XCTAssertTrue(model.settings.devices.enabled)
+        XCTAssertTrue(Settings.load(from: dir.appendingPathComponent("settings.json")).devices.enabled)
     }
 
     func testFollowsModelWhenUnchanged() async throws {

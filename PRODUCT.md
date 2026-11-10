@@ -31,8 +31,8 @@ A menu-bar agent that enforces breaks gently: the break is a full-screen cover y
 
 - Swift 5 language mode, SwiftUI views hosted in AppKit windows, xcodegen project (`SaveMyEyes/project.yml`), XCTest unit tests (`make test`).
 - macOS 14 is the minimum, the development Mac runs macOS 27.2. The native window materials (Liquid Glass on macOS 26+, NSVisualEffectView materials before) are painted by `Sources/Windows/GlassBacking.swift`; SwiftUI views paint no background.
-- `AppModel` is the one object views talk to; `WindowCoordinating`, `CalendarServicing` and `CallDetecting` (`Sources/Core/Contracts.swift`) are the fixed seams between core, windows, calendar and call detection.
-- Unit tests in `SaveMyEyes/Tests` must keep passing; they cover settings clamping and persistence, the break rules and scheduler, calendar rules, call detection and the settings form.
+- `AppModel` is the one object views talk to; `WindowCoordinating`, `CalendarServicing` and `DeviceDetecting` (`Sources/Core/Contracts.swift`) are the fixed seams between core, windows, the calendar and device detection (a camera or microphone in use).
+- Unit tests in `SaveMyEyes/Tests` must keep passing; they cover settings clamping and persistence, the break rules and scheduler, calendar rules, device detection and the settings form.
 - Terminology: "short break", "long break", "stop protection" (pause for 1–3 h), "turn off protection" (quit for this session), "meeting" (the one word for anything that pauses breaks: a calendar event, or a camera or microphone in use; the UI never says "call").
 
 ## Brand Commitments

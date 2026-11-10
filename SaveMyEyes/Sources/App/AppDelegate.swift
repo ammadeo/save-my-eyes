@@ -23,14 +23,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         NSApp.setActivationPolicy(.accessory)
 
-        var calls = CallDetector()
+        var devices = DeviceDetector()
         #if DEBUG
-        if let secs = ProcessInfo.processInfo.environment["SME_DEV_CALL"].flatMap(TimeInterval.init) {
-            Log.info("startup", "SME_DEV_CALL=\(secs): the microphone reads as in use for \(secs) s")
-            calls = CallDetector(probes: [.microphone: DevCallProbe(secs: secs)])
+        if let secs = ProcessInfo.processInfo.environment["SME_DEV_MICROPHONE"].flatMap(TimeInterval.init) {
+            Log.info("startup", "SME_DEV_MICROPHONE=\(secs): the microphone reads as in use for \(secs) s")
+            devices = DeviceDetector(probes: [.microphone: DevMicrophoneProbe(secs: secs)])
         }
         #endif
-        let model = AppModel(calendar: CalendarService(), calls: calls)
+        let model = AppModel(calendar: CalendarService(), devices: devices)
         let windows = WindowManager(model: model)
         model.windows = windows
         let statusItem = StatusItemController(model: model, windows: windows)
@@ -77,10 +77,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 #if DEBUG
-/// Dev aid (`SME_DEV_CALL=<secs>`): a microphone that reads as in use for the first `secs`
-/// seconds, to see the paused state (menu-bar icon, menu status) without starting a call.
+/// Dev aid (`SME_DEV_MICROPHONE=<secs>`): a microphone that reads as in use for the first `secs`
+/// seconds, to see the paused state (menu-bar icon, menu status) without a real meeting.
 /// Needs "Pause breaks while camera or microphone is on" switched on.
-private final class DevCallProbe: CallProbe {
+private final class DevMicrophoneProbe: DeviceProbe {
     private let until: Date
 
     init(secs: TimeInterval) {

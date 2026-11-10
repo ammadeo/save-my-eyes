@@ -36,17 +36,17 @@ private final class FakeCalendar: CalendarServicing {
     func openPrivacySettings() {}
 }
 
-/// Call detection stub for the model wiring.
+/// Device detection stub for the model wiring.
 @MainActor
-private final class FakeCalls: CallDetecting {
+private final class FakeDevices: DeviceDetecting {
     var enabled = false { didSet { if !enabled { active = [] } } }
     var graceSecs = 0
-    var active: Set<CallDevice> = [] { didSet { onPauseChanged?() } }
-    var onStatusChanged: ((CallStatus) -> Void)?
+    var active: Set<Device> = [] { didSet { onPauseChanged?() } }
+    var onStatusChanged: ((DeviceStatus) -> Void)?
     var onPauseChanged: (() -> Void)?
     var started = 0
-    var status: CallStatus { CallStatus(enabled: enabled, active: enabled ? active : []) }
-    func pause(now: Date) -> Pause? { status.inUse ? .holding(until: now.addingTimeInterval(30), label: "call") : nil }
+    var status: DeviceStatus { DeviceStatus(enabled: enabled, active: enabled ? active : []) }
+    func pause(now: Date) -> Pause? { status.inUse ? .holding(until: now.addingTimeInterval(30), label: "devices") : nil }
     func refresh() async {}
     func start() { started += 1 }
 }
@@ -82,7 +82,7 @@ final class PauseSourcesTests: XCTestCase {
         calendar.until = now.addingTimeInterval(600)
         XCTAssertEqual(both.heldUntil(now: now), now.addingTimeInterval(600), "the meeting ends later")
         camera.until = now.addingTimeInterval(900)
-        XCTAssertEqual(both.heldUntil(now: now), now.addingTimeInterval(900), "the call runs over the meeting")
+        XCTAssertEqual(both.heldUntil(now: now), now.addingTimeInterval(900), "the device use runs over the event")
     }
 
     /// The pause in effect is the whole answer of the source that holds longest, so the
@@ -104,6 +104,17 @@ final class PauseSourcesTests: XCTestCase {
         a.onPauseChanged?()
         b.onPauseChanged?()
         XCTAssertEqual(changes, 2)
+    }
+
+    /// One pause after a meeting for every source that can see one end.
+    func testThePauseAfterAMeeting() throws {
+        let ended = now
+        let pause = try XCTUnwrap(Pause.afterMeeting(endedAt: ended, grace: 60, now: now.addingTimeInterval(59)))
+        XCTAssertEqual(pause.holdsUntil, now.addingTimeInterval(60))
+        XCTAssertEqual(pause.endsAt, now.addingTimeInterval(60))
+        XCTAssertEqual(pause.label.en, "Pause after a meeting")
+        XCTAssertNil(Pause.afterMeeting(endedAt: ended, grace: 60, now: now.addingTimeInterval(60)), "over at its end")
+        XCTAssertNil(Pause.afterMeeting(endedAt: ended, grace: 0, now: now), "no pause configured")
     }
 
     func testRefreshReachesEverySource() async {
@@ -142,73 +153,73 @@ final class PauseSourcesTests: XCTestCase {
 
     // MARK: Model wiring
 
-    private func makeModel(_ settings: Settings, calls: FakeCalls) throws -> AppModel {
+    private func makeModel(_ settings: Settings, devices: FakeDevices) throws -> AppModel {
         let url = dir.appendingPathComponent("settings.json")
         try settings.save(to: url)
-        return AppModel(settingsURL: url, calendar: FakeCalendar(), calls: calls)
+        return AppModel(settingsURL: url, calendar: FakeCalendar(), devices: devices)
     }
 
     func testModelConfiguresCallDetectionFromSettings() throws {
-        let calls = FakeCalls()
-        let model = try makeModel(Settings(lang: .en, calendar: .init(enabled: false, graceSecs: 120), calls: .init(enabled: true)), calls: calls)
-        XCTAssertTrue(calls.enabled)
-        XCTAssertEqual(calls.graceSecs, 120, "the pause after a call is shared with the calendar")
-        XCTAssertEqual(model.callStatus, CallStatus(enabled: true, active: []))
-        XCTAssertEqual(calls.started, 0)
+        let devices = FakeDevices()
+        let model = try makeModel(Settings(lang: .en, calendar: .init(enabled: false, graceSecs: 120), devices: .init(enabled: true)), devices: devices)
+        XCTAssertTrue(devices.enabled)
+        XCTAssertEqual(devices.graceSecs, 120, "one pause after a meeting for both signals")
+        XCTAssertEqual(model.deviceStatus, DeviceStatus(enabled: true, active: []))
+        XCTAssertEqual(devices.started, 0)
         model.start()
-        XCTAssertEqual(calls.started, 1)
+        XCTAssertEqual(devices.started, 1)
     }
 
     func testCallsToggleAppliesAtOnceAndPersists() throws {
-        let calls = FakeCalls()
-        let model = try makeModel(Settings(lang: .en), calls: calls)
-        XCTAssertFalse(calls.enabled)
+        let devices = FakeDevices()
+        let model = try makeModel(Settings(lang: .en), devices: devices)
+        XCTAssertFalse(devices.enabled)
 
-        XCTAssertEqual(model.setCallsEnabled(true), CallStatus(enabled: true, active: []))
-        XCTAssertTrue(calls.enabled)
-        XCTAssertTrue(model.settings.calls.enabled)
-        XCTAssertTrue(Settings.load(from: dir.appendingPathComponent("settings.json")).calls.enabled)
+        XCTAssertEqual(model.setDevicesEnabled(true), DeviceStatus(enabled: true, active: []))
+        XCTAssertTrue(devices.enabled)
+        XCTAssertTrue(model.settings.devices.enabled)
+        XCTAssertTrue(Settings.load(from: dir.appendingPathComponent("settings.json")).devices.enabled)
 
-        calls.active = [.microphone]
-        calls.onStatusChanged?(calls.status)
-        XCTAssertEqual(model.callStatus.active, [.microphone], "the detector's changes reach the views")
+        devices.active = [.microphone]
+        devices.onStatusChanged?(devices.status)
+        XCTAssertEqual(model.deviceStatus.active, [.microphone], "the detector's changes reach the views")
 
-        XCTAssertEqual(model.setCallsEnabled(false), .off)
-        XCTAssertFalse(model.settings.calls.enabled)
+        XCTAssertEqual(model.setDevicesEnabled(false), .off)
+        XCTAssertFalse(model.settings.devices.enabled)
     }
 
     func testSavingSettingsUpdatesTheCallGrace() throws {
-        let calls = FakeCalls()
-        let model = try makeModel(Settings(lang: .en), calls: calls)
+        let devices = FakeDevices()
+        let model = try makeModel(Settings(lang: .en), devices: devices)
         var next = model.settings
         next.calendar.graceSecs = 300
         model.saveSettings(next)
-        XCTAssertEqual(calls.graceSecs, 300)
+        XCTAssertEqual(devices.graceSecs, 300)
     }
 
     // MARK: The model's pause: what the menu-bar icon and the menu's status show
 
     func testNoPauseWhenNothingHolds() throws {
-        let model = try makeModel(Settings(lang: .en), calls: FakeCalls())
+        let model = try makeModel(Settings(lang: .en), devices: FakeDevices())
         model.setNextBreak(NextBreakOptions(inSecs: 3600))
         XCTAssertNil(model.pause(now: Date()))
     }
 
     /// Any source that holds breaks shows as the pause, with nothing written for it in the model.
     func testASourceThatHoldsIsThePause() throws {
-        let calls = FakeCalls()
-        let model = try makeModel(Settings(lang: .en, calls: .init(enabled: true)), calls: calls)
+        let devices = FakeDevices()
+        let model = try makeModel(Settings(lang: .en, devices: .init(enabled: true)), devices: devices)
         model.setNextBreak(NextBreakOptions(inSecs: 3600))
-        calls.active = [.camera]
-        XCTAssertEqual(model.pause(now: Date())?.label, L(verbatim: "call"))
-        calls.active = []
+        devices.active = [.camera]
+        XCTAssertEqual(model.pause(now: Date())?.label, L(verbatim: "devices"))
+        devices.active = []
         XCTAssertNil(model.pause(now: Date()))
     }
 
     func testABreakOnScreenIsNotAPause() throws {
-        let calls = FakeCalls()
-        let model = try makeModel(Settings(lang: .en, calls: .init(enabled: true)), calls: calls)
-        calls.active = [.camera]
+        let devices = FakeDevices()
+        let model = try makeModel(Settings(lang: .en, devices: .init(enabled: true)), devices: devices)
+        devices.active = [.camera]
         model.setNextBreak(NextBreakOptions(inSecs: 3600))
         model.startBreak()
         XCTAssertNil(model.pause(now: Date()))
@@ -218,12 +229,12 @@ final class PauseSourcesTests: XCTestCase {
 
     /// A source's change reaches whoever observes the model's pause (the status item).
     func testAPauseChangeIsObservable() throws {
-        let calls = FakeCalls()
-        let model = try makeModel(Settings(lang: .en, calls: .init(enabled: true)), calls: calls)
+        let devices = FakeDevices()
+        let model = try makeModel(Settings(lang: .en, devices: .init(enabled: true)), devices: devices)
         model.setNextBreak(NextBreakOptions(inSecs: 3600))
         let changed = Flag()
         withObservationTracking { _ = model.pause(now: Date()) } onChange: { changed.value = true }
-        calls.active = [.microphone]
+        devices.active = [.microphone]
         XCTAssertTrue(changed.value)
     }
 
@@ -246,7 +257,7 @@ final class PauseSourcesTests: XCTestCase {
     }
 
     func testStoppingProtectionPausesAndSchedulesALongBreak() throws {
-        let model = try makeModel(Settings(lang: .en), calls: FakeCalls())
+        let model = try makeModel(Settings(lang: .en), devices: FakeDevices())
         model.pauseProtection(hours: 2)
         let pause = try XCTUnwrap(model.pause(now: Date()))
         XCTAssertEqual(pause.holdsUntil.timeIntervalSinceNow, 7200, accuracy: 5)
@@ -256,7 +267,7 @@ final class PauseSourcesTests: XCTestCase {
 
     /// Rescheduling (a settings save) does not quietly end the stop: the earlier break is held.
     func testStoppedProtectionSurvivesAReschedule() async throws {
-        let model = try makeModel(Settings(lang: .en), calls: FakeCalls())
+        let model = try makeModel(Settings(lang: .en), devices: FakeDevices())
         model.pauseProtection(hours: 1)
         model.setNextBreak(NextBreakOptions(inSecs: 1, keepWindows: true))
         try? await Task.sleep(for: .milliseconds(1500))
@@ -267,7 +278,7 @@ final class PauseSourcesTests: XCTestCase {
     }
 
     func testStartingABreakByHandEndsTheStop() throws {
-        let model = try makeModel(Settings(lang: .en), calls: FakeCalls())
+        let model = try makeModel(Settings(lang: .en), devices: FakeDevices())
         model.pauseProtection(hours: 1)
         model.startLongBreakNow()
         XCTAssertEqual(model.breakState.phase, .active)
@@ -277,9 +288,9 @@ final class PauseSourcesTests: XCTestCase {
 
     /// The scheduler asks every source together: a device in use alone holds a due break.
     func testDeviceInUseHoldsADueBreak() async throws {
-        let calls = FakeCalls()
-        let model = try makeModel(Settings(lang: .en, calls: .init(enabled: true)), calls: calls)
-        calls.active = [.camera]
+        let devices = FakeDevices()
+        let model = try makeModel(Settings(lang: .en, devices: .init(enabled: true)), devices: devices)
+        devices.active = [.camera]
         model.setNextBreak(NextBreakOptions(inSecs: 1))
         try? await Task.sleep(for: .milliseconds(1500))
         XCTAssertEqual(model.breakState.phase, .idle)

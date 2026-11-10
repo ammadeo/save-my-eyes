@@ -7,8 +7,8 @@ import SwiftUI
 private enum T {
     static let meetings = L("Meetings", "Spotkania")
     static let toggle = L("Pause breaks during calendar events", "Bez przerw w trakcie spotkań")
-    static let calls = L("Pause breaks while camera or microphone is on", "Bez przerw w trakcie rozmów")
-    static let callsDetail = L(
+    static let devices = L("Pause breaks while camera or microphone is on", "Bez przerw w trakcie rozmów")
+    static let devicesDetail = L(
         "Save My Eyes only knows that an app is using them: it can't see, hear or record anything.",
         "Za rozmowę uznajemy użycie kamery lub mikrofonu przez dowolną aplikację. Save My Eyes wie tylko, że są włączone: nie może niczego zobaczyć, usłyszeć ani nagrać.")
     static let grace = L("Resume breaks after a meeting ends", "Wstrzymaj przerwy po zakończeniu rozmowy")
@@ -114,7 +114,7 @@ struct MenuSettingsPane: View {
 /// warning under it when the switch is on but the calendar cannot be read), the camera or
 /// microphone switch (small print saying what the app can and cannot know), then the pause
 /// after a meeting, which applies to both. The switches apply at once (ticking the calendar one is what shows the macOS
-/// permission prompt; the calls one needs no permission), the grace slider goes with the draft.
+/// permission prompt; the devices one needs no permission), the grace slider goes with the draft.
 private struct CalendarSection: View {
     let model: AppModel
     @Binding var grace: Int
@@ -135,9 +135,9 @@ private struct CalendarSection: View {
                     CalendarAccessWarning(model: model, disabled: busy)
                 }
                 GroupDivider()
-                SwitchRow(label: model.t(T.calls), detail: model.t(T.callsDetail),
-                          isOn: Binding(get: { model.settings.calls.enabled },
-                                        set: { _ = model.setCallsEnabled($0) }))
+                SwitchRow(label: model.t(T.devices), detail: model.t(T.devicesDetail),
+                          isOn: Binding(get: { model.settings.devices.enabled },
+                                        set: { _ = model.setDevicesEnabled($0) }))
                 GroupDivider()
                 SliderRow(label: model.t(T.grace), value: $grace, range: SettingsFormRules.calendarGraceMin,
                           scale: 60, suffix: model.t(Strings.minutesSuffix), zeroLabel: model.t(T.graceZero))

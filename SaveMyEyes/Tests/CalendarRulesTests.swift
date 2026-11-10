@@ -87,4 +87,24 @@ final class CalendarRulesTests: XCTestCase {
         let found = CalendarRules.busyEvents([allDay, free, canceled, declined, zero, event(-5, 5)])
         XCTAssertEqual(found, [busy(-5, 5, "Sync")])
     }
+
+    func testThePauseDuringAMeeting() throws {
+        let pause = try XCTUnwrap(CalendarRules.pause(busy: [busy(0, 30, "  Sync  ")], now: at(10), grace: grace))
+        XCTAssertEqual(pause.holdsUntil, at(31), "held through the pause after it")
+        XCTAssertEqual(pause.endsAt, at(30), "but shown as ending with the meeting")
+        XCTAssertEqual(pause.label, L(verbatim: "Sync"))
+        XCTAssertEqual(CalendarRules.pause(busy: [busy(0, 30, " ")], now: at(10), grace: grace)?.label.en, "Busy")
+    }
+
+    /// After the meeting the shared pause after a meeting follows, the same one a device gives.
+    func testThePauseAfterAMeeting() throws {
+        let events = [busy(0, 30, "Sync"), busy(-60, -40, "Earlier")]
+        XCTAssertEqual(CalendarRules.lastMeetingEnd(busy: events, now: at(30.5)), at(30))
+        XCTAssertNil(CalendarRules.lastMeetingEnd(busy: events, now: at(-70)))
+        let pause = try XCTUnwrap(CalendarRules.pause(busy: events, now: at(30.5), grace: grace))
+        XCTAssertEqual(pause, Pause.afterMeeting(endedAt: at(30), grace: grace, now: at(30.5)))
+        XCTAssertEqual(pause.holdsUntil, at(31))
+        XCTAssertNil(CalendarRules.pause(busy: events, now: at(31), grace: grace), "over once the pause has run")
+        XCTAssertNil(CalendarRules.pause(busy: [], now: at(0), grace: grace))
+    }
 }

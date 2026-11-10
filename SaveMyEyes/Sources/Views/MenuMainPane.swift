@@ -59,7 +59,7 @@ struct MenuMainPane: View {
         // The popover builds a fresh pane each time it opens: re-read calendar access (never
         // prompts) so a grant just given in System Settings clears the warning, and which
         // devices are in use.
-        .task { await model.refreshCallStatus() }
+        .task { await model.refreshSources() }
     }
 
     // MARK: Status
