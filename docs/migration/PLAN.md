@@ -83,7 +83,7 @@ Prove on this Mac (macOS 27.2) that a Tauri window with the AppKit level/collect
 Wire both sides in `tauri dev`, walk the full flow (tray → menu → settings → before-break → break → covers → end → reschedule, long break, stop protection, quit), fix contract drift, delete `legacy-electron/`, mark the PR ready.
 
 ### Out of scope for this PR
-App Store packaging; Windows-specific polish beyond "it builds"; new features.
+App Store packaging; new features.
 
 ## Decisions taken by the owner (2026-11-04)
 

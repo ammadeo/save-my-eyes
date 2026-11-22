@@ -1,21 +1,30 @@
-<h1> Save My Eyes </h1>
-<p>
-<h3>App that helps you protect your eyes while working long on a computer</h3>
-<img align="center" src="https://i.ibb.co/94DJ8DP/rsz-5f7c7771956a8.jpg" alt="save my eyes screenshot">
-<p align="center">Save My Eyes long break screenshot</p>
-<h3>What You can expect</h3>
-<ul>
-  <li>App will run on a computer startup</li>
-  <li>It's easy to customize Your break time</li>
-  <li>It'll prevent You from using Your computer, when You need a break (Don't worry You can always skip it with one click :wink:)</li>
-  <li>You can accesses all options from tray menu</li>
-  <li>It works on multiple monitors setup</li>
-  <li>It pauses breaks during calendar events, and while an app is using your camera or microphone</li>
-  <li>It's free! <a href="https://www.buymeacoffee.com/ammadeo">You can buy me a coffee here :coffee:</a></li>
-</ul>
-<br/>
-<p>Save My Eyes is a native macOS menu-bar app (Swift, SwiftUI and AppKit; macOS 14 or later). The last Windows build is <a href="https://github.com/ammadeo/save-my-eyes/releases/download/v0.2.2/save-my-eyes-Setup-0.2.2.exe">v0.2.2 (Electron)</a>.</p>
-</p>
+# Save My Eyes
+
+A macOS menu-bar app that covers your screen for 20 seconds every 20 minutes, so you take the eye break you'd otherwise skip.
+
+![The break cover over a blurred desktop: "Take a short break for 20 seconds", a countdown at 00:19, a "Skip short break" button and a break idea, "Blink your eyes"](docs/design/05-break-cover.png)
+
+<img src="docs/design/01-menu.png" width="400" alt="The menu: next short break in 20 seconds, Start a long break now, Stop protection, Settings and Quit Save My Eyes">
+
+## Download
+
+[Download for macOS](https://github.com/ammadeo/save-my-eyes/releases/latest)
+
+- Needs macOS 14 or later. Runs on Apple Silicon and Intel Macs.
+- Open the download and drag Save My Eyes to Applications.
+- Releases so far aren't notarized, so on first launch macOS says it can't verify the app. Click Done, then open System Settings › Privacy & Security and choose Open Anyway.
+- Or, in Terminal, run `xattr -dr com.apple.quarantine "/Applications/Save My Eyes.app"` and open the app again.
+
+## What you get
+
+- It starts at login and lives in the menu bar, with no Dock icon.
+- You get a 20-second break every 20 minutes, and every third break is a 5-minute one. You can change all three numbers.
+- A break covers every display, and you can always skip it with one click.
+- From the menu you can see the countdown to your next break, start a long break now, or stop protection for 1, 2 or 3 hours.
+- Breaks can wait while a calendar event is on, or while any app is using your camera or microphone, and for 1 more minute after it ends. Both switches are off by default.
+- The app only knows that the camera or microphone is in use. It can't see, hear or record anything, and it asks for calendar access only when you turn that switch on.
+- It speaks English and Polish.
+- It's free and open source. [You can buy me a coffee here](https://www.buymeacoffee.com/ammadeo).
 
 ## Development (Swift, Xcode 26+)
 
@@ -57,3 +66,9 @@ xcrun notarytool store-credentials save-my-eyes --apple-id <apple-id> --team-id 
 ```
 
 From then on every `make dist` signs with the hardened runtime, notarizes, and staples the ticket to the DMG.
+
+## License
+
+Save My Eyes is licensed under GPL-3.0. See [`LICENSE`](LICENSE).
+
+The break illustrations are by Katerina Limpitsouni ([unDraw](https://undraw.co/)).
