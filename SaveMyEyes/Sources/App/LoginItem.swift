@@ -5,8 +5,8 @@ import ServiceManagement
 
 enum LoginItem {
     /// LaunchAgent written by the Tauri build's autostart plugin; its binary is gone after
-    /// the native app replaces it.
-    private static let legacyLabel = "com.ammadeo.savemyeyes"
+    /// the native app replaces it. The plugin names it after the app, not the bundle id.
+    private static let legacyLabel = "Save My Eyes"
 
     @MainActor
     static func enable() {
