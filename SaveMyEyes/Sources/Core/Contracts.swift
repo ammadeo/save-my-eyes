@@ -188,7 +188,8 @@ protocol WindowCoordinating: AnyObject {
     func openBeforeBreak()
     func closeBeforeBreak()
     /// Full-screen break cover on the primary display plus a blank cover on every other
-    /// display; closes the before-break card first and focuses the break cover.
+    /// display; closes the before-break card first and focuses the break cover. When the
+    /// cover closes, focus goes back to the app that had it, if that app is still running.
     func openBreakCovers()
     /// Before-break card, break cover and blank covers. Never the menu.
     func closeBreakWindows()
