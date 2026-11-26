@@ -26,10 +26,11 @@ test: project
 
 # Debug build with the dev aids: SME_DEV_EVERY_SECS=8 fires the first break after 8 s,
 # SME_DEV_OPEN_MENU=1 opens the menu at startup (settings / stop-protection open that pane),
-# SME_DEV_MICROPHONE=20 makes the microphone read as in use for 20 s (the paused menu-bar icon).
+# SME_DEV_MICROPHONE=20 makes the microphone read as in use for 20 s (the paused menu-bar icon),
+# SME_DEV_SUN=up|down makes the sun read as up or down (the day or night break ideas).
 run: build
 	pkill -x "Save My Eyes" || true
-	open $(APP) --env SME_DEV_EVERY_SECS=$${SME_DEV_EVERY_SECS:-} --env SME_DEV_OPEN_MENU=$${SME_DEV_OPEN_MENU:-} --env SME_DEV_MICROPHONE=$${SME_DEV_MICROPHONE:-}
+	open $(APP) --env SME_DEV_EVERY_SECS=$${SME_DEV_EVERY_SECS:-} --env SME_DEV_OPEN_MENU=$${SME_DEV_OPEN_MENU:-} --env SME_DEV_MICROPHONE=$${SME_DEV_MICROPHONE:-} --env SME_DEV_SUN=$${SME_DEV_SUN:-}
 
 release: project
 	$(XCB) -configuration Release build 2>&1 | tail -5

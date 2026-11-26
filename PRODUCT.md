@@ -25,6 +25,7 @@ A menu-bar agent that enforces breaks gently: the break is a full-screen cover y
 - Runs as a menu-bar-only agent (no Dock icon), started at login.
 - Four surfaces, all created from `WindowManager` at runtime: the menu (an `NSPopover` under the status item with countdown, long-break shortcut, stop protection, settings, quit), the before-break card (a non-activating panel top-right of the primary display: Wait / Start / Skip, auto-starts in 5 s), the break cover (full-screen window on the primary display: countdown, idea card, skip/finish, inline settings and stop protection), and a blank cover on every other display.
 - Short breaks auto-close when the clock ends; long breaks wait for the user. Short and long sound cues play at start and end when sounds are on.
+- The idea card on the cover is drawn as each break starts from the idea sets that fit that moment (`Sources/Core/Ideas`): one set always fits, one only while the sun is up (going outside, looking out the window), one only after sunset (dimming the lights; nothing that needs the window, since the blinds may be down). Whether the sun is up comes from the Mac's time zone (the city it is named after, from the system's time zone table) and the date; the app never asks for the user's location.
 - Settings (cadence, lengths, sounds, language, pausing breaks during calendar events and while a camera or microphone is in use, and their shared pause after a meeting) persist in a JSON file and are clamped by `Settings.validate()`.
 
 ## Capabilities and Constraints
@@ -32,7 +33,8 @@ A menu-bar agent that enforces breaks gently: the break is a full-screen cover y
 - Swift 5 language mode, SwiftUI views hosted in AppKit windows, xcodegen project (`SaveMyEyes/project.yml`), XCTest unit tests (`make test`).
 - macOS 14 is the minimum, the development Mac runs macOS 27.2. The native window materials (Liquid Glass on macOS 26+, NSVisualEffectView materials before) are painted by `Sources/Windows/GlassBacking.swift`; SwiftUI views paint no background.
 - `AppModel` is the one object views talk to; `WindowCoordinating`, `CalendarServicing` and `DeviceDetecting` (`Sources/Core/Contracts.swift`) are the fixed seams between core, windows, the calendar and device detection (a camera or microphone in use).
-- Unit tests in `SaveMyEyes/Tests` must keep passing; they cover settings clamping and persistence, the break rules and scheduler, calendar rules, device detection and the settings form.
+- Break ideas come in sets (`IdeaSet` in `Sources/Core/Ideas`), and each set carries its own rule for when it fits. A new kind of set (the weather, the season, a setting) is one more entry in `IdeaSets.builtIn`; the model, the scheduler and the views do not change.
+- Unit tests in `SaveMyEyes/Tests` must keep passing; they cover settings clamping and persistence, the break rules and scheduler, calendar rules, device detection, the idea sets and sun rules, and the settings form.
 - Terminology: "short break", "long break", "stop protection" (pause for 1–3 h), "turn off protection" (quit for this session), "meeting" (the one word for anything that pauses breaks: a calendar event, or a camera or microphone in use; the UI never says "call").
 
 ## Brand Commitments

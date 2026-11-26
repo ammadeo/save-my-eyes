@@ -114,7 +114,7 @@ struct BreakView: View {
             }, { exitButton })
             Spacer(minLength: 24)
             row(.bottom, {
-                IdeaCard(model: model, isLong: isLong, finished: finished, forceCloseLock: forceCloseLock,
+                IdeaCard(model: model, idea: model.breakIdea, isLong: isLong, finished: finished, forceCloseLock: forceCloseLock,
                          imageHeight: size.width >= 1024 ? 160 : 128)
             }, { settingsTrigger })
         }
@@ -254,7 +254,7 @@ struct BreakView: View {
                         Text(linkedText([("\(model.t(SettingsStrings.createdBy)) ", nil),
                                          (model.t(SettingsStrings.author), SettingsStrings.authorURL)]))
                         Text(linkedText([("\(model.t(SettingsStrings.thanksTo)) ", nil),
-                                         ("Katerina Limpitsouni", SettingsStrings.undrawURL),
+                                         (model.t(SettingsStrings.illustrator), SettingsStrings.undrawURL),
                                          (" \(model.t(SettingsStrings.thanksFor))", nil)]))
                     }
                     .font(.smeFootnote)
