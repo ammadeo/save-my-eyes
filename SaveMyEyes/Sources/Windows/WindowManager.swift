@@ -86,12 +86,15 @@ final class WindowManager: NSObject, WindowCoordinating {
             Log.error("windows", "openBreakCovers: no screen")
             return
         }
+        // The before-break card never takes focus, so this is the app the user was working in.
+        let returnTo = NSWorkspace.shared.frontmostApplication.flatMap { $0 == .current ? nil : $0 }
         let cover = makeCover(on: screen) { BreakView(model: self.model, beacon: $0) }
         cover.onClose = { [weak self, model] in
             guard let self else { return }
             self.breakCover = nil
             self.stopObservingScreens()
             self.disarmEscape()
+            Self.restoreFocus(to: returnTo)
             Log.info("windows", "break cover closed")
             Task { @MainActor in model.breakWindowClosed() }
         }
@@ -111,6 +114,15 @@ final class WindowManager: NSObject, WindowCoordinating {
         blanks.forEach { $0.close() }
         breakCover?.close()
         disarmEscape()
+    }
+
+    /// Hand focus back to the app that had it when the break began, if it is still running.
+    /// Only while this app still holds focus: if focus already moved elsewhere, that wins.
+    private static func restoreFocus(to app: NSRunningApplication?) {
+        guard let app, !app.isTerminated, NSApp.isActive else { return }
+        NSApp.yieldActivation(to: app)
+        app.activate()
+        Log.info("windows", "focus back to \(app.bundleIdentifier ?? "pid \(app.processIdentifier)")")
     }
 
     // MARK: Escape hatch
