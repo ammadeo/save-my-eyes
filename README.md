@@ -2,7 +2,7 @@
 
 A macOS menu-bar app that covers your screen for 20 seconds every 20 minutes, so you take the eye break you'd otherwise skip.
 
-![The break cover over a blurred desktop: "Take a short break for 20 seconds", a countdown at 00:19, a "Skip short break" button and a break idea, "Blink your eyes"](docs/design/05-break-cover.png)
+![The break cover over a blurred desktop: "Take a short break for 20 seconds", a countdown at 00:18, a "Skip short break" button and a break idea, "Look near, then far", with a drawing of a person looking through a spyglass](docs/design/05-break-cover.png)
 
 <img src="docs/design/01-menu.png" width="400" alt="The menu: next short break in 20 seconds, Start a long break now, Stop protection, Settings and Quit Save My Eyes">
 
