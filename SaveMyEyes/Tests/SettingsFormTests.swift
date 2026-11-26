@@ -76,7 +76,7 @@ final class SettingsFormTests: XCTestCase {
         XCTAssertEqual(SettingsFormRules.message(code: .calendarGrace, from: 1000, to: 900, lang: .en, every: 1200),
                        "Changed pause after a meeting from 17 min. to 15 min.")
         XCTAssertEqual(SettingsFormRules.message(code: .calendarGrace, from: 1000, to: 900, lang: .pl, every: 1200),
-                       "Naprawiam wstrzymanie po rozmowie z 17 min. na 15 min.")
+                       "Zmieniono wstrzymanie po spotkaniu z 17 min. na 15 min.")
     }
 
     // MARK: Clamping and snapping
@@ -138,14 +138,14 @@ final class SettingsFormTests: XCTestCase {
         XCTAssertEqual(SettingsFormRules.message(code: .shortEvery, from: 10, to: 60, lang: .en, every: 1200),
                        "Changed time between short breaks from 10 sec. to 60 sec.")
         XCTAssertEqual(SettingsFormRules.message(code: .shortLast, from: 10, to: 60, lang: .pl, every: 1200),
-                       "Naprawiam długość krótkiej przerwy z 10 sek. na 60 sek.")
+                       "Zmieniono długość krótkiej przerwy z 10 sek. na 60 sek.")
     }
 
     func testLongEveryMessageRendersAsMinutes() {
         XCTAssertEqual(SettingsFormRules.message(code: .longEvery, from: 2.5, to: 3, lang: .en, every: 1200),
                        "Changed time between long breaks from 50 min. to 60 min.")
         XCTAssertEqual(SettingsFormRules.message(Fix(code: .longEvery, from: 40, to: 30), lang: .pl, every: 600),
-                       "Naprawiam czas między długimi przerwami z 400 min. na 300 min.")
+                       "Zmieniono czas między długimi przerwami z 400 min. na 300 min.")
     }
 
     // MARK: Form

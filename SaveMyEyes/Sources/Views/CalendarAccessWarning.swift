@@ -7,12 +7,12 @@
 import SwiftUI
 
 private enum T {
-    static let title = L("Breaks aren't paused during calendar events", "Przerwy nie czekają na koniec spotkań")
+    static let title = L("Breaks aren't paused during calendar events", "Przerwy nie są wstrzymywane podczas spotkań w kalendarzu")
     static let detail = L("Save My Eyes can't read your calendar.", "Save My Eyes nie może odczytać kalendarza.")
     static let allow = L("Allow…", "Zezwól…")
     static let openSettings = L("Open Privacy Settings…", "Otwórz ustawienia prywatności…")
     static let turnOff = L("Turn off", "Wyłącz")
-    static let turnOffHint = L("Turns off Pause breaks during calendar events", "Wyłącza Bez przerw w trakcie spotkań")
+    static let turnOffHint = L("Turns off Pause breaks during calendar events", "Wyłącza wstrzymywanie przerw podczas spotkań w kalendarzu")
 }
 
 /// Row content without its own group: the main pane wraps it in a `GlassGroup`, the

@@ -8,10 +8,10 @@ private enum T {
     static let breakNext = L("Next", "Następna")
     static let breakIn = L("in", "za")
     static let breakIsNow = L("is still going", "trwa")
-    static let heldForMeeting = L("Moved to after your meeting", "Przesunięta na czas po rozmowie")
+    static let heldForMeeting = L("Moved to after your meeting", "Przesunięta na czas po spotkaniu")
     static let paused = L("Breaks are paused", "Przerwy wstrzymane")
     static let pausedUntil = L("until {time}", "do {time}")
-    static let startLongBreak = L("Start a long break now", "Zacznij długą przerwę teraz")
+    static let startLongBreak = L("Start a long break now", "Rozpocznij teraz długą przerwę")
     static let stopProtection = L("Stop protection", "Wstrzymaj ochronę")
     static let settings = L("Settings", "Ustawienia")
     static let quit = L("Quit Save My Eyes", "Zakończ Save My Eyes")
@@ -76,7 +76,8 @@ struct MenuMainPane: View {
     private func breakStatus(state: BreakState, isBreakNow: Bool, now: Date) -> some View {
         let name = model.t(state.isLong ? Strings.breakLong : Strings.breakShort)
         let label = isBreakNow ? "\(name) \(model.t(T.breakIsNow))" : "\(model.t(T.breakNext)) \(name) \(model.t(T.breakIn))"
-        let value = state.scheduledAt.map { HumanDuration.between(now, $0, lang: model.lang) } ?? "—"
+        // Polish reads "za 1 minutę": the accusative after "za".
+        let value = state.scheduledAt.map { HumanDuration.accusative(HumanDuration.between(now, $0, lang: model.lang), lang: model.lang) } ?? "—"
         return VStack(alignment: .leading, spacing: 0) {
             Text(label.capitalizedFirst)
                 .foregroundStyle(Theme.labelSecondary)

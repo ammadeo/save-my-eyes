@@ -10,9 +10,9 @@ private enum T {
     // Polish is kept short: both buttons must fit the 360 pt card side by side.
     static let start = L("start this break", "zacznij przerwę")
     static let wait = L("wait", "zaczekaj")
-    static let skip = L("skip this break", "pomiń")
+    static let skip = L("skip this break", "pomiń przerwę")
     static let base = L("will start", "zacznie się")
-    static let statusWaiting = L("when you're ready", "kiedy zechcesz")
+    static let statusWaiting = L("when you're ready", "wtedy, kiedy zechcesz")
     static let statusIn = L("in", "za")
     static let waitingPrefix = L("You've been waiting for", "Czekasz już")
     static let autoStart = L("Time until the break starts", "Czas do rozpoczęcia przerwy")
@@ -55,7 +55,7 @@ struct BeforeBreakView: View {
         let secsLeft = max(1, Int((autoStartSecs - elapsed).rounded(.up)))
         let name = model.t(isLong ? Strings.breakLong : Strings.breakShort)
         let tail = waiting ? model.t(T.statusWaiting)
-            : "\(model.t(T.statusIn)) \(HumanDuration.formatted(seconds: secsLeft, lang: model.lang))"
+            : "\(model.t(T.statusIn)) \(HumanDuration.accusative(HumanDuration.formatted(seconds: secsLeft, lang: model.lang), lang: model.lang))"
         let status = "\(name) \(model.t(T.base)) \(tail)".capitalizedFirst
 
         return HStack(alignment: .top, spacing: 12) {
@@ -108,9 +108,9 @@ struct BeforeBreakView: View {
         let secs = Int(now.timeIntervalSince(waitingFrom))
         guard secs >= 60 else { return nil }
         let info = HumanDuration.formatted(seconds: secs / 60 * 60, lang: model.lang)
-        // "Czekasz już minutę", not "1 minuta".
+        // "Czekasz już minutę", not "1 minuta"; "1 godzinę", not "1 godzina".
         if model.lang == .pl, info.hasPrefix("1 minuta") { return "minutę" }
-        return info
+        return HumanDuration.accusative(info, lang: model.lang)
     }
 
     private func onPrimary() {

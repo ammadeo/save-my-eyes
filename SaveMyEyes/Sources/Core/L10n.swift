@@ -43,17 +43,17 @@ enum Strings {
 
     // Tray menu (also relabelled when the language changes).
     static let trayOpen = L("Open Save My Eyes", "Otwórz Save My Eyes")
-    static let trayLongBreak = L("Start a long break now", "Rozpocznij długą przerwę teraz")
+    static let trayLongBreak = L("Start a long break now", "Rozpocznij teraz długą przerwę")
     static let trayQuit = L("Quit", "Zakończ")
     /// Tooltip and VoiceOver label of the status item while breaks are on hold.
     static let trayPaused = L("Save My Eyes: breaks are paused", "Save My Eyes: przerwy wstrzymane")
 
     /// Startup notification body.
     static func startupMessage(secs: Int, lang: Lang) -> String {
-        let next = HumanDuration.formatted(seconds: secs, lang: lang)
+        let next = HumanDuration.accusative(HumanDuration.formatted(seconds: secs, lang: lang), lang: lang)
         switch lang {
         case .en: return "Your eyes are protected. Next break will start in \(next)."
-        case .pl: return "Dbamy o Twoje oczy. Następna przerwa rozpocznie się za \(next)."
+        case .pl: return "Twoje oczy są pod ochroną. Następna przerwa rozpocznie się za \(next)."
         }
     }
 
