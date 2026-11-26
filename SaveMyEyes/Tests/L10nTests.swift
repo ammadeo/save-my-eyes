@@ -21,8 +21,24 @@ final class L10nTests: XCTestCase {
         XCTAssertEqual(HumanDuration.formatted(seconds: 3 * 3600, lang: .pl), "3 godziny")
     }
 
+    /// After "za" / "przez" Polish needs the accusative; only the singular forms change.
+    func testAccusativePl() {
+        func acc(_ secs: Int, _ lang: Lang = .pl) -> String {
+            HumanDuration.accusative(HumanDuration.formatted(seconds: secs, lang: lang), lang: lang)
+        }
+        XCTAssertEqual(acc(1), "1 sekundę")
+        XCTAssertEqual(acc(60), "1 minutę")
+        XCTAssertEqual(acc(3600), "1 godzinę")
+        XCTAssertEqual(acc(2 * 60), "2 minuty")
+        XCTAssertEqual(acc(5 * 60), "5 minut")
+        XCTAssertEqual(acc(21 * 60), "21 minut")
+        XCTAssertEqual(acc(60, .en), "1 minute")
+    }
+
     func testStartupMessages() {
         XCTAssertEqual(Strings.startupMessage(secs: 1200, lang: .en), "Your eyes are protected. Next break will start in 20 minutes.")
-        XCTAssertEqual(Strings.startupMessage(secs: 1200, lang: .pl), "Dbamy o Twoje oczy. Następna przerwa rozpocznie się za 20 minut.")
+        XCTAssertEqual(Strings.startupMessage(secs: 1200, lang: .pl), "Twoje oczy są pod ochroną. Następna przerwa rozpocznie się za 20 minut.")
+        XCTAssertEqual(Strings.startupMessage(secs: 60, lang: .pl), "Twoje oczy są pod ochroną. Następna przerwa rozpocznie się za 1 minutę.")
+        XCTAssertEqual(Strings.startupMessage(secs: 60, lang: .en), "Your eyes are protected. Next break will start in 1 minute.")
     }
 }

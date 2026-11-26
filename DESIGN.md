@@ -225,11 +225,13 @@ The break cover's clock: display-size light numerals, tabular, a wide sage progr
 
 ## Imagery
 
-The seven unDraw illustrations (`SaveMyEyes/Resources/Images/*.svg`) are recoloured into the system and are the only polychrome objects on the cover. They are plain SVG files loaded as `NSImage`, so their colours are literal:
+The sixteen illustrations (`SaveMyEyes/Resources/Images/*.svg`, one per break idea plus the donation card) are unDraw's, except `shoulders.svg` and `spyglass.svg`, which were drawn for the app in the same flat, faceless style where unDraw had nothing that fit. All are recoloured into the system and are the only polychrome objects on the cover. They are plain SVG files loaded as `NSImage`, so their colours are literal:
 
 - **sage-700** `#4F6E5A` main garments and far trees; **sage-500** `#6B8F77` the main object (balls, leaves, mug, sky); **sage-300** `#A9C4B0` light garments and backdrops.
 - **clay-500** `#B8A58B` and **clay-300** `#D9CBB8` the quiet second hue (tops, birds, sprouts) where unDraw used pink or yellow.
 - **ink** `#2E3A33` and **ink-2** `#45554B` outlines, hair, furniture, instead of unDraw's navy.
+- **mist** `#DBE4DE` pale furniture and backdrops, instead of the lavender grey (`#D6D6E3`, `#CFCCE0`) of unDraw's newer drawings.
+- A new drawing is recoloured by replacing unDraw's literals: `#6C63FF` → sage-500, `#2F2E41` / `#090814` → ink, `#3F3D56` → ink-2, lavender greys → mist.
 - Skin tones and plain greys are unDraw's own; brick texture in `window.svg` is `#8fa394` so it reads softly on both appearances.
 - No blue, purple, pink or yellow may return. Keep each picture at 128–160px tall inside its card.
 

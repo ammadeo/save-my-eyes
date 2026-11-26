@@ -1,74 +1,38 @@
-// Bottom-left of the cover: one random break idea per break type, or after a finished long
-// break the "Save My Eyes is free" donation card. Port of IndexIdea.vue + ContentDonation.vue.
+// Bottom-left of the cover: the break idea the model drew as the break started
+// (`AppModel.breakIdea`, from the idea sets in `Core/Ideas`), or after a finished long break
+// the "Save My Eyes is free" donation card. Port of IndexIdea.vue + ContentDonation.vue.
 
 import SwiftUI
 
 private enum T {
-    static let title = L("Try this break idea", "Zainspiruj się")
-    static let donationAlt = L("Spread love", "Podziel się miłością")
-    static let donationTitle = L("Save My Eyes is free", "Podoba Ci się aplikacja?")
-    static let donationText = L("If these breaks help you, you can support its development", "Rozważ wsparcie rozwoju tego projektu")
-    static let donationLink = L("Buy me a coffee", "Zamów mi kawę")
+    static let title = L("Try this break idea", "Pomysł na przerwę")
+    static let donationAlt = L("Three small creatures around a big heart", "Trzy małe stworki wokół dużego serca")
+    static let donationTitle = L("Save My Eyes is free", "Save My Eyes jest za darmo")
+    static let donationText = L("If these breaks help you, you can support its development", "Jeśli te przerwy Ci pomagają, możesz wesprzeć rozwój aplikacji")
+    static let donationLink = L("Buy me a coffee", "Postaw mi kawę")
     static let donationNote = L("Opens in your browser", "Otworzy się w Twojej przeglądarce")
-}
-
-struct Idea {
-    let title: L
-    let image: String
-    let alt: L
-    let content: L
-
-    static let long: [Idea] = [
-        Idea(title: L("Do some exercises", "Poćwicz chwilę"), image: "workout",
-             alt: L("Woman dancing", "Tańcząca kobieta"),
-             content: L("A few minutes of movement gives your body a rest from sitting",
-                        "Kilka minut ćwiczeń pomoże ci się zrelaksować")),
-        Idea(title: L("Go outside", "Wyjdź na świeże powietrze"), image: "outside",
-             alt: L("Woman walking through a forest", "Kobieta idzie przez las"),
-             content: L("Go out to a park or a forest. Being close to nature will help you relax",
-                        "Pójdź na spacer do parku. Kontakt z naturą pomoże ci się zrelaksować")),
-        Idea(title: L("Relax a bit", "Zrelaksuj się"), image: "mindfulness",
-             alt: L("Woman meditating in front of an ancient temple", "Kobieta medytuje przed świątynią"),
-             content: L("Do whatever relaxes you: drink tea, meditate. Just stay off your phone and computer",
-                        "Zrób to co zwykle, gdy potrzebujesz się odprężyć. Przykładowo wypij herbatę, bądź pomedytuj. Pamiętaj, żeby nie używać do tego komputera, ani telefonu")),
-    ]
-
-    static let short: [Idea] = [
-        Idea(title: L("Look out the window", "Wyjrzyj przez okno"), image: "window",
-             alt: L("Woman looks out the window", "Kobieta spogląda przez okno"),
-             content: L("Focus on something far away to let your eyes relax",
-                        "Patrzenie w dal pomoże Ci uniknąć krótkowzroczności")),
-        Idea(title: L("Look at plants", "Popatrz na rośliny"), image: "plants",
-             alt: L("Man is sitting in front of flowers", "Mężczyzna siedzi przy kwiatach"),
-             content: L("Green plants will help relax your eyes",
-                        "Spojrzenie na rośliny pomoże Ci zrelaksować oczy i odprężyć umysł")),
-        Idea(title: L("Blink your eyes", "Pomrugaj oczami"), image: "blink",
-             alt: L("Man looks at the darkness", "Mężczyzna patrzy w ciemność"),
-             content: L("Blink a few times to clean your eyes", "Mrugnij kilka razy, aby oczyścić oczy")),
-    ]
-
-    static func random(long: Bool) -> Idea { (long ? Idea.long : Idea.short).randomElement()! }
 }
 
 struct IdeaCard: View {
     let model: AppModel
+    /// `nil` when no idea set had one for this break: the card is left out.
+    let idea: Idea?
     let isLong: Bool
     let finished: Bool
     let forceCloseLock: Bool
     let imageHeight: CGFloat
 
-    @State private var idea: Idea
     @State private var appeared = false
     @State private var coffeeOpened = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(model: AppModel, isLong: Bool, finished: Bool, forceCloseLock: Bool, imageHeight: CGFloat) {
+    init(model: AppModel, idea: Idea?, isLong: Bool, finished: Bool, forceCloseLock: Bool, imageHeight: CGFloat) {
         self.model = model
+        self.idea = idea
         self.isLong = isLong
         self.finished = finished
         self.forceCloseLock = forceCloseLock
         self.imageHeight = imageHeight
-        _idea = State(initialValue: Idea.random(long: isLong))
     }
 
     private var showDonation: Bool { isLong && finished }
@@ -79,14 +43,14 @@ struct IdeaCard: View {
                 .font(.smeFootnote)
                 .foregroundStyle(Theme.labelSecondary)
                 .padding(.leading, 16)
-                .opacity(showDonation ? 0 : 1)
+                .opacity(showDonation || idea == nil ? 0 : 1)
                 .animation(.linear(duration: 0.1), value: showDonation)
             ZStack(alignment: .bottomLeading) {
                 if showDonation {
                     RaisedCard { donation }
                         .transition(swapIn)
-                } else {
-                    RaisedCard { ideaContent }
+                } else if let idea {
+                    RaisedCard { ideaContent(idea) }
                         .transition(swapOut)
                 }
             }
@@ -110,7 +74,7 @@ struct IdeaCard: View {
         reduceMotion ? .opacity : .asymmetric(insertion: .opacity, removal: .move(edge: .leading).combined(with: .opacity))
     }
 
-    private var ideaContent: some View {
+    private func ideaContent(_ idea: Idea) -> some View {
         HStack(spacing: 20) {
             IdeaImage(name: idea.image, alt: model.t(idea.alt), height: imageHeight)
             VStack(alignment: .leading, spacing: 4) {

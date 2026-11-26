@@ -6,16 +6,16 @@ import SwiftUI
 
 private enum T {
     static let meetings = L("Meetings", "Spotkania")
-    static let toggle = L("Pause breaks during calendar events", "Bez przerw w trakcie spotkań")
-    static let devices = L("Pause breaks while camera or microphone is on", "Bez przerw w trakcie rozmów")
+    static let toggle = L("Pause breaks during calendar events", "Wstrzymuj przerwy podczas spotkań w kalendarzu")
+    static let devices = L("Pause breaks while camera or microphone is on", "Wstrzymuj przerwy, gdy działa kamera lub mikrofon")
     static let devicesDetail = L(
         "Save My Eyes only knows that an app is using them: it can't see, hear or record anything.",
-        "Za rozmowę uznajemy użycie kamery lub mikrofonu przez dowolną aplikację. Save My Eyes wie tylko, że są włączone: nie może niczego zobaczyć, usłyszeć ani nagrać.")
-    static let grace = L("Resume breaks after a meeting ends", "Wstrzymaj przerwy po zakończeniu rozmowy")
+        "Save My Eyes wie tylko, że używa ich jakaś aplikacja: nie może niczego zobaczyć, usłyszeć ani nagrać.")
+    static let grace = L("Resume breaks after a meeting ends", "Wznów przerwy po zakończeniu spotkania")
     static let graceZero = L("Immediately", "Od razu")
     static let hint = L(
         "Uses events from the Calendar app. All-day, declined and free events don't count. For Google Calendar, add your Google account in System Settings › Internet Accounts.",
-        "Przerwa wypadająca w trakcie wydarzenia z aplikacji Kalendarz poczeka do jego końca. Aby użyć Kalendarza Google, dodaj konto Google w Ustawieniach systemowych › Konta internetowe.")
+        "Korzysta z wydarzeń w aplikacji Kalendarz. Nie liczą się wydarzenia całodniowe, odrzucone i oznaczone jako wolne. Aby korzystać z Kalendarza Google, dodaj konto Google w Ustawieniach systemowych › Konta internetowe.")
 }
 
 struct MenuSettingsPane: View {
@@ -65,7 +65,7 @@ struct MenuSettingsPane: View {
             ("\(model.t(SettingsStrings.createdBy)) ", nil),
             (model.t(SettingsStrings.author), SettingsStrings.authorURL),
             (" · \(model.t(SettingsStrings.thanksTo)) ", nil),
-            ("Katerina Limpitsouni", SettingsStrings.undrawURL),
+            (model.t(SettingsStrings.illustrator), SettingsStrings.undrawURL),
             (" \(model.t(SettingsStrings.thanksFor)) · ", nil),
             (model.t(SettingsStrings.coffee), SettingsStrings.coffeeURL),
         ])

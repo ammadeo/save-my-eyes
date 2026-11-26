@@ -14,7 +14,7 @@ private enum T {
     static let cameraOn = L("Camera is on", "Kamera jest włączona")
     static let microphoneOn = L("Microphone is on", "Mikrofon jest włączony")
     static let cameraAndMicrophoneOn = L("Camera and microphone are on", "Kamera i mikrofon są włączone")
-    static let deviceNext = L("Your next break starts once the camera and microphone are off", "Następna przerwa zaplanowana jest po rozmowie")
+    static let deviceNext = L("Your next break starts once the camera and microphone are off", "Następna przerwa zacznie się po wyłączeniu kamery i mikrofonu")
 }
 
 @MainActor

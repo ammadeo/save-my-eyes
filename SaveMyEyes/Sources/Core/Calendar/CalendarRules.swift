@@ -6,7 +6,7 @@ import Foundation
 
 private enum T {
     static let untitled = L("Busy", "Zajęte")
-    static let next = L("Your next break starts after this event ends", "Następna przerwa zaplanowana jest po spotkaniu")
+    static let next = L("Your next break starts after this event ends", "Następna przerwa zacznie się po tym spotkaniu")
 }
 
 struct Interval: Equatable, Sendable {

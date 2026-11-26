@@ -58,7 +58,7 @@ struct Pause: Equatable, Sendable {
 }
 
 private enum T {
-    static let afterMeeting = L("Pause after a meeting", "Wstrzymanie po rozmowie")
+    static let afterMeeting = L("Pause after a meeting", "Wstrzymanie po spotkaniu")
     static let afterMeetingNext = L("Your next break starts after this pause", "Następna przerwa zacznie się po tym wstrzymaniu")
 }
 

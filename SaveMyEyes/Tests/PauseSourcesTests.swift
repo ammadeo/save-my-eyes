@@ -21,36 +21,6 @@ private final class Flag: @unchecked Sendable {
     var value = false
 }
 
-/// Calendar stub: always free, no EventKit, no timers outliving the test's model.
-@MainActor
-private final class FakeCalendar: CalendarServicing {
-    var enabled = false
-    var graceSecs = 0
-    var onStatusChanged: ((CalendarStatus) -> Void)?
-    var onPauseChanged: (() -> Void)?
-    var status: CalendarStatus { CalendarStatus(enabled: enabled, access: .granted, meeting: nil, syncedAt: nil) }
-    func pause(now: Date) -> Pause? { nil }
-    func refresh() async {}
-    func start() {}
-    func requestAccess() async -> CalendarAccess { .granted }
-    func openPrivacySettings() {}
-}
-
-/// Device detection stub for the model wiring.
-@MainActor
-private final class FakeDevices: DeviceDetecting {
-    var enabled = false { didSet { if !enabled { active = [] } } }
-    var graceSecs = 0
-    var active: Set<Device> = [] { didSet { onPauseChanged?() } }
-    var onStatusChanged: ((DeviceStatus) -> Void)?
-    var onPauseChanged: (() -> Void)?
-    var started = 0
-    var status: DeviceStatus { DeviceStatus(enabled: enabled, active: enabled ? active : []) }
-    func pause(now: Date) -> Pause? { status.inUse ? .holding(until: now.addingTimeInterval(30), label: "devices") : nil }
-    func refresh() async {}
-    func start() { started += 1 }
-}
-
 /// `PauseSources` (every way to pause breaks as one), a hold with no known end in the
 /// scheduler, and the model's wiring: one pause drives the hold, the icon and the menu.
 @MainActor

@@ -4,8 +4,8 @@
 import SwiftUI
 
 private enum T {
-    static let waiting = L("Wait for break to end", "Poczekaj na koniec przerwy")
-    static let finished = L("Break has ended", "Przerwa zakończyła się")
+    static let waiting = L("Wait for the break to end", "Poczekaj na koniec przerwy")
+    static let finished = L("The break has ended", "Przerwa zakończyła się")
     static let finish = L("Finish this break", "Zakończ przerwę")
     static let skip = L("Skip this break", "Pomiń przerwę")
 }

@@ -19,11 +19,16 @@ final class AppModel {
     /// True from the clock reaching zero until the break is over (a cover created late starts
     /// in the finished state).
     private(set) var breakEnded = false
+    /// The idea on the break cover: drawn as each break starts from every idea set that fits
+    /// that moment (`IdeaSets.pick`). `nil` before the first break.
+    private(set) var breakIdea: Idea?
 
     @ObservationIgnored let scheduler: Scheduler
     @ObservationIgnored let calendar: CalendarServicing
     @ObservationIgnored let devices: DeviceDetecting
     @ObservationIgnored let stopProtection: StopProtection
+    /// Every set of break ideas. A new kind of set is one more `IdeaSet` in `IdeaSets.builtIn`.
+    @ObservationIgnored private let ideas: IdeaSets
     /// Everything that can put breaks on hold. A new way to pause breaks is one more
     /// `PauseSource` in this list (see `init`).
     @ObservationIgnored private let pauses: PauseSources
@@ -49,8 +54,9 @@ final class AppModel {
     /// Current-language lookup for the views.
     func t(_ l: L) -> String { settings.lang.pick(l) }
 
-    init(settingsURL: URL = Settings.defaultURL, calendar: CalendarServicing, devices: DeviceDetecting) {
+    init(settingsURL: URL = Settings.defaultURL, calendar: CalendarServicing, devices: DeviceDetecting, ideas: IdeaSets = .builtIn) {
         self.settingsURL = settingsURL
+        self.ideas = ideas
         let loaded = Settings.load(from: settingsURL)
         Log.info("startup", "settings from \(settingsURL.path): \(loaded)")
         self.settings = loaded
@@ -82,7 +88,9 @@ final class AppModel {
         scheduler.onFire = { [unowned self] fired in
             switch fired {
             case .before: self.windows?.openBeforeBreak()
-            case .breakNow: self.windows?.openBreakCovers()
+            case .breakNow:
+                self.breakIdea = self.ideas.pick(long: self.scheduler.snapshot.isLong, now: Date())
+                self.windows?.openBreakCovers()
             }
         }
         scheduler.onCloseBreakWindows = { [unowned self] in self.windows?.closeBreakWindows() }

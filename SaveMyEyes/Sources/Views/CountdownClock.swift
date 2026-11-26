@@ -5,8 +5,8 @@ import SwiftUI
 private enum T {
     static let shortFinished = L("short break ended", "krótka przerwa zakończyła się")
     static let longFinished = L("long break ended", "długa przerwa zakończyła się")
-    static let shortStarted = L("take a short break for", "krótka przerwa przez")
-    static let longStarted = L("take a long break for", "długa przerwa przez")
+    static let shortStarted = L("take a short break for", "zrób sobie krótką przerwę na")
+    static let longStarted = L("take a long break for", "zrób sobie długą przerwę na")
     static let ago = L("ago", "temu")
     static let autoFinish = L("Ends by itself", "Zakończy się sama")
     static let progress = L("Break progress", "Postęp przerwy")
